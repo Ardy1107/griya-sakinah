@@ -86,7 +86,8 @@ export function AuthProvider({ children }) {
         loading,
         signIn,
         signOut,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
+        isSuperadmin
     }
 
     return (

@@ -53,7 +53,7 @@ const AdminDashboard = () => {
             description: 'Kelola tagihan internet warga',
             icon: Wifi,
             color: 'blue',
-            link: '/internet',
+            link: '/internet/admin',
             stats: { label: 'Pelanggan Aktif', value: '120+' }
         },
         {

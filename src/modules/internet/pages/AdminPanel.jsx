@@ -33,7 +33,7 @@ const TABS = [
 ]
 
 export default function AdminPanel() {
-    const { user, loading, signOut, isAuthenticated } = useAuth()
+    const { user, loading, signOut, isAuthenticated, isSuperadmin } = useAuth()
     const [activeTab, setActiveTab] = useState('transparansi')
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [selectedPeriod, setSelectedPeriod] = useState(() => {
@@ -395,14 +395,16 @@ export default function AdminPanel() {
                         <span style={{ color: 'var(--text-primary)' }}>{user?.email}</span>
                     </div>
 
-                    <Link
-                        to="/admin/dashboard"
-                        className="btn btn-primary"
-                        style={{ width: '100%', marginBottom: 'var(--space-sm)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                    >
-                        <Home size={16} />
-                        Admin Portal
-                    </Link>
+                    {isSuperadmin && (
+                        <Link
+                            to="/admin/dashboard"
+                            className="btn btn-primary"
+                            style={{ width: '100%', marginBottom: 'var(--space-sm)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                            <Home size={16} />
+                            Admin Portal
+                        </Link>
+                    )}
 
                     <button
                         className="btn btn-secondary"

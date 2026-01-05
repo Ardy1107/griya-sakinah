@@ -37,6 +37,7 @@ const PeduliAdmin = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [authError, setAuthError] = useState('');
+    const [isSuperadmin, setIsSuperadmin] = useState(false);
 
     // UI State
     const [showAddModal, setShowAddModal] = useState(false);
@@ -56,6 +57,22 @@ const PeduliAdmin = () => {
     });
 
     useEffect(() => {
+        // Check SSO from SuperAdmin Portal first
+        try {
+            const ssoSession = localStorage.getItem('superadmin_session');
+            if (ssoSession) {
+                const parsed = JSON.parse(ssoSession);
+                if (parsed.expiry > Date.now() && parsed.user) {
+                    setIsAuthenticated(true);
+                    setIsSuperadmin(true);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Invalid SSO session
+        }
+
+        // Fallback to module auth
         const auth = sessionStorage.getItem('peduli_admin_auth');
         if (auth === 'true') setIsAuthenticated(true);
     }, []);
@@ -191,7 +208,23 @@ const PeduliAdmin = () => {
                         <p>Griya Sakinah Peduli</p>
                     </div>
                 </div>
-                <div className="header-actions">
+                <div className="header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {isSuperadmin && (
+                        <Link to="/admin/dashboard" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '8px 16px',
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            borderRadius: '8px',
+                            color: 'white',
+                            textDecoration: 'none',
+                            fontSize: '13px',
+                            fontWeight: 600
+                        }}>
+                            🏠 Admin Portal
+                        </Link>
+                    )}
                     <button className="add-btn" onClick={() => setShowAddModal(true)}>
                         <Plus size={18} />
                         Buat Kasus

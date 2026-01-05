@@ -177,6 +177,43 @@ export default function LoginPage() {
                         ← Kembali ke Dashboard Publik
                     </a>
                 </div>
+
+                {/* SuperAdmin Quick Access */}
+                <div style={{
+                    marginTop: '20px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                    <p style={{
+                        color: 'var(--text-muted)',
+                        fontSize: '12px',
+                        textAlign: 'center',
+                        marginBottom: '12px'
+                    }}>
+                        Atau masuk via Admin Portal
+                    </p>
+                    <a
+                        href="/admin"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            width: '100%',
+                            padding: '12px 16px',
+                            background: 'linear-gradient(135deg, #8B5CF6, #6366F1)',
+                            color: 'white',
+                            borderRadius: '12px',
+                            textDecoration: 'none',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            boxShadow: '0 4px 16px rgba(139, 92, 246, 0.3)',
+                            transition: 'transform 0.2s'
+                        }}
+                    >
+                        🔐 Login sebagai SuperAdmin
+                    </a>
+                </div>
             </div>
         </div>
     );

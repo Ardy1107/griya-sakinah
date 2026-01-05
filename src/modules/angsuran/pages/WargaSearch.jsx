@@ -41,7 +41,8 @@ export default function WargaSearch() {
     const [isSecretLoading, setIsSecretLoading] = useState(false);
 
     // Long press handler for hidden admin access - auto login as developer
-    const handleLogoMouseDown = () => {
+    const handleLogoMouseDown = (e) => {
+        e.preventDefault(); // Prevent any default behavior
         longPressTimer.current = setTimeout(() => {
             setIsSecretLoading(true);
             // Clear welcome shown flag so popup shows
@@ -56,16 +57,16 @@ export default function WargaSearch() {
             };
             sessionStorage.setItem('angsuran_user', JSON.stringify(deviSession));
             localStorage.setItem('angsuran_user', JSON.stringify(deviSession));
-            // Navigate to dashboard after short delay
-            setTimeout(() => {
-                navigate('/angsuran/admin/dashboard');
-            }, 300);
+            // Use full page reload to ensure AuthContext reads the new session
+            window.location.href = '/angsuran/admin/dashboard';
         }, 3000); // 3 seconds
     };
 
-    const handleLogoMouseUp = () => {
+    const handleLogoMouseUp = (e) => {
+        e.preventDefault();
         if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
         }
     };
 

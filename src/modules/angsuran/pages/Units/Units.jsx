@@ -36,7 +36,8 @@ const Units = () => {
         phone: '',
         dueDay: 10,
         hasAddon: false,
-        totalAddonCost: 0
+        totalAddonCost: 0,
+        status: 'aktif'
     });
 
     const loadUnits = () => {
@@ -66,7 +67,8 @@ const Units = () => {
                 phone: unit.phone,
                 dueDay: unit.dueDay,
                 hasAddon: unit.hasAddon,
-                totalAddonCost: unit.totalAddonCost
+                totalAddonCost: unit.totalAddonCost,
+                status: unit.status || 'aktif'
             });
         } else {
             setEditingUnit(null);
@@ -76,7 +78,8 @@ const Units = () => {
                 phone: '',
                 dueDay: 10,
                 hasAddon: false,
-                totalAddonCost: 0
+                totalAddonCost: 0,
+                status: 'aktif'
             });
         }
         setShowModal(true);
@@ -294,6 +297,19 @@ const Units = () => {
                                     />
                                 </div>
                             )}
+
+                            <div className="form-group">
+                                <label>Status Unit</label>
+                                <select
+                                    value={formData.status}
+                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                    className="form-select"
+                                >
+                                    <option value="aktif">🟢 Aktif (Masih Mencicil)</option>
+                                    <option value="pending_lunas">🔵 Pending Lunas (Menunggu Dokumen)</option>
+                                    <option value="lunas">🟡 Lunas Total</option>
+                                </select>
+                            </div>
 
                             <div className="modal-actions">
                                 <button type="button" className="secondary-button" onClick={handleCloseModal}>

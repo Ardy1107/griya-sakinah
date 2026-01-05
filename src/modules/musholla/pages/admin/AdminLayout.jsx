@@ -53,7 +53,28 @@ export default function AdminLayout() {
     }, []);
 
     async function checkAuth() {
-        // 1. Check Global Admin Portal Session
+        // 1. Check SSO Session (superadmin_session from Admin Portal)
+        try {
+            const ssoSession = localStorage.getItem('superadmin_session');
+            if (ssoSession) {
+                const parsed = JSON.parse(ssoSession);
+                if (parsed.expiry > Date.now() && parsed.user) {
+                    setUser({
+                        id: parsed.user.id,
+                        email: parsed.user.email,
+                        name: parsed.user.name,
+                        role: 'super_admin',
+                        isSuperadminSSO: true
+                    });
+                    setLoading(false);
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error('Invalid SSO session', e);
+        }
+
+        // 2. Check Global Admin Portal Session
         const adminSession = localStorage.getItem('griya_admin_session');
         if (adminSession) {
             try {
@@ -330,25 +351,27 @@ export default function AdminLayout() {
                         padding: '16px 12px',
                         borderTop: `1px solid ${colors.cardBorder}`
                     }}>
-                        <Link
-                            to="/admin/dashboard"
-                            className="flex items-center gap-md"
-                            style={{
-                                padding: '12px 16px',
-                                borderRadius: '12px',
-                                textDecoration: 'none',
-                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1))',
-                                border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.4)'}`,
-                                marginBottom: '8px',
-                                color: colors.blueText,
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            <LayoutDashboard size={18} />
-                            <span>Admin Portal</span>
-                        </Link>
+                        {user?.role === 'super_admin' && (
+                            <Link
+                                to="/admin/dashboard"
+                                className="flex items-center gap-md"
+                                style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    textDecoration: 'none',
+                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1))',
+                                    border: `1px solid ${darkMode ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.4)'}`,
+                                    marginBottom: '8px',
+                                    color: colors.blueText,
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <LayoutDashboard size={18} />
+                                <span>Admin Portal</span>
+                            </Link>
+                        )}
 
                         <Link
                             to="/musholla"

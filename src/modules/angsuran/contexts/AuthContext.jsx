@@ -11,6 +11,28 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // SSO: First check for superadmin session from Admin Portal
+        try {
+            const ssoSession = localStorage.getItem('superadmin_session');
+            if (ssoSession) {
+                const parsed = JSON.parse(ssoSession);
+                if (parsed.expiry > Date.now() && parsed.user) {
+                    setUser({
+                        id: parsed.user.id,
+                        username: 'superadmin',
+                        name: parsed.user.name,
+                        role: 'superadmin',
+                        moduleAccess: ['angsuran', 'internet', 'musholla', 'komunitas'],
+                        isSuperadminSSO: true
+                    });
+                    setLoading(false);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Invalid SSO session, continue to normal auth check
+        }
+
         // Check for existing session (from portal_user or direct angsuran_user)
         const portalUser = sessionStorage.getItem('portal_user');
         const angsuranUser = sessionStorage.getItem('angsuran_user') || localStorage.getItem('angsuran_user');

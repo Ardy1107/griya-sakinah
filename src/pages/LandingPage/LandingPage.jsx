@@ -29,11 +29,25 @@ const LandingPage = () => {
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Secret access - long press on logo
-    // 3 seconds = auto-login as devi (developer)
-    // 5 seconds = go to superadmin login
+    // 3 seconds = go to superadmin login PAGE (requires password!)
+    // 5 seconds = auto-login as devi (developer - angsuran only)
     const pressTimer = useRef(null);
     const [pressProgress, setPressProgress] = useState(0);
     const secretLoginTriggered = useRef(false);
+
+    // Clear ALL sessions when landing page loads - SECURITY!
+    useEffect(() => {
+        // Clear all module sessions when user visits landing page
+        // This ensures fresh login is always required
+        sessionStorage.removeItem('angsuran_user');
+        localStorage.removeItem('angsuran_user');
+        sessionStorage.removeItem('superadmin_session');
+        localStorage.removeItem('superadmin_session');
+        sessionStorage.removeItem('welcomeShownThisLogin');
+        // Clear SuperAdmin portal session too!
+        localStorage.removeItem('griya_admin_session');
+        sessionStorage.removeItem('griya_admin_session');
+    }, []);
 
     const handleLogoMouseDown = () => {
         let progress = 0;
@@ -42,30 +56,20 @@ const LandingPage = () => {
             progress += 2; // 2% every 100ms
             setPressProgress(progress);
 
-            // At 60% (3 seconds) = auto-login as devi developer
-            if (progress >= 60 && !secretLoginTriggered.current) {
+            // At 100% (5 seconds) = go to SuperAdmin LOGIN page (requires password!)
+            if (progress >= 100 && !secretLoginTriggered.current) {
                 secretLoginTriggered.current = true;
                 clearInterval(pressTimer.current);
                 setPressProgress(0);
 
-                // Set developer session and go to dashboard
-                const deviSession = {
-                    id: 'dev-devi',
-                    username: 'devi',
-                    name: 'Developer Devi',
-                    role: 'developer',
-                    moduleAccess: ['angsuran']
-                };
-                sessionStorage.setItem('angsuran_user', JSON.stringify(deviSession));
-                localStorage.setItem('angsuran_user', JSON.stringify(deviSession));
-                navigate('/angsuran/admin/dashboard');
-            }
+                // Clear all sessions before going to admin login
+                sessionStorage.removeItem('superadmin_session');
+                localStorage.removeItem('superadmin_session');
+                localStorage.removeItem('griya_admin_session');
+                sessionStorage.removeItem('griya_admin_session');
 
-            // At 100% (5 seconds) = superadmin login
-            if (progress >= 100) {
-                clearInterval(pressTimer.current);
-                setPressProgress(0);
-                navigate('/superadmin/login');
+                // Navigate to SuperAdmin LOGIN page - REQUIRES PASSWORD!
+                navigate('/admin');
             }
         }, 100);
     };

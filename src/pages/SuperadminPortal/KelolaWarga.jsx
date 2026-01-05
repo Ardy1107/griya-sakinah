@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useSuperadmin } from '../../contexts/SuperadminContext';
 import { supabase } from '../../modules/angsuran/lib/supabase';
+import { createFuzzySearch } from '../../lib/smartSearch';
 import './SuperadminPortal.css';
 
 export default function KelolaWarga() {
@@ -135,10 +136,8 @@ export default function KelolaWarga() {
         setShowModal(true);
     };
 
-    const filteredWarga = wargaList.filter(w =>
-        w.blok.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        w.nama.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter with fuzzy search
+    const filteredWarga = createFuzzySearch(wargaList, ['blok', 'nama', 'phone'], searchQuery);
 
     if (authLoading || loading) {
         return (

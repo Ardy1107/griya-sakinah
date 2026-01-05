@@ -141,11 +141,26 @@ const setSession = (user) => {
         password: undefined // Don't store password in session
     };
     localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, JSON.stringify(sessionData));
+
+    // SSO: If SuperAdmin, also set superadmin_session for other modules
+    if (user.role === ROLES.SUPER_ADMIN) {
+        const ssoSession = {
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: 'superadmin'
+            },
+            expiry: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+        };
+        localStorage.setItem('superadmin_session', JSON.stringify(ssoSession));
+    }
 };
 
 // Clear session
 const clearSession = () => {
     localStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+    localStorage.removeItem('superadmin_session'); // Also clear SSO session
 };
 
 export const useAdminAuth = () => {

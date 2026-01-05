@@ -17,7 +17,8 @@ import {
     Wallet,
     Sun,
     Moon,
-    Info
+    Info,
+    Map
 } from 'lucide-react';
 import './Layout.css';
 
@@ -97,6 +98,13 @@ const Layout = () => {
             icon: Activity,
             label: 'Monitoring',
             tooltip: 'Pantau status pembayaran setiap unit rumah',
+            roles: ['admin', 'developer', 'superadmin']
+        },
+        {
+            path: '/angsuran/admin/map',
+            icon: Map,
+            label: 'Peta Blok',
+            tooltip: 'Visualisasi status pembayaran per blok rumah',
             roles: ['admin', 'developer', 'superadmin']
         },
         {

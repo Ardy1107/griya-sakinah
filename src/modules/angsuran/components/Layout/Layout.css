@@ -207,6 +207,9 @@
 .sidebar-footer {
     padding: 16px 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* Portal Back Button - Premium Style */
@@ -256,7 +259,6 @@
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
-    margin-bottom: 8px;
     transition: all 0.2s ease;
 }
 

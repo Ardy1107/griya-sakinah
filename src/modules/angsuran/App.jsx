@@ -13,6 +13,7 @@ import Settings from './pages/Settings/Settings';
 import PaymentMonitoring from './pages/PaymentMonitoring/PaymentMonitoring';
 import TransactionHistory from './pages/TransactionHistory/TransactionHistory';
 import WargaSearch from './pages/WargaSearch';
+import HousingMap from './pages/HousingMap/HousingMap';
 import './angsuran.css';
 
 // Protected Route Component - Only for admin access
@@ -154,6 +155,15 @@ function AngsuranRoutes() {
                         element={
                             <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
                                 <PaymentMonitoring />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="map"
+                        element={
+                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                <HousingMap />
                             </ProtectedRoute>
                         }
                     />

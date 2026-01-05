@@ -24,6 +24,7 @@ import {
     AlertCircle,
     Save
 } from 'lucide-react';
+import { createFuzzySearch } from '../../lib/smartSearch';
 import './DirektoriWarga.css';
 
 const ADMIN_PASSWORD = 'direktori2026';
@@ -150,13 +151,11 @@ const DirektoriWarga = () => {
     // Get unique bloks
     const bloks = [...new Set(residents.map(r => r.blok.split('-')[0]))].sort();
 
-    // Filter residents
-    const filteredResidents = residents.filter(r => {
-        const matchSearch = r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.blok.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.phone.includes(searchTerm);
+    // Filter residents with fuzzy search
+    const fuzzyResults = createFuzzySearch(residents, ['name', 'blok', 'phone'], searchTerm);
+    const filteredResidents = fuzzyResults.filter(r => {
         const matchBlok = filterBlok === 'all' || r.blok.startsWith(filterBlok);
-        return matchSearch && matchBlok;
+        return matchBlok;
     });
 
     // Group by blok

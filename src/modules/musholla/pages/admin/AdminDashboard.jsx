@@ -8,13 +8,15 @@ import {
     Plus,
     ArrowRight,
     Heart,
-    Banknote
+    Banknote,
+    BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from '../../components/ui';
 import { PremiumButton } from '../../components/PremiumComponents';
 import { formatRupiah, formatDate } from '../../lib/utils';
 import { getDashboardStats, getDonations, getConstructionCosts } from '../../lib/supabase';
+import InteractiveCharts from '../../components/InteractiveCharts';
 
 export default function AdminDashboard() {
     const context = useOutletContext() || {};
@@ -43,11 +45,46 @@ export default function AdminDashboard() {
     });
     const [recentDonations, setRecentDonations] = useState([]);
     const [recentExpenses, setRecentExpenses] = useState([]);
+    const [monthlyChartData, setMonthlyChartData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadData();
     }, []);
+
+    // Process monthly data for charts
+    function processMonthlyData(donations, expenses) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        const currentYear = new Date().getFullYear();
+
+        // Initialize monthly totals
+        const monthlyTotals = months.map((bulan, idx) => ({
+            bulan,
+            month: idx + 1,
+            donasi: 0,
+            pengeluaran: 0
+        }));
+
+        // Aggregate donations by month
+        donations.forEach(d => {
+            const date = new Date(d.tanggal_bayar);
+            if (date.getFullYear() === currentYear) {
+                const monthIdx = date.getMonth();
+                monthlyTotals[monthIdx].donasi += d.nominal || 0;
+            }
+        });
+
+        // Aggregate expenses by month
+        expenses.forEach(e => {
+            const date = new Date(e.tanggal);
+            if (date.getFullYear() === currentYear) {
+                const monthIdx = date.getMonth();
+                monthlyTotals[monthIdx].pengeluaran += e.nominal || 0;
+            }
+        });
+
+        return monthlyTotals;
+    }
 
     async function loadData() {
         try {
@@ -60,6 +97,13 @@ export default function AdminDashboard() {
             setStats(statsData);
             setRecentDonations((donationsData.data || []).slice(0, 5));
             setRecentExpenses((expensesData.data || []).slice(0, 5));
+
+            // Process monthly data for charts
+            const chartData = processMonthlyData(
+                donationsData.data || [],
+                expensesData.data || []
+            );
+            setMonthlyChartData(chartData);
         } catch (error) {
             console.error('Error loading dashboard:', error);
         } finally {
@@ -282,6 +326,25 @@ export default function AdminDashboard() {
                         <ArrowRight size={20} style={{ color: colors.textMuted }} />
                     </div>
                 </Link>
+            </div>
+
+            {/* Interactive Charts Section */}
+            <div style={{ marginBottom: '32px' }}>
+                <div className="flex items-center gap-sm" style={{ marginBottom: '20px' }}>
+                    <BarChart3 size={24} color={colors.blueText} />
+                    <h2 style={{
+                        fontSize: '1.25rem',
+                        fontWeight: 700,
+                        color: colors.text
+                    }}>
+                        📊 Statistik Visual
+                    </h2>
+                </div>
+                <InteractiveCharts
+                    monthlyData={monthlyChartData}
+                    darkMode={darkMode}
+                    onDrillDown={(month) => console.log('Drill down:', month)}
+                />
             </div>
 
             {/* Recent Activity Grid */}

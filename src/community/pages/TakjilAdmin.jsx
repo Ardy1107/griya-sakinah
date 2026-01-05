@@ -37,6 +37,7 @@ const TakjilAdmin = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [authError, setAuthError] = useState('');
+    const [isSuperadmin, setIsSuperadmin] = useState(false);
 
     // UI State
     const [selectedDate, setSelectedDate] = useState(null);
@@ -45,6 +46,22 @@ const TakjilAdmin = () => {
     const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1)); // March 2026 (Ramadan)
 
     useEffect(() => {
+        // Check SSO from SuperAdmin Portal first
+        try {
+            const ssoSession = localStorage.getItem('superadmin_session');
+            if (ssoSession) {
+                const parsed = JSON.parse(ssoSession);
+                if (parsed.expiry > Date.now() && parsed.user) {
+                    setIsAuthenticated(true);
+                    setIsSuperadmin(true);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Invalid SSO session
+        }
+
+        // Fallback to module auth
         const auth = sessionStorage.getItem('takjil_admin_auth');
         if (auth === 'true') setIsAuthenticated(true);
     }, []);
@@ -222,9 +239,27 @@ const TakjilAdmin = () => {
                         <p>Jadwal Donatur Ramadhan {currentMonth.getFullYear()}</p>
                     </div>
                 </div>
-                <button className="logout-btn" onClick={handleLogout}>
-                    Logout
-                </button>
+                <div className="header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {isSuperadmin && (
+                        <Link to="/admin/dashboard" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '8px 16px',
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            borderRadius: '8px',
+                            color: 'white',
+                            textDecoration: 'none',
+                            fontSize: '13px',
+                            fontWeight: 600
+                        }}>
+                            🏠 Admin Portal
+                        </Link>
+                    )}
+                    <button className="logout-btn" onClick={handleLogout}>
+                        Logout
+                    </button>
+                </div>
             </header>
 
             {/* Stats */}
