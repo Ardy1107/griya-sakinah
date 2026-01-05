@@ -1,0 +1,550 @@
+/**
+ * Takjil Admin Styles
+ */
+
+.takjil-login {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1e293b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 48px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    color: white;
+}
+
+.login-card h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #f9fafb;
+    margin: 0 0 8px;
+}
+
+.login-card>p {
+    color: #9ca3af;
+    margin: 0 0 32px;
+    font-size: 14px;
+}
+
+.password-input {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.password-input input {
+    width: 100%;
+    padding: 16px 50px 16px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #f9fafb;
+    font-size: 16px;
+    outline: none;
+}
+
+.password-input input:focus {
+    border-color: #F59E0B;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.auth-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+    color: #6b7280;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+/* Admin Dashboard */
+.takjil-admin {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0f1a 0%, #111827 100%);
+    padding: 20px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.admin-header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #f9fafb;
+    margin: 0;
+}
+
+.admin-header p {
+    color: #9ca3af;
+    margin: 4px 0 0;
+    font-size: 14px;
+}
+
+.logout-btn {
+    padding: 10px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Stats */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-card.emerald {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.stat-card.emerald svg {
+    color: #10B981;
+}
+
+.stat-card.gold {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.stat-card.gold svg {
+    color: #F59E0B;
+}
+
+.stat-card .value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #f9fafb;
+}
+
+.stat-card .label {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* Calendar Navigation */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.calendar-nav button {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-nav h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin: 0;
+    min-width: 180px;
+    text-align: center;
+}
+
+/* Calendar */
+.calendar-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.day-header {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 8px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-cell {
+    min-height: 80px;
+    padding: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-cell.empty {
+    background: transparent;
+    cursor: default;
+}
+
+.calendar-cell.available {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.calendar-cell.available:hover {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.calendar-cell.confirmed {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.date-number {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin-bottom: 4px;
+}
+
+.donatur-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.donatur-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #10B981;
+}
+
+.donatur-menu {
+    font-size: 10px;
+    color: #9ca3af;
+}
+
+.available-label {
+    font-size: 10px;
+    color: #6b7280;
+}
+
+/* Schedule List */
+.schedule-list {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.schedule-list h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin: 0 0 16px;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.schedule-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #9ca3af;
+    min-width: 100px;
+}
+
+.schedule-info {
+    flex: 1;
+}
+
+.schedule-donatur {
+    display: block;
+    font-weight: 600;
+    color: #f9fafb;
+    font-size: 14px;
+}
+
+.schedule-menu {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn.edit {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3B82F6;
+}
+
+.action-btn.delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.modal {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #f9fafb;
+}
+
+.close-btn {
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+    font-weight: 600;
+}
+
+.modal-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #f9fafb;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #F59E0B;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.cancel-btn {
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #9ca3af;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .calendar-cell {
+        min-height: 60px;
+        padding: 6px;
+    }
+
+    .date-number {
+        font-size: 12px;
+    }
+
+    .donatur-name,
+    .donatur-menu,
+    .available-label {
+        font-size: 9px;
+    }
+}

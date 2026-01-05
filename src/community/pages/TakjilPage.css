@@ -1,0 +1,268 @@
+/**
+ * Takjil Page Styles
+ */
+
+.takjil-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0f1a 0%, #111827 100%);
+    padding: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.page-header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #f9fafb;
+    margin: 0;
+}
+
+.page-header p {
+    color: #9ca3af;
+    margin: 4px 0 0;
+    font-size: 14px;
+}
+
+/* Stats */
+.takjil-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.stat-card svg {
+    color: #F59E0B;
+}
+
+.stat-card.available {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.stat-card.available svg {
+    color: #10B981;
+}
+
+.stat-card .value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #f9fafb;
+}
+
+.stat-card .label {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* Calendar */
+.calendar-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.calendar-nav button {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-nav h3 {
+    font-size: 16px;
+    color: #f9fafb;
+    margin: 0;
+    min-width: 180px;
+    text-align: center;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.day-name {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 8px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.day-cell {
+    min-height: 70px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.day-cell.empty {
+    background: transparent;
+}
+
+.day-cell.filled {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.day-cell.available {
+    border: 1px dashed rgba(16, 185, 129, 0.3);
+}
+
+.date-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin-bottom: 4px;
+}
+
+.donor-info {
+    flex: 1;
+}
+
+.donor-name {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #F59E0B;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.donor-menu {
+    display: block;
+    font-size: 9px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.slot-available {
+    font-size: 9px;
+    color: #10B981;
+}
+
+/* Legend */
+.legend {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.dot.filled {
+    background: rgba(245, 158, 11, 0.3);
+    border: 1px solid #F59E0B;
+}
+
+.dot.available {
+    border: 1px dashed #10B981;
+}
+
+/* CTA */
+.cta-section {
+    text-align: center;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+}
+
+.cta-section p {
+    color: #f9fafb;
+    margin: 0 0 8px;
+}
+
+.cta-section .contact {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .day-cell {
+        min-height: 50px;
+        padding: 4px;
+    }
+
+    .donor-name,
+    .donor-menu,
+    .slot-available {
+        font-size: 8px;
+    }
+}

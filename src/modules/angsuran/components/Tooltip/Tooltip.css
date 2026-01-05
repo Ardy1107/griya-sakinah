@@ -1,0 +1,116 @@
+.tooltip-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.95);
+    color: #f1f5f9;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: tooltipFadeIn 0.15s ease;
+    pointer-events: none;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+}
+
+/* Top position (default) */
+.tooltip-top {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip-top .tooltip-arrow {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: rgba(15, 23, 42, 0.95);
+}
+
+/* Bottom position */
+.tooltip-bottom {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip-bottom .tooltip-arrow {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: rgba(15, 23, 42, 0.95);
+}
+
+/* Right position */
+.tooltip-right {
+    top: 50%;
+    left: calc(100% + 8px);
+    transform: translateY(-50%);
+}
+
+.tooltip-right .tooltip-arrow {
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-right-color: rgba(15, 23, 42, 0.95);
+}
+
+/* Left position */
+.tooltip-left {
+    top: 50%;
+    right: calc(100% + 8px);
+    transform: translateY(-50%);
+}
+
+.tooltip-left .tooltip-arrow {
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left-color: rgba(15, 23, 42, 0.95);
+}
+
+/* Light mode */
+[data-theme="light"] .tooltip {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+[data-theme="light"] .tooltip-top .tooltip-arrow {
+    border-top-color: #0f172a;
+}
+
+[data-theme="light"] .tooltip-bottom .tooltip-arrow {
+    border-bottom-color: #0f172a;
+}
+
+[data-theme="light"] .tooltip-right .tooltip-arrow {
+    border-right-color: #0f172a;
+}
+
+[data-theme="light"] .tooltip-left .tooltip-arrow {
+    border-left-color: #0f172a;
+}

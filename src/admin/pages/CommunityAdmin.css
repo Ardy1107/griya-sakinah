@@ -1,0 +1,628 @@
+/**
+ * Community Admin Panel Styles
+ * For use within Superadmin dashboard
+ */
+
+.community-admin {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Panel Tabs */
+.panel-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.panel-tab:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #f9fafb;
+}
+
+.panel-tab.active {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--tab-color, #10B981);
+    border-bottom-color: var(--tab-color, #10B981);
+}
+
+.panel-tab svg {
+    opacity: 0.7;
+}
+
+.panel-tab.active svg {
+    opacity: 1;
+}
+
+/* Panel Content */
+.panel-content {
+    padding: 20px;
+    min-height: 400px;
+}
+
+/* Common Panel Styles */
+.panel-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.stat.emerald {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.stat.emerald svg {
+    color: #10B981;
+}
+
+.stat.blue {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.stat.blue svg {
+    color: #3B82F6;
+}
+
+.stat.gold {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.stat.gold svg {
+    color: #F59E0B;
+}
+
+.stat .value {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    color: #f9fafb;
+}
+
+.stat .label {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Section Header */
+.section-header,
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h3,
+.panel-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin: 0;
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Members List */
+.members-list,
+.residents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.member-item,
+.resident-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.member-item.won {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.member-info,
+.resident-info {
+    flex: 1;
+}
+
+.member-info .name,
+.resident-info .name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.member-info .blok,
+.resident-info .details {
+    font-size: 12px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.won-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+    font-size: 10px;
+    color: #F59E0B;
+    font-weight: 600;
+}
+
+.member-actions,
+.resident-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.member-actions button,
+.resident-actions button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-actions button:hover,
+.resident-actions button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f9fafb;
+}
+
+.resident-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 14px;
+}
+
+.resident-info .role {
+    padding: 2px 6px;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+    font-size: 9px;
+    color: #F59E0B;
+    margin-left: 6px;
+}
+
+/* Arisan Content */
+.arisan-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .arisan-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.spin-section {
+    text-align: center;
+}
+
+.spin-section h3 {
+    font-size: 14px;
+    color: #f9fafb;
+    margin: 0 0 16px;
+}
+
+.mini-wheel {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    margin: 0 auto 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.wheel-name {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0 0;
+    font-size: 9px;
+    color: #f9fafb;
+    white-space: nowrap;
+    padding-left: 30px;
+}
+
+.spin-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-spin {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-spin:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-spin .spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn-reset {
+    padding: 10px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.winner-box {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #F59E0B;
+}
+
+/* Calendar */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.calendar-nav button {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: 8px;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-nav h3 {
+    font-size: 14px;
+    color: #f9fafb;
+    margin: 0;
+    min-width: 150px;
+    text-align: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.day-header {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 8px;
+}
+
+.day-cell {
+    min-height: 50px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.day-cell.empty {
+    background: transparent;
+    cursor: default;
+}
+
+.day-cell.filled {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.date-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.donatur-name {
+    display: block;
+    font-size: 9px;
+    color: #10B981;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Cases */
+.cases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.case-card {
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+}
+
+.case-info h4 {
+    font-size: 14px;
+    color: #f9fafb;
+    margin: 0 0 4px;
+}
+
+.case-info span {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.case-progress {
+    margin: 12px 0;
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #EC4899, #DB2777);
+    border-radius: 3px;
+}
+
+.case-progress>span {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.case-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.case-actions button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.case-actions button:first-child {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+
+.case-actions button:last-child {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+}
+
+/* Search Box */
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    flex: 1;
+    max-width: 250px;
+}
+
+.search-box svg {
+    color: #6b7280;
+}
+
+.search-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #f9fafb;
+    font-size: 13px;
+    outline: none;
+}
+
+/* Modal */
+.panel-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-box {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.modal-box h4 {
+    font-size: 16px;
+    color: #f9fafb;
+    margin: 0 0 16px;
+}
+
+.modal-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-box input,
+.modal-box select,
+.modal-box textarea {
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #f9fafb;
+    font-size: 13px;
+    outline: none;
+}
+
+.modal-box textarea {
+    min-height: 60px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #d1d5db;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: 16px;
+    height: 16px;
+    accent-color: #EC4899;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+.modal-buttons button:last-child {
+    background: linear-gradient(135deg, #10B981, #059669);
+    border: none;
+    color: white;
+}

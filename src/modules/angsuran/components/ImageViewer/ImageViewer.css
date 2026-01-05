@@ -1,0 +1,154 @@
+/* ImageViewer Modal Styles */
+.image-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-viewer-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.image-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-viewer-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.image-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.image-viewer-actions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.image-viewer-actions button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.image-viewer-actions .close-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.image-viewer-actions .close-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+}
+
+.zoom-level {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 48px;
+    text-align: center;
+}
+
+.image-viewer-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 1rem;
+}
+
+.viewer-image {
+    max-width: 100%;
+    max-height: calc(100vh - 100px);
+    object-fit: contain;
+    border-radius: 0.5rem;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease;
+}
+
+.viewer-image.hidden {
+    opacity: 0;
+}
+
+.image-loading,
+.image-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: #94a3b8;
+}
+
+.image-loading .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Thumbnail in payment form */
+.payment-thumbnail {
+    margin-top: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+.payment-thumbnail img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 0.5rem;
+    border: 2px solid var(--border-color, #334155);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.payment-thumbnail:hover img {
+    border-color: var(--color-primary, #10b981);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+}
+
+.thumbnail-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted, #94a3b8);
+    margin-top: 0.375rem;
+}
