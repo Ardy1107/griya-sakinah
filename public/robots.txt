@@ -1,0 +1,16 @@
+# robots.txt for griyasakinah.org
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://griyasakinah.org/sitemap.xml
+
+# Allow search engine crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Disallow admin and API paths (SPA routes handled client-side)
+Disallow: /api/
