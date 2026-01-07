@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getUnitByIdSync as getUnitById, getPaymentsByUnitSync as getPaymentsByUnit } from '../../utils/database';
+import { getUnitById, getPaymentsByUnit } from '../../utils/database';
 import { generateWhatsAppLink, getPaymentConfirmationMessage } from '../../utils/pdfGenerator';
 import {
     ArrowLeft,
@@ -26,14 +26,21 @@ const UnitDetail = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (unitId) {
-            const unitData = getUnitById(unitId);
-            const paymentData = getPaymentsByUnit(unitId);
+        const loadData = async () => {
+            if (unitId) {
+                try {
+                    const unitData = await getUnitById(unitId);
+                    const paymentData = await getPaymentsByUnit(unitId);
 
-            setUnit(unitData);
-            setPayments(paymentData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-            setLoading(false);
-        }
+                    setUnit(unitData);
+                    setPayments(paymentData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+                } catch (err) {
+                    console.error('Error loading unit data:', err);
+                }
+                setLoading(false);
+            }
+        };
+        loadData();
     }, [unitId]);
 
     const formatRupiah = (num) => {

@@ -75,76 +75,87 @@ const Dashboard = () => {
 
     const loadData = () => {
         setLoading(true);
-        const paymentStats = getPaymentStats();
-        const aging = getAgingReceivable();
-        const monthly = getMonthlyIncome();
-        const units = getUnits();
-        const payments = getPayments();
+        try {
+            const paymentStats = getPaymentStats();
+            const aging = getAgingReceivable();
+            const monthly = getMonthlyIncome();
+            const units = getUnits() || [];
+            const payments = getPayments() || [];
 
-        // Count units with kelebihan bangunan payments
-        const kelebihanUnits = new Set();
-        payments.forEach(p => {
-            if (p.category === 'tambahan') {
-                kelebihanUnits.add(p.unitId);
-            }
-        });
+            // Count units with kelebihan bangunan payments
+            const kelebihanUnits = new Set();
+            payments.forEach(p => {
+                if (p.category === 'tambahan') {
+                    kelebihanUnits.add(p.unitId);
+                }
+            });
 
-        // Get expense data for current month
-        const now = new Date();
-        const balanceData = getMonthlyBalanceSync(now.getMonth(), now.getFullYear());
-        setExpenseStats({
-            totalExpenses: balanceData.totalExpenses,
-            netBalance: balanceData.netBalance
-        });
+            // Get expense data for current month
+            const now = new Date();
+            const balanceData = getMonthlyBalanceSync(now.getMonth(), now.getFullYear()) || { totalExpenses: 0, netBalance: 0 };
+            setExpenseStats({
+                totalExpenses: balanceData.totalExpenses || 0,
+                netBalance: balanceData.netBalance || 0
+            });
 
-        // Calculate units due soon (within 5 days)
-        const today = new Date();
-        const currentDay = today.getDate();
-        const currentMonth = today.getMonth();
-        const currentYear = today.getFullYear();
+            // Calculate units due soon (within 5 days)
+            const today = new Date();
+            const currentDay = today.getDate();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
 
-        const dueSoon = units.filter(unit => {
-            const dueDay = unit.dueDay;
-            const daysUntilDue = dueDay - currentDay;
-            // Due within next 5 days (before or on due date)
-            return daysUntilDue >= -2 && daysUntilDue <= 5;
-        }).map(unit => ({
-            ...unit,
-            daysUntilDue: unit.dueDay - currentDay
-        }));
-
-        // Calculate unpaid units for this month (for modal)
-        const paidUnitIdsThisMonth = new Set(
-            payments
-                .filter(p => {
-                    const pDate = new Date(p.date);
-                    return pDate.getMonth() === currentMonth &&
-                        pDate.getFullYear() === currentYear &&
-                        p.category === 'pokok';
-                })
-                .map(p => p.unitId)
-        );
-
-        const unpaidList = units
-            .filter(unit => !paidUnitIdsThisMonth.has(unit.id))
-            .map(unit => ({
-                id: unit.id,
-                blok: unit.blok,
-                residentName: unit.residentName,
-                phone: unit.phone,
-                dueDay: unit.dueDay,
-                monthlyFee: unit.monthlyFee || 200000
+            const dueSoon = units.filter(unit => {
+                const dueDay = unit.dueDay;
+                const daysUntilDue = dueDay - currentDay;
+                // Due within next 5 days (before or on due date)
+                return daysUntilDue >= -2 && daysUntilDue <= 5;
+            }).map(unit => ({
+                ...unit,
+                daysUntilDue: unit.dueDay - currentDay
             }));
 
-        setUnpaidUnits(unpaidList);
+            // Calculate unpaid units for this month (for modal)
+            const paidUnitIdsThisMonth = new Set(
+                payments
+                    .filter(p => {
+                        const pDate = new Date(p.date);
+                        return pDate.getMonth() === currentMonth &&
+                            pDate.getFullYear() === currentYear &&
+                            p.category === 'pokok';
+                    })
+                    .map(p => p.unitId)
+            );
 
-        setStats({
-            ...paymentStats,
-            kelebihanBangunanCount: kelebihanUnits.size
-        });
-        setAgingData(aging);
-        setMonthlyData(monthly);
-        setDueSoonUnits(dueSoon);
+            const unpaidList = units
+                .filter(unit => !paidUnitIdsThisMonth.has(unit.id))
+                .map(unit => ({
+                    id: unit.id,
+                    blok: unit.blok,
+                    residentName: unit.residentName,
+                    phone: unit.phone,
+                    dueDay: unit.dueDay,
+                    monthlyFee: unit.monthlyFee || 200000
+                }));
+
+            setUnpaidUnits(unpaidList);
+
+            setStats({
+                ...(paymentStats || { totalThisMonth: 0, totalUnits: 0, overdueUnits: 0 }),
+                kelebihanBangunanCount: kelebihanUnits.size
+            });
+            setAgingData(aging || []);
+            setMonthlyData(monthly || []);
+            setDueSoonUnits(dueSoon);
+        } catch (err) {
+            console.error('Error loading dashboard data:', err);
+            // Set default values on error
+            setStats({ totalThisMonth: 0, totalUnits: 0, overdueUnits: 0, kelebihanBangunanCount: 0 });
+            setExpenseStats({ totalExpenses: 0, netBalance: 0 });
+            setAgingData([]);
+            setMonthlyData([]);
+            setDueSoonUnits([]);
+            setUnpaidUnits([]);
+        }
         setLoading(false);
     };
 

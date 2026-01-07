@@ -99,14 +99,7 @@ export default function SuperadminLogin() {
                         </button>
                     </form>
 
-                    {/* Demo Credentials */}
-                    <div className="demo-credentials">
-                        <p>Demo Credentials:</p>
-                        <div className="credential-row">
-                            <span className="label">Superadmin:</span>
-                            <code>superadmin / super123</code>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>

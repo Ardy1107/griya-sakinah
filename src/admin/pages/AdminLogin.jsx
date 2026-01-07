@@ -123,10 +123,7 @@ const AdminLogin = () => {
                         </a>
                     </div>
 
-                    <div className="demo-credentials">
-                        <p><strong>Demo Access:</strong></p>
-                        <code>superadmin / admin123</code>
-                    </div>
+
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 const AdminAuthContext = createContext(null);
 
@@ -60,87 +61,22 @@ export const ROLE_PERMISSIONS = {
     }
 };
 
-// Default admin accounts (for development/demo)
-const DEFAULT_ADMINS = [
-    {
-        id: 'sa-001',
-        username: 'superadmin',
-        password: 'admin123',
-        name: 'Super Administrator',
-        role: ROLES.SUPER_ADMIN,
-        email: 'admin@griyasakinah.com',
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 'aa-001',
-        username: 'admin.angsuran',
-        password: 'angsuran123',
-        name: 'Admin Angsuran',
-        role: ROLES.ADMIN_ANGSURAN,
-        email: 'angsuran@griyasakinah.com',
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 'ai-001',
-        username: 'admin.internet',
-        password: 'internet123',
-        name: 'Admin Internet',
-        role: ROLES.ADMIN_INTERNET,
-        email: 'internet@griyasakinah.com',
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 'am-001',
-        username: 'admin.musholla',
-        password: 'musholla123',
-        name: 'Admin Musholla',
-        role: ROLES.ADMIN_MUSHOLLA,
-        email: 'musholla@griyasakinah.com',
-        createdAt: new Date().toISOString()
-    }
-];
+// Session storage key
+const SESSION_KEY = 'griya_admin_session';
 
-// LocalStorage keys
-const STORAGE_KEYS = {
-    ADMIN_SESSION: 'griya_admin_session',
-    ADMIN_USERS: 'griya_admin_users',
-    ALL_USERS: 'griya_all_users'
-};
-
-// Initialize admin users in localStorage
-const initializeAdminUsers = () => {
-    const existing = localStorage.getItem(STORAGE_KEYS.ADMIN_USERS);
-    if (!existing) {
-        localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(DEFAULT_ADMINS));
-        return DEFAULT_ADMINS;
-    }
-    return JSON.parse(existing);
-};
-
-// Get all admin users
-const getAdminUsers = () => {
-    const data = localStorage.getItem(STORAGE_KEYS.ADMIN_USERS);
-    return data ? JSON.parse(data) : initializeAdminUsers();
-};
-
-// Save admin users
-const saveAdminUsers = (users) => {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_USERS, JSON.stringify(users));
-};
-
-// Get session
+// Get session from sessionStorage
 const getSession = () => {
-    const session = localStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
+    const session = sessionStorage.getItem(SESSION_KEY);
     return session ? JSON.parse(session) : null;
 };
 
-// Set session
+// Set session to sessionStorage
 const setSession = (user) => {
     const sessionData = {
         ...user,
         password: undefined // Don't store password in session
     };
-    localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, JSON.stringify(sessionData));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
 
     // SSO: If SuperAdmin, also set superadmin_session for other modules
     if (user.role === ROLES.SUPER_ADMIN) {
@@ -159,7 +95,7 @@ const setSession = (user) => {
 
 // Clear session
 const clearSession = () => {
-    localStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+    sessionStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('superadmin_session'); // Also clear SSO session
 };
 
@@ -177,10 +113,6 @@ export const AdminAuthProvider = ({ children }) => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        // Initialize users
-        initializeAdminUsers();
-        setUsers(getAdminUsers());
-
         // Check for existing session
         const session = getSession();
         if (session) {
@@ -189,22 +121,49 @@ export const AdminAuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    // Login - Now uses Supabase
     const login = async (username, password) => {
-        const allAdmins = getAdminUsers();
-        const foundAdmin = allAdmins.find(a => a.username === username);
-
-        if (!foundAdmin) {
-            return { success: false, error: 'Username tidak ditemukan' };
+        if (!isSupabaseConfigured()) {
+            return { success: false, error: 'Database tidak tersedia. Hubungi administrator.' };
         }
 
-        if (foundAdmin.password !== password) {
-            return { success: false, error: 'Password salah' };
+        try {
+            // Query from Supabase portal_users table
+            const { data, error } = await supabase
+                .from('portal_users')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .eq('is_active', true)
+                .single();
+
+            if (error || !data) {
+                return { success: false, error: 'Username atau password salah' };
+            }
+
+            // Update last_login
+            await supabase
+                .from('portal_users')
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', data.id);
+
+            const userData = {
+                id: data.id,
+                username: data.username,
+                name: data.full_name || data.username,
+                email: data.email,
+                role: data.role,
+                moduleAccess: data.module_access || []
+            };
+
+            setSession(userData);
+            setAdmin(userData);
+
+            return { success: true, admin: userData };
+        } catch (err) {
+            console.error('Login error:', err);
+            return { success: false, error: 'Koneksi bermasalah. Coba lagi.' };
         }
-
-        setSession(foundAdmin);
-        setAdmin(foundAdmin);
-
-        return { success: true, admin: foundAdmin };
     };
 
     const logout = () => {
@@ -231,54 +190,147 @@ export const AdminAuthProvider = ({ children }) => {
         return ROLE_PERMISSIONS[admin.role]?.canCreateAdmins || false;
     };
 
-    // CRUD operations for users
-    const createUser = (userData) => {
-        const newUser = {
-            id: `user-${Date.now()}`,
-            ...userData,
-            createdAt: new Date().toISOString(),
-            createdBy: admin?.id
-        };
-
-        const allAdmins = getAdminUsers();
-        allAdmins.push(newUser);
-        saveAdminUsers(allAdmins);
-        setUsers(allAdmins);
-
-        return { success: true, user: newUser };
-    };
-
-    const updateUser = (userId, updates) => {
-        const allAdmins = getAdminUsers();
-        const index = allAdmins.findIndex(u => u.id === userId);
-
-        if (index === -1) {
-            return { success: false, error: 'User tidak ditemukan' };
+    // CRUD operations for users - Now uses Supabase
+    const createUser = async (userData) => {
+        if (!isSupabaseConfigured()) {
+            return { success: false, error: 'Database tidak tersedia' };
         }
 
-        allAdmins[index] = { ...allAdmins[index], ...updates };
-        saveAdminUsers(allAdmins);
-        setUsers(allAdmins);
+        try {
+            const { data, error } = await supabase
+                .from('portal_users')
+                .insert([{
+                    username: userData.username,
+                    password: userData.password,
+                    full_name: userData.name,
+                    email: userData.email,
+                    role: userData.role,
+                    is_active: true,
+                    module_access: userData.moduleAccess || [],
+                    created_by: admin?.id
+                }])
+                .select()
+                .single();
 
-        return { success: true, user: allAdmins[index] };
+            if (error) {
+                console.error('Create user error:', error);
+                return { success: false, error: 'Gagal membuat user: ' + error.message };
+            }
+
+            // Refresh users list
+            await fetchUsers();
+
+            return { success: true, user: data };
+        } catch (err) {
+            console.error('Create user error:', err);
+            return { success: false, error: 'Koneksi bermasalah' };
+        }
     };
 
-    const deleteUser = (userId) => {
-        const allAdmins = getAdminUsers();
-        const filtered = allAdmins.filter(u => u.id !== userId);
-
-        if (filtered.length === allAdmins.length) {
-            return { success: false, error: 'User tidak ditemukan' };
+    const updateUser = async (userId, updates) => {
+        if (!isSupabaseConfigured()) {
+            return { success: false, error: 'Database tidak tersedia' };
         }
 
-        saveAdminUsers(filtered);
-        setUsers(filtered);
+        try {
+            const updateData = {};
+            if (updates.username) updateData.username = updates.username;
+            if (updates.password) updateData.password = updates.password;
+            if (updates.name) updateData.full_name = updates.name;
+            if (updates.email) updateData.email = updates.email;
+            if (updates.role) updateData.role = updates.role;
+            if (updates.moduleAccess) updateData.module_access = updates.moduleAccess;
+            if (typeof updates.is_active !== 'undefined') updateData.is_active = updates.is_active;
 
-        return { success: true };
+            const { data, error } = await supabase
+                .from('portal_users')
+                .update(updateData)
+                .eq('id', userId)
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Update user error:', error);
+                return { success: false, error: 'Gagal update user: ' + error.message };
+            }
+
+            // Refresh users list
+            await fetchUsers();
+
+            return { success: true, user: data };
+        } catch (err) {
+            console.error('Update user error:', err);
+            return { success: false, error: 'Koneksi bermasalah' };
+        }
+    };
+
+    const deleteUser = async (userId) => {
+        if (!isSupabaseConfigured()) {
+            return { success: false, error: 'Database tidak tersedia' };
+        }
+
+        try {
+            const { error } = await supabase
+                .from('portal_users')
+                .delete()
+                .eq('id', userId);
+
+            if (error) {
+                console.error('Delete user error:', error);
+                return { success: false, error: 'Gagal hapus user: ' + error.message };
+            }
+
+            // Refresh users list
+            await fetchUsers();
+
+            return { success: true };
+        } catch (err) {
+            console.error('Delete user error:', err);
+            return { success: false, error: 'Koneksi bermasalah' };
+        }
+    };
+
+    const fetchUsers = async () => {
+        if (!isSupabaseConfigured()) {
+            return [];
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('portal_users')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Fetch users error:', error);
+                return [];
+            }
+
+            // Map to legacy format
+            const mappedUsers = data.map(u => ({
+                id: u.id,
+                username: u.username,
+                name: u.full_name || u.username,
+                email: u.email,
+                role: u.role,
+                moduleAccess: u.module_access || [],
+                isActive: u.is_active,
+                createdAt: u.created_at,
+                lastLogin: u.last_login
+            }));
+
+            setUsers(mappedUsers);
+            return mappedUsers;
+        } catch (err) {
+            console.error('Fetch users error:', err);
+            return [];
+        }
     };
 
     const getUsers = () => {
-        return getAdminUsers();
+        // Trigger async fetch
+        fetchUsers();
+        return users;
     };
 
     const value = {
@@ -294,6 +346,7 @@ export const AdminAuthProvider = ({ children }) => {
         updateUser,
         deleteUser,
         getUsers,
+        fetchUsers,
         isAuthenticated: !!admin,
         isSuperAdmin: admin?.role === ROLES.SUPER_ADMIN,
         ROLES,

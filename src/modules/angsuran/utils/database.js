@@ -85,130 +85,143 @@ export const clearSession = () => {
 // ============ UNITS ============
 export const getUnits = async () => {
     if (isSupabaseConfigured()) {
-        const { data, error } = await supabase
-            .from('units')
-            .select('*')
-            .order('block_number');
-        if (error) throw error;
-        return data.map(u => ({
-            id: u.id,
-            blockNumber: u.block_number,
-            residentName: u.resident_name,
-            phone: u.phone,
-            dueDay: u.due_day,
-            hasAddon: u.has_addon,
-            totalAddonCost: u.total_addon_cost,
-            createdAt: u.created_at
-        }));
+        try {
+            const { data, error } = await supabase
+                .from('units')
+                .select('*')
+                .order('block_number');
+            if (error) throw error;
+            return data.map(u => ({
+                id: u.id,
+                blockNumber: u.block_number,
+                residentName: u.resident_name,
+                phone: u.phone,
+                dueDay: u.due_day,
+                hasAddon: u.has_addon,
+                totalAddonCost: u.total_addon_cost,
+                status: u.status || 'aktif',
+                createdAt: u.created_at
+            }));
+        } catch (err) {
+            console.error('Supabase error, falling back to localStorage:', err);
+            return getAll(KEYS.UNITS);
+        }
     }
     return getAll(KEYS.UNITS);
 };
 
 export const getUnitsSync = () => getAll(KEYS.UNITS);
 
-export const getUnitById = async (id) => {
-    if (isSupabaseConfigured()) {
-        const { data, error } = await supabase
-            .from('units')
-            .select('*')
-            .eq('id', id)
-            .single();
-        if (error) throw error;
-        return {
-            id: data.id,
-            blockNumber: data.block_number,
-            residentName: data.resident_name,
-            phone: data.phone,
-            dueDay: data.due_day,
-            hasAddon: data.has_addon,
-            totalAddonCost: data.total_addon_cost,
-            createdAt: data.created_at
-        };
-    }
+export const getUnitByIdSync = (id) => {
     const units = getAll(KEYS.UNITS);
     return units.find(u => u.id === id);
 };
 
-export const getUnitByIdSync = (id) => {
+export const getUnitById = async (id) => {
+    if (isSupabaseConfigured()) {
+        try {
+            const { data, error } = await supabase
+                .from('units')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (error) throw error;
+            return {
+                id: data.id,
+                blockNumber: data.block_number,
+                residentName: data.resident_name,
+                phone: data.phone,
+                dueDay: data.due_day,
+                hasAddon: data.has_addon,
+                totalAddonCost: data.total_addon_cost,
+                status: data.status || 'aktif',
+                createdAt: data.created_at
+            };
+        } catch (err) {
+            console.error('Supabase error:', err);
+        }
+    }
+    // Fallback to localStorage
     const units = getAll(KEYS.UNITS);
     return units.find(u => u.id === id);
 };
 
 export const createUnit = async (unitData) => {
     if (isSupabaseConfigured()) {
-        const { data, error } = await supabase
-            .from('units')
-            .insert({
-                block_number: unitData.blockNumber,
-                resident_name: unitData.residentName,
-                phone: unitData.phone,
-                due_day: unitData.dueDay,
-                has_addon: unitData.hasAddon,
-                total_addon_cost: unitData.totalAddonCost
-            })
-            .select()
-            .single();
-        if (error) throw error;
-        return {
-            id: data.id,
-            blockNumber: data.block_number,
-            residentName: data.resident_name,
-            phone: data.phone,
-            dueDay: data.due_day,
-            hasAddon: data.has_addon,
-            totalAddonCost: data.total_addon_cost,
-            createdAt: data.created_at
-        };
+        try {
+            const { data, error } = await supabase
+                .from('units')
+                .insert({
+                    block_number: unitData.blockNumber,
+                    resident_name: unitData.residentName,
+                    phone: unitData.phone,
+                    due_day: unitData.dueDay,
+                    has_addon: unitData.hasAddon,
+                    total_addon_cost: unitData.totalAddonCost,
+                    status: unitData.status || 'aktif'
+                })
+                .select()
+                .single();
+            if (error) throw error;
+            return {
+                id: data.id,
+                blockNumber: data.block_number,
+                residentName: data.resident_name,
+                phone: data.phone,
+                dueDay: data.due_day,
+                hasAddon: data.has_addon,
+                totalAddonCost: data.total_addon_cost,
+                status: data.status,
+                createdAt: data.created_at
+            };
+        } catch (err) {
+            console.error('Supabase error, falling back to localStorage:', err);
+        }
     }
-    const units = getAll(KEYS.UNITS);
-    const newUnit = {
-        id: generateId(),
-        ...unitData,
-        createdAt: new Date().toISOString()
-    };
-    units.push(newUnit);
-    setAll(KEYS.UNITS, units);
-    return newUnit;
+    // Fallback to localStorage
+    return create(KEYS.UNITS, unitData);
 };
 
 export const updateUnit = async (id, unitData) => {
     if (isSupabaseConfigured()) {
-        const { data, error } = await supabase
-            .from('units')
-            .update({
-                block_number: unitData.blockNumber,
-                resident_name: unitData.residentName,
-                phone: unitData.phone,
-                due_day: unitData.dueDay,
-                has_addon: unitData.hasAddon,
-                total_addon_cost: unitData.totalAddonCost,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', id)
-            .select()
-            .single();
-        if (error) throw error;
-        return data;
+        try {
+            const { data, error } = await supabase
+                .from('units')
+                .update({
+                    block_number: unitData.blockNumber,
+                    resident_name: unitData.residentName,
+                    phone: unitData.phone,
+                    due_day: unitData.dueDay,
+                    has_addon: unitData.hasAddon,
+                    total_addon_cost: unitData.totalAddonCost,
+                    status: unitData.status,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error('Supabase error, falling back to localStorage:', err);
+        }
     }
-    const units = getAll(KEYS.UNITS);
-    const index = units.findIndex(u => u.id === id);
-    if (index !== -1) {
-        units[index] = { ...units[index], ...unitData };
-        setAll(KEYS.UNITS, units);
-        return units[index];
-    }
-    return null;
+    // Fallback to localStorage
+    return update(KEYS.UNITS, id, unitData);
 };
 
 export const deleteUnit = async (id) => {
     if (isSupabaseConfigured()) {
-        const { error } = await supabase.from('units').delete().eq('id', id);
-        if (error) throw error;
-        return;
+        try {
+            const { error } = await supabase.from('units').delete().eq('id', id);
+            if (error) throw error;
+            return;
+        } catch (err) {
+            console.error('Supabase error, falling back to localStorage:', err);
+        }
     }
-    const units = getAll(KEYS.UNITS);
-    const filtered = units.filter(u => u.id !== id);
-    setAll(KEYS.UNITS, filtered);
+    // Fallback to localStorage
+    remove(KEYS.UNITS, id);
 };
 
 // ============ PAYMENTS ============
