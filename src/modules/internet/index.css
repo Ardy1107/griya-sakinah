@@ -604,8 +604,6 @@ a:hover {
   border-radius: var(--radius-xl);
   width: 100%;
   max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
   animation: slideUp 0.3s ease;
 }
 
@@ -651,6 +649,31 @@ a:hover {
 
 .modal-body {
   padding: var(--space-lg);
+  max-height: 60vh;
+  overflow-y: scroll;
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+/* Chrome/Safari/Edge scrollbar for modal-body */
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  border-radius: 10px;
+  border: 2px solid var(--bg-card);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 .modal-footer {
@@ -659,6 +682,7 @@ a:hover {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-md);
+  background: var(--bg-card);
 }
 
 /* Receipt Template */

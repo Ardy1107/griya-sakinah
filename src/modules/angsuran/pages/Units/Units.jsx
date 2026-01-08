@@ -24,7 +24,11 @@ import {
     Upload,
     FileSpreadsheet,
     CheckCircle,
-    AlertCircle
+    AlertCircle,
+    ArrowUpDown,
+    Filter,
+    SortAsc,
+    SortDesc
 } from 'lucide-react';
 import './Units.css';
 
@@ -35,6 +39,10 @@ const Units = () => {
     const [units, setUnits] = useState([]);
     const [filteredUnits, setFilteredUnits] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('blockNumber');
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterAddon, setFilterAddon] = useState('all');
     const [showModal, setShowModal] = useState(false);
     const [editingUnit, setEditingUnit] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -46,6 +54,8 @@ const Units = () => {
         dueDay: 10,
         hasAddon: false,
         totalAddonCost: 0,
+        monthlyPayment: 0,
+        startingInstallment: 0,
         status: 'aktif'
     });
 
@@ -67,6 +77,7 @@ const Units = () => {
                 'Tanggal Jatuh Tempo': 10,
                 'Ada Bangunan Tambahan': 'Tidak',
                 'Biaya Bangunan Tambahan': 0,
+                'Nominal Angsuran': 3000000,
                 'Status': 'aktif'
             },
             {
@@ -76,6 +87,7 @@ const Units = () => {
                 'Tanggal Jatuh Tempo': 15,
                 'Ada Bangunan Tambahan': 'Ya',
                 'Biaya Bangunan Tambahan': 5000000,
+                'Nominal Angsuran': 5500000,
                 'Status': 'aktif'
             }
         ];
@@ -92,6 +104,7 @@ const Units = () => {
             { wch: 20 }, // Tanggal Jatuh Tempo
             { wch: 22 }, // Ada Bangunan Tambahan
             { wch: 25 }, // Biaya Bangunan Tambahan
+            { wch: 18 }, // Nominal Angsuran
             { wch: 15 }  // Status
         ];
 
@@ -125,6 +138,7 @@ const Units = () => {
                     const hasAddonText = row['Ada Bangunan Tambahan']?.toString().toLowerCase();
                     const hasAddon = hasAddonText === 'ya' || hasAddonText === 'yes' || hasAddonText === 'true' || hasAddonText === '1';
                     const totalAddonCost = parseInt(row['Biaya Bangunan Tambahan']) || 0;
+                    const monthlyPayment = parseInt(row['Nominal Angsuran']) || 0;
                     const status = row['Status']?.toString().toLowerCase() || 'aktif';
 
                     // Validation
@@ -151,6 +165,7 @@ const Units = () => {
                         dueDay: Math.min(31, Math.max(1, dueDay)),
                         hasAddon,
                         totalAddonCost: hasAddon ? totalAddonCost : 0,
+                        monthlyPayment,
                         status: validStatus
                     });
                 });
@@ -176,7 +191,7 @@ const Units = () => {
         for (const unitData of importData) {
             try {
                 await createUnit(unitData);
-                await createAuditLog(user.id, 'CREATE_UNIT', `Imported unit ${unitData.blockNumber} from Excel`);
+                await createAuditLog({ userId: user.id, action: 'CREATE_UNIT', details: `Imported unit ${unitData.blockNumber} from Excel` });
                 successCount++;
             } catch (err) {
                 console.error('Error importing unit:', err);
@@ -218,12 +233,63 @@ const Units = () => {
     }, []);
 
     useEffect(() => {
-        const filtered = units.filter(unit =>
-            unit.blockNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            unit.residentName.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredUnits(filtered);
-    }, [searchTerm, units]);
+        let result = [...units];
+
+        // Search filter
+        if (searchTerm) {
+            result = result.filter(unit =>
+                unit.blockNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                unit.residentName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Status filter
+        if (filterStatus !== 'all') {
+            result = result.filter(unit => unit.status === filterStatus);
+        }
+
+        // Addon filter
+        if (filterAddon !== 'all') {
+            result = result.filter(unit =>
+                filterAddon === 'yes' ? unit.hasAddon : !unit.hasAddon
+            );
+        }
+
+        // Sorting
+        result.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (sortBy) {
+                case 'blockNumber':
+                    aVal = a.blockNumber.toLowerCase();
+                    bVal = b.blockNumber.toLowerCase();
+                    break;
+                case 'residentName':
+                    aVal = a.residentName.toLowerCase();
+                    bVal = b.residentName.toLowerCase();
+                    break;
+                case 'status':
+                    aVal = a.status || 'aktif';
+                    bVal = b.status || 'aktif';
+                    break;
+                case 'monthlyPayment':
+                    aVal = a.monthlyPayment || 0;
+                    bVal = b.monthlyPayment || 0;
+                    break;
+                default:
+                    aVal = a.blockNumber.toLowerCase();
+                    bVal = b.blockNumber.toLowerCase();
+            }
+
+            if (sortOrder === 'asc') {
+                return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            } else {
+                return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+            }
+        });
+
+        setFilteredUnits(result);
+    }, [searchTerm, units, sortBy, sortOrder, filterStatus, filterAddon]);
 
     const handleOpenModal = (unit = null) => {
         if (unit) {
@@ -235,6 +301,8 @@ const Units = () => {
                 dueDay: unit.dueDay,
                 hasAddon: unit.hasAddon,
                 totalAddonCost: unit.totalAddonCost,
+                monthlyPayment: unit.monthlyPayment || 0,
+                startingInstallment: unit.startingInstallment || 0,
                 status: unit.status || 'aktif'
             });
         } else {
@@ -246,6 +314,8 @@ const Units = () => {
                 dueDay: 10,
                 hasAddon: false,
                 totalAddonCost: 0,
+                monthlyPayment: 0,
+                startingInstallment: 0,
                 status: 'aktif'
             });
         }
@@ -263,10 +333,10 @@ const Units = () => {
         try {
             if (editingUnit) {
                 await updateUnit(editingUnit.id, formData);
-                await createAuditLog(user.id, 'UPDATE_UNIT', `Updated unit ${formData.blockNumber}`);
+                await createAuditLog({ userId: user.id, action: 'UPDATE_UNIT', details: `Updated unit ${formData.blockNumber}` });
             } else {
                 await createUnit(formData);
-                await createAuditLog(user.id, 'CREATE_UNIT', `Created unit ${formData.blockNumber}`);
+                await createAuditLog({ userId: user.id, action: 'CREATE_UNIT', details: `Created unit ${formData.blockNumber}` });
             }
 
             await loadUnits();
@@ -281,7 +351,7 @@ const Units = () => {
         if (window.confirm(`Hapus unit ${unit.blockNumber}?`)) {
             try {
                 await deleteUnit(unit.id);
-                await createAuditLog(user.id, 'DELETE_UNIT', `Deleted unit ${unit.blockNumber}`);
+                await createAuditLog({ userId: user.id, action: 'DELETE_UNIT', details: `Deleted unit ${unit.blockNumber}` });
                 await loadUnits();
             } catch (err) {
                 console.error('Error deleting unit:', err);
@@ -377,6 +447,60 @@ const Units = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+
+                        <div className="filter-controls">
+                            {/* Sort */}
+                            <div className="filter-group">
+                                <label><ArrowUpDown size={14} /> Urutkan</label>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="filter-select"
+                                >
+                                    <option value="blockNumber">Nomor Blok</option>
+                                    <option value="residentName">Nama Penghuni</option>
+                                    <option value="status">Status</option>
+                                    <option value="monthlyPayment">Nominal Angsuran</option>
+                                </select>
+                                <button
+                                    className="sort-order-btn"
+                                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                    title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+                                >
+                                    {sortOrder === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
+                                </button>
+                            </div>
+
+                            {/* Filter Status */}
+                            <div className="filter-group">
+                                <label><Filter size={14} /> Status</label>
+                                <select
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    className="filter-select"
+                                >
+                                    <option value="all">Semua Status</option>
+                                    <option value="aktif">🟢 Aktif</option>
+                                    <option value="pending_lunas">🔵 Pending Lunas</option>
+                                    <option value="lunas">🟡 Lunas</option>
+                                </select>
+                            </div>
+
+                            {/* Filter Addon */}
+                            <div className="filter-group">
+                                <label>Bangunan Tambahan</label>
+                                <select
+                                    value={filterAddon}
+                                    onChange={(e) => setFilterAddon(e.target.value)}
+                                    className="filter-select"
+                                >
+                                    <option value="all">Semua</option>
+                                    <option value="yes">Ada</option>
+                                    <option value="no">Tidak Ada</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div className="filter-info">
                             Menampilkan {filteredUnits.length} dari {units.length} unit
                         </div>
@@ -458,87 +582,112 @@ const Units = () => {
                                     </button>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="modal-form">
-                                    <div className="form-row">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="modal-body">
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Nomor Blok</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.blockNumber}
+                                                    onChange={(e) => setFormData({ ...formData, blockNumber: e.target.value })}
+                                                    placeholder="Contoh: A-01"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Tanggal Jatuh Tempo</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="31"
+                                                    value={formData.dueDay}
+                                                    onChange={(e) => setFormData({ ...formData, dueDay: parseInt(e.target.value) })}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="form-group">
-                                            <label>Nomor Blok</label>
+                                            <label>Nama Penghuni</label>
                                             <input
                                                 type="text"
-                                                value={formData.blockNumber}
-                                                onChange={(e) => setFormData({ ...formData, blockNumber: e.target.value })}
-                                                placeholder="Contoh: A-01"
+                                                value={formData.residentName}
+                                                onChange={(e) => setFormData({ ...formData, residentName: e.target.value })}
+                                                placeholder="Nama lengkap penghuni"
                                                 required
                                             />
                                         </div>
+
                                         <div className="form-group">
-                                            <label>Tanggal Jatuh Tempo</label>
+                                            <label>Nomor HP</label>
                                             <input
-                                                type="number"
-                                                min="1"
-                                                max="31"
-                                                value={formData.dueDay}
-                                                onChange={(e) => setFormData({ ...formData, dueDay: parseInt(e.target.value) })}
+                                                type="tel"
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                placeholder="08xxxxxxxxxx"
                                                 required
                                             />
                                         </div>
-                                    </div>
 
-                                    <div className="form-group">
-                                        <label>Nama Penghuni</label>
-                                        <input
-                                            type="text"
-                                            value={formData.residentName}
-                                            onChange={(e) => setFormData({ ...formData, residentName: e.target.value })}
-                                            placeholder="Nama lengkap penghuni"
-                                            required
-                                        />
-                                    </div>
+                                        <div className="form-group checkbox-group">
+                                            <label className="checkbox-label">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.hasAddon}
+                                                    onChange={(e) => setFormData({ ...formData, hasAddon: e.target.checked })}
+                                                />
+                                                <span>Ada Bangunan Tambahan</span>
+                                            </label>
+                                        </div>
 
-                                    <div className="form-group">
-                                        <label>Nomor HP</label>
-                                        <input
-                                            type="tel"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            placeholder="08xxxxxxxxxx"
-                                            required
-                                        />
-                                    </div>
+                                        {formData.hasAddon && (
+                                            <div className="form-group">
+                                                <label>Total Biaya Bangunan Tambahan</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.totalAddonCost}
+                                                    onChange={(e) => setFormData({ ...formData, totalAddonCost: parseInt(e.target.value) || 0 })}
+                                                    placeholder="Masukkan nominal"
+                                                />
+                                            </div>
+                                        )}
 
-                                    <div className="form-group checkbox-group">
-                                        <label className="checkbox-label">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.hasAddon}
-                                                onChange={(e) => setFormData({ ...formData, hasAddon: e.target.checked })}
-                                            />
-                                            <span>Ada Bangunan Tambahan</span>
-                                        </label>
-                                    </div>
-
-                                    {formData.hasAddon && (
                                         <div className="form-group">
-                                            <label>Total Biaya Bangunan Tambahan</label>
+                                            <label>💰 Nominal Angsuran Bulanan</label>
                                             <input
                                                 type="number"
-                                                value={formData.totalAddonCost}
-                                                onChange={(e) => setFormData({ ...formData, totalAddonCost: parseInt(e.target.value) || 0 })}
-                                                placeholder="Masukkan nominal"
+                                                value={formData.monthlyPayment}
+                                                onChange={(e) => setFormData({ ...formData, monthlyPayment: parseInt(e.target.value) || 0 })}
+                                                placeholder="Contoh: 3000000"
                                             />
+                                            <span className="input-hint">Nominal yang harus dibayar setiap bulan</span>
                                         </div>
-                                    )}
 
-                                    <div className="form-group">
-                                        <label>Status Unit</label>
-                                        <select
-                                            value={formData.status}
-                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                            className="form-select"
-                                        >
-                                            <option value="aktif">🟢 Aktif (Masih Mencicil)</option>
-                                            <option value="pending_lunas">🔵 Pending Lunas (Menunggu Dokumen)</option>
-                                            <option value="lunas">🟡 Lunas Total</option>
-                                        </select>
+                                        <div className="form-group">
+                                            <label>📊 Sudah Angsur Ke-</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={formData.startingInstallment}
+                                                onChange={(e) => setFormData({ ...formData, startingInstallment: parseInt(e.target.value) || 0 })}
+                                                placeholder="Contoh: 24"
+                                            />
+                                            <span className="input-hint">Angsuran terakhir sebelum pakai aplikasi ini (0 jika baru mulai)</span>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Status Unit</label>
+                                            <select
+                                                value={formData.status}
+                                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                                className="form-select"
+                                            >
+                                                <option value="aktif">🟢 Aktif (Masih Mencicil)</option>
+                                                <option value="pending_lunas">🔵 Pending Lunas (Menunggu Dokumen)</option>
+                                                <option value="lunas">🟡 Lunas Total</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div className="modal-actions">

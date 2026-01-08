@@ -28,49 +28,68 @@ const Reports = () => {
         totalPokok: 0,
         totalTambahan: 0,
         unitCount: 0,
-        paidUnits: []
+        paidUnits: [],
+        allUnits: []
     });
 
     useEffect(() => {
         generateReport();
     }, [selectedMonth]);
 
-    const generateReport = () => {
-        const allPayments = getPayments();
-        const allUnits = getUnits();
-        const monthKey = getMonthYearKey(selectedMonth);
+    const generateReport = async () => {
+        try {
+            const allPayments = await getPayments() || [];
+            const allUnits = await getUnits() || [];
+            const monthKey = getMonthYearKey(selectedMonth);
 
-        // Filter payments for selected month
-        const monthPayments = allPayments.filter(p => {
-            if (p.paymentMonthKey) {
-                return p.paymentMonthKey === monthKey;
-            }
-            // Fallback to createdAt for old data
-            const payDate = new Date(p.createdAt);
-            return payDate.getMonth() === selectedMonth.month &&
-                payDate.getFullYear() === selectedMonth.year;
-        });
+            // Ensure arrays
+            const paymentsArr = Array.isArray(allPayments) ? allPayments : [];
+            const unitsArr = Array.isArray(allUnits) ? allUnits : [];
 
-        const totalIncome = monthPayments.reduce((sum, p) => sum + p.amount, 0);
-        const totalPokok = monthPayments
-            .filter(p => p.category === 'pokok')
-            .reduce((sum, p) => sum + p.amount, 0);
-        const totalTambahan = monthPayments
-            .filter(p => p.category === 'tambahan')
-            .reduce((sum, p) => sum + p.amount, 0);
+            // Filter payments for selected month
+            const monthPayments = paymentsArr.filter(p => {
+                if (p.paymentMonthKey) {
+                    return p.paymentMonthKey === monthKey;
+                }
+                // Fallback to createdAt for old data
+                const payDate = new Date(p.createdAt);
+                return payDate.getMonth() === selectedMonth.month &&
+                    payDate.getFullYear() === selectedMonth.year;
+            });
 
-        // Get unique units that paid
-        const paidUnitIds = [...new Set(monthPayments.map(p => p.unitId))];
-        const paidUnits = paidUnitIds.map(id => allUnits.find(u => u.id === id)).filter(Boolean);
+            const totalIncome = monthPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+            const totalPokok = monthPayments
+                .filter(p => p.category === 'pokok')
+                .reduce((sum, p) => sum + (p.amount || 0), 0);
+            const totalTambahan = monthPayments
+                .filter(p => p.category === 'tambahan')
+                .reduce((sum, p) => sum + (p.amount || 0), 0);
 
-        setReportData({
-            payments: monthPayments,
-            totalIncome,
-            totalPokok,
-            totalTambahan,
-            unitCount: allUnits.length,
-            paidUnits
-        });
+            // Get unique units that paid
+            const paidUnitIds = [...new Set(monthPayments.map(p => p.unitId))];
+            const paidUnits = paidUnitIds.map(id => unitsArr.find(u => u.id === id)).filter(Boolean);
+
+            setReportData({
+                payments: monthPayments,
+                totalIncome,
+                totalPokok,
+                totalTambahan,
+                unitCount: unitsArr.length,
+                paidUnits,
+                allUnits: unitsArr
+            });
+        } catch (err) {
+            console.error('Error generating report:', err);
+            setReportData({
+                payments: [],
+                totalIncome: 0,
+                totalPokok: 0,
+                totalTambahan: 0,
+                unitCount: 0,
+                paidUnits: [],
+                allUnits: []
+            });
+        }
     };
 
     const formatRupiah = (num) => {
@@ -134,7 +153,7 @@ const Reports = () => {
         doc.text('Nominal', 140, y);
 
         doc.setFont('helvetica', 'normal');
-        const units = getUnits();
+        const units = reportData.allUnits;
 
         reportData.payments.forEach((payment, index) => {
             y += 7;
@@ -160,7 +179,7 @@ const Reports = () => {
     };
 
     const handleExportCSV = () => {
-        const units = getUnits();
+        const units = reportData.allUnits;
         const headers = ['No', 'Tanggal', 'Blok', 'Nama', 'Kategori', 'Angsuran', 'Nominal', 'Status'];
 
         const rows = reportData.payments.map((payment, index) => {
@@ -313,8 +332,7 @@ const Reports = () => {
                             </thead>
                             <tbody>
                                 {reportData.payments.map((payment, index) => {
-                                    const units = getUnits();
-                                    const unit = units.find(u => u.id === payment.unitId);
+                                    const unit = reportData.allUnits.find(u => u.id === payment.unitId);
                                     return (
                                         <tr key={payment.id}>
                                             <td>{index + 1}</td>

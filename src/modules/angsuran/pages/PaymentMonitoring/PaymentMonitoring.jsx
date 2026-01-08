@@ -28,8 +28,19 @@ const PaymentMonitoring = () => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        setUnits(getUnitsSync());
-        setPayments(getPaymentsSync());
+        const loadData = async () => {
+            try {
+                const unitsData = await getUnitsSync();
+                const paymentsData = await getPaymentsSync();
+                setUnits(Array.isArray(unitsData) ? unitsData : []);
+                setPayments(Array.isArray(paymentsData) ? paymentsData : []);
+            } catch (err) {
+                console.error('Error loading monitoring data:', err);
+                setUnits([]);
+                setPayments([]);
+            }
+        };
+        loadData();
     }, []);
 
     // Helper: Get payment for specific unit, month, year

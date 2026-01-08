@@ -257,7 +257,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 20px;
     z-index: 1000;
     animation: fadeIn 0.2s ease;
 }
@@ -267,10 +267,34 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-width: 550px;
+    max-height: 85vh;
+    overflow-y: scroll;
     animation: slideUp 0.3s ease;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar for Modal - Chrome/Safari/Edge */
+.modal::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 16px 0;
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    border: 2px solid #1e293b;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 .modal.modal-large {
@@ -312,10 +336,41 @@
 }
 
 .modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable Modal Body */
+.modal-body {
     padding: 24px;
+    max-height: 60vh;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+/* Chrome/Safari/Edge scrollbar for modal-body */
+.modal-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    border: 2px solid #1e293b;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 .form-row {
@@ -510,9 +565,9 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    padding-top: 8px;
+    padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 8px;
+    background: #1e293b;
 }
 
 .primary-button {
@@ -766,4 +821,217 @@
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
+}
+
+/* ===================================
+   iOS-STYLE RAPEL SECTION
+   =================================== */
+
+.rapel-section {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ios-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.toggle-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toggle-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.toggle-subtitle {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* iOS Switch */
+.ios-switch {
+    position: relative;
+    width: 51px;
+    height: 31px;
+    flex-shrink: 0;
+}
+
+.ios-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ios-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(120, 120, 128, 0.32);
+    border-radius: 31px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ios-switch .slider::before {
+    position: absolute;
+    content: "";
+    height: 27px;
+    width: 27px;
+    left: 2px;
+    bottom: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ios-switch input:checked+.slider {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.ios-switch input:checked+.slider::before {
+    transform: translateX(20px);
+}
+
+/* Rapel Options */
+.rapel-options {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rapel-months-select label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.month-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.month-chip {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.month-chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+.month-chip.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.4);
+}
+
+.custom-months {
+    width: 80px;
+    padding: 10px 12px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 20px !important;
+    color: #94a3b8 !important;
+    font-size: 13px;
+    text-align: center;
+}
+
+.custom-months:focus {
+    border-color: #10b981 !important;
+    color: #f1f5f9 !important;
+}
+
+/* Rapel Preview */
+.rapel-preview {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.preview-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #10b981;
+    margin-bottom: 12px;
+}
+
+.preview-months {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.preview-month-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 8px;
+    color: #34d399;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.preview-more {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.rapel-total {
+    padding-top: 12px;
+    border-top: 1px solid rgba(16, 185, 129, 0.2);
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.rapel-total strong {
+    color: #10b981;
+    font-size: 18px;
+    margin-left: 8px;
 }

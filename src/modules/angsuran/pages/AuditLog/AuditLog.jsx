@@ -24,17 +24,30 @@ const AuditLog = () => {
     const [filterUser, setFilterUser] = useState('all');
 
     useEffect(() => {
-        const logsData = getAuditLogs();
-        const usersData = getUsers();
+        const loadData = async () => {
+            try {
+                const logsData = await getAuditLogs() || [];
+                const usersData = await getUsers() || [];
 
-        // Sort by timestamp descending
-        const sorted = logsData.sort((a, b) =>
-            new Date(b.timestamp) - new Date(a.timestamp)
-        );
+                const logsArr = Array.isArray(logsData) ? logsData : [];
+                const usersArr = Array.isArray(usersData) ? usersData : [];
 
-        setLogs(sorted);
-        setFilteredLogs(sorted);
-        setUsers(usersData);
+                // Sort by timestamp descending
+                const sorted = logsArr.sort((a, b) =>
+                    new Date(b.timestamp) - new Date(a.timestamp)
+                );
+
+                setLogs(sorted);
+                setFilteredLogs(sorted);
+                setUsers(usersArr);
+            } catch (err) {
+                console.error('Error loading audit logs:', err);
+                setLogs([]);
+                setFilteredLogs([]);
+                setUsers([]);
+            }
+        };
+        loadData();
     }, []);
 
     useEffect(() => {

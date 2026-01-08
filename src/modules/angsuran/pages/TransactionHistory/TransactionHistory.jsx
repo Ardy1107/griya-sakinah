@@ -37,27 +37,37 @@ const TransactionHistory = () => {
         loadData();
     }, []);
 
-    const loadData = () => {
+    const loadData = async () => {
         setLoading(true);
-        const allPayments = getPayments();
-        const allUnits = getUnits();
+        try {
+            const allPayments = await getPayments() || [];
+            const allUnits = await getUnits() || [];
 
-        // Enrich payments with unit data
-        const enrichedPayments = allPayments.map(payment => {
-            const unit = allUnits.find(u => u.id === payment.unitId);
-            return {
-                ...payment,
-                blockNumber: unit?.blockNumber || '-',
-                residentName: unit?.residentName || '-',
-                phone: unit?.phone || '-'
-            };
-        });
+            // Ensure arrays
+            const paymentsArr = Array.isArray(allPayments) ? allPayments : [];
+            const unitsArr = Array.isArray(allUnits) ? allUnits : [];
 
-        // Sort by date descending (newest first)
-        enrichedPayments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+            // Enrich payments with unit data
+            const enrichedPayments = paymentsArr.map(payment => {
+                const unit = unitsArr.find(u => u.id === payment.unitId);
+                return {
+                    ...payment,
+                    blockNumber: unit?.blockNumber || '-',
+                    residentName: unit?.residentName || '-',
+                    phone: unit?.phone || '-'
+                };
+            });
 
-        setPayments(enrichedPayments);
-        setUnits(allUnits);
+            // Sort by date descending (newest first)
+            enrichedPayments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+
+            setPayments(enrichedPayments);
+            setUnits(unitsArr);
+        } catch (err) {
+            console.error('Error loading transactions:', err);
+            setPayments([]);
+            setUnits([]);
+        }
         setLoading(false);
     };
 
@@ -113,8 +123,7 @@ const TransactionHistory = () => {
         { value: '11', label: 'Desember' }
     ];
 
-    const currentYear = new Date().getFullYear();
-    const years = [currentYear, currentYear - 1, currentYear - 2];
+    const years = [2026, 2027, 2028, 2029, 2030];
 
     return (
         <div className="transaction-history-page">
@@ -172,17 +181,27 @@ const TransactionHistory = () => {
                 </div>
             </div>
 
-            {/* Summary Card */}
-            <div className="summary-card">
-                <div className="summary-item">
-                    <span className="summary-label">Total Transaksi</span>
-                    <span className="summary-value">{filteredPayments.length}</span>
+            {/* Summary Stats */}
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-icon blue">
+                        <Hash size={24} />
+                    </div>
+                    <div className="stat-content">
+                        <span className="stat-label">Total Transaksi</span>
+                        <span className="stat-value">{filteredPayments.length}</span>
+                    </div>
                 </div>
-                <div className="summary-item">
-                    <span className="summary-label">Total Nominal</span>
-                    <span className="summary-value green">
-                        {formatRupiah(filteredPayments.reduce((sum, p) => sum + p.amount, 0))}
-                    </span>
+                <div className="stat-card">
+                    <div className="stat-icon green">
+                        <CreditCard size={24} />
+                    </div>
+                    <div className="stat-content">
+                        <span className="stat-label">Total Nominal</span>
+                        <span className="stat-value green">
+                            {formatRupiah(filteredPayments.reduce((sum, p) => sum + p.amount, 0))}
+                        </span>
+                    </div>
                 </div>
             </div>
 

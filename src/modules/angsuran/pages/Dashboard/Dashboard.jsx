@@ -73,18 +73,21 @@ const Dashboard = () => {
         }
     }, [user]);
 
-    const loadData = () => {
+    const loadData = async () => {
         setLoading(true);
         try {
-            const paymentStats = getPaymentStats();
-            const aging = getAgingReceivable();
-            const monthly = getMonthlyIncome();
-            const units = getUnits() || [];
-            const payments = getPayments() || [];
+            const paymentStats = await getPaymentStats() || {};
+            const aging = await getAgingReceivable() || [];
+            const monthly = await getMonthlyIncome() || [];
+            const units = await getUnits() || [];
+            const payments = await getPayments() || [];
+
+            // Ensure payments is an array
+            const paymentsArray = Array.isArray(payments) ? payments : [];
 
             // Count units with kelebihan bangunan payments
             const kelebihanUnits = new Set();
-            payments.forEach(p => {
+            paymentsArray.forEach(p => {
                 if (p.category === 'tambahan') {
                     kelebihanUnits.add(p.unitId);
                 }
@@ -92,19 +95,20 @@ const Dashboard = () => {
 
             // Get expense data for current month
             const now = new Date();
-            const balanceData = getMonthlyBalanceSync(now.getMonth(), now.getFullYear()) || { totalExpenses: 0, netBalance: 0 };
+            const balanceData = await getMonthlyBalanceSync(now.getMonth(), now.getFullYear()) || { totalExpenses: 0, netBalance: 0 };
             setExpenseStats({
                 totalExpenses: balanceData.totalExpenses || 0,
                 netBalance: balanceData.netBalance || 0
             });
 
             // Calculate units due soon (within 5 days)
+            const unitsArray = Array.isArray(units) ? units : [];
             const today = new Date();
             const currentDay = today.getDate();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
 
-            const dueSoon = units.filter(unit => {
+            const dueSoon = unitsArray.filter(unit => {
                 const dueDay = unit.dueDay;
                 const daysUntilDue = dueDay - currentDay;
                 // Due within next 5 days (before or on due date)
@@ -116,7 +120,7 @@ const Dashboard = () => {
 
             // Calculate unpaid units for this month (for modal)
             const paidUnitIdsThisMonth = new Set(
-                payments
+                paymentsArray
                     .filter(p => {
                         const pDate = new Date(p.date);
                         return pDate.getMonth() === currentMonth &&
@@ -126,7 +130,7 @@ const Dashboard = () => {
                     .map(p => p.unitId)
             );
 
-            const unpaidList = units
+            const unpaidList = unitsArray
                 .filter(unit => !paidUnitIdsThisMonth.has(unit.id))
                 .map(unit => ({
                     id: unit.id,
@@ -141,10 +145,11 @@ const Dashboard = () => {
 
             setStats({
                 ...(paymentStats || { totalThisMonth: 0, totalUnits: 0, overdueUnits: 0 }),
+                totalUnits: unitsArray.length,
                 kelebihanBangunanCount: kelebihanUnits.size
             });
-            setAgingData(aging || []);
-            setMonthlyData(monthly || []);
+            setAgingData(Array.isArray(aging) ? aging : []);
+            setMonthlyData(Array.isArray(monthly) ? monthly : []);
             setDueSoonUnits(dueSoon);
         } catch (err) {
             console.error('Error loading dashboard data:', err);

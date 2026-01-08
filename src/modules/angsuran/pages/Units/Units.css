@@ -62,25 +62,43 @@
     color: #f1f5f9;
 }
 
-/* Filter Bar */
+/* Filter Bar - iOS Premium Card */
 .filter-bar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 16px;
-    flex-wrap: wrap;
 }
 
+/* Filter Controls Card - Vertical Layout */
+.filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.8));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+}
+
+/* Search Box - iOS Style */
 .search-box {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    flex: 1;
-    max-width: 400px;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .search-box svg {
@@ -101,9 +119,133 @@
     color: #64748b;
 }
 
+/* Filter Group - Vertical Layout */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-group label svg {
+    color: #10b981;
+    width: 14px;
+    height: 14px;
+}
+
+/* Filter Select - Clean Style */
+.filter-select {
+    width: 100%;
+    padding: 12px 36px 12px 14px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(15, 23, 42, 0.7);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.filter-select option {
+    background: #1e293b;
+    color: #f1f5f9;
+    padding: 12px;
+}
+
+/* Sort Order Button */
+.sort-order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 10px;
+    color: #60a5fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sort-order-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Filter Info */
 .filter-info {
     font-size: 13px;
+    font-weight: 500;
     color: #64748b;
+    padding-top: 4px;
+}
+
+/* Light Mode Filter Controls */
+[data-theme="light"] .filter-select {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .filter-select:hover {
+    border-color: #10b981;
+}
+
+[data-theme="light"] .filter-select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+[data-theme="light"] .sort-order-btn {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="light"] .filter-group label {
+    color: #475569;
+}
+
+/* Responsive Filter Bar */
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        flex: 1;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
 }
 
 /* Units Grid */
@@ -276,9 +418,33 @@
     border-radius: 20px;
     width: 100%;
     max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: 85vh;
+    overflow-y: scroll;
     animation: slideUp 0.3s ease;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar for Modal - Chrome/Safari/Edge */
+.modal::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 16px 0;
+}
+
+.modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    border: 2px solid #1e293b;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 @keyframes slideUp {
@@ -328,10 +494,41 @@
 }
 
 .modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable Modal Body */
+.modal-body {
     padding: 24px;
+    max-height: 60vh;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+/* Chrome/Safari/Edge scrollbar for modal-body */
+.modal-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    border: 2px solid #1e293b;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 .form-row {
@@ -401,9 +598,9 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    padding-top: 8px;
+    padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 8px;
+    background: #1e293b;
 }
 
 /* View Detail Button */

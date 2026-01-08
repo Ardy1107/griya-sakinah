@@ -408,6 +408,29 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    /* Green Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 rgba(255, 255, 255, 0.1);
+}
+
+.modal-form::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-form::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.modal-form::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #10b981, #059669);
+    border-radius: 4px;
+}
+
+.modal-form::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #34d399, #10b981);
 }
 
 .form-group label {

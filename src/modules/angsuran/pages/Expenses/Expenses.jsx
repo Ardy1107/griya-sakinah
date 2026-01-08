@@ -44,20 +44,28 @@ const Expenses = () => {
         notes: ''
     });
 
-    const loadData = () => {
-        const data = getExpensesSync();
-        setExpenses(data);
+    const loadData = async () => {
+        try {
+            const data = await getExpensesSync() || [];
+            const expensesArr = Array.isArray(data) ? data : [];
+            setExpenses(expensesArr);
 
-        // Filter by selected month/year
-        const filtered = data.filter(e => {
-            const date = new Date(e.createdAt);
-            return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
-        });
-        setFilteredExpenses(filtered);
+            // Filter by selected month/year
+            const filtered = expensesArr.filter(e => {
+                const date = new Date(e.createdAt);
+                return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
+            });
+            setFilteredExpenses(filtered);
 
-        // Get balance
-        const bal = getMonthlyBalanceSync(selectedMonth, selectedYear);
-        setBalance(bal);
+            // Get balance
+            const bal = await getMonthlyBalanceSync(selectedMonth, selectedYear) || { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
+            setBalance(bal);
+        } catch (err) {
+            console.error('Error loading expenses:', err);
+            setExpenses([]);
+            setFilteredExpenses([]);
+            setBalance({ totalIncome: 0, totalExpenses: 0, netBalance: 0 });
+        }
     };
 
     useEffect(() => {
@@ -105,11 +113,11 @@ const Expenses = () => {
             createdBy: user.id
         });
 
-        await createAuditLog(
-            user.id,
-            'CREATE_EXPENSE',
-            `Expense to ${formData.workerName}: Rp ${formData.amount}`
-        );
+        await createAuditLog({
+            userId: user.id,
+            action: 'CREATE_EXPENSE',
+            details: `Expense to ${formData.workerName}: Rp ${formData.amount}`
+        });
 
         loadData();
         handleCloseModal();
@@ -118,7 +126,7 @@ const Expenses = () => {
     const handleDelete = async (expense) => {
         if (window.confirm(`Hapus pengeluaran untuk "${expense.workerName}"?`)) {
             await deleteExpense(expense.id);
-            await createAuditLog(user.id, 'DELETE_EXPENSE', `Deleted expense: ${expense.workerName}`);
+            await createAuditLog({ userId: user.id, action: 'DELETE_EXPENSE', details: `Deleted expense: ${expense.workerName}` });
             loadData();
         }
     };

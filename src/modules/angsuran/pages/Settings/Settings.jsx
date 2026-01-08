@@ -58,7 +58,7 @@ const Settings = () => {
             link.click();
             URL.revokeObjectURL(url);
 
-            createAuditLog(user.id, 'BACKUP_DATABASE', 'Database backup downloaded');
+            createAuditLog({ userId: user.id, action: 'BACKUP_DATABASE', details: 'Database backup downloaded' });
             showMessage('success', 'Backup berhasil diunduh!');
         } catch (error) {
             showMessage('error', 'Gagal membuat backup: ' + error.message);
@@ -71,7 +71,7 @@ const Settings = () => {
         try {
             setDriveLoading(true);
             const result = await backupDatabaseToDrive();
-            await createAuditLog(user.id, 'BACKUP_DRIVE', 'Database backup uploaded to Google Drive');
+            await createAuditLog({ userId: user.id, action: 'BACKUP_DRIVE', details: 'Database backup uploaded to Google Drive' });
             showMessage('success', `Backup berhasil! File ID: ${result.id}`);
         } catch (error) {
             console.error(error);
@@ -101,7 +101,7 @@ const Settings = () => {
                     }
                 });
 
-                createAuditLog(user.id, 'RESTORE_DATABASE', `Database restored from backup dated ${data.backupDate}`);
+                createAuditLog({ userId: user.id, action: 'RESTORE_DATABASE', details: `Database restored from backup dated ${data.backupDate}` });
                 showMessage('success', 'Data berhasil direstore! Halaman akan dimuat ulang...');
 
                 setTimeout(() => {
