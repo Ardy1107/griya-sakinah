@@ -43,6 +43,7 @@ const Units = () => {
     const [sortOrder, setSortOrder] = useState('asc');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterAddon, setFilterAddon] = useState('all');
+    const [filterBlock, setFilterBlock] = useState('all');
     const [showModal, setShowModal] = useState(false);
     const [editingUnit, setEditingUnit] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -255,6 +256,14 @@ const Units = () => {
             );
         }
 
+        // Block filter (A or B)
+        if (filterBlock !== 'all') {
+            result = result.filter(unit => {
+                const blockPrefix = unit.blockNumber.charAt(0).toUpperCase();
+                return blockPrefix === filterBlock;
+            });
+        }
+
         // Sorting
         result.sort((a, b) => {
             let aVal, bVal;
@@ -289,7 +298,7 @@ const Units = () => {
         });
 
         setFilteredUnits(result);
-    }, [searchTerm, units, sortBy, sortOrder, filterStatus, filterAddon]);
+    }, [searchTerm, units, sortBy, sortOrder, filterStatus, filterAddon, filterBlock]);
 
     const handleOpenModal = (unit = null) => {
         if (unit) {
@@ -497,6 +506,20 @@ const Units = () => {
                                     <option value="all">Semua</option>
                                     <option value="yes">Ada</option>
                                     <option value="no">Tidak Ada</option>
+                                </select>
+                            </div>
+
+                            {/* Filter Block */}
+                            <div className="filter-group">
+                                <label>Blok</label>
+                                <select
+                                    value={filterBlock}
+                                    onChange={(e) => setFilterBlock(e.target.value)}
+                                    className="filter-select"
+                                >
+                                    <option value="all">Semua Blok</option>
+                                    <option value="A">Blok A (A1-A18)</option>
+                                    <option value="B">Blok B (B1-B20)</option>
                                 </select>
                             </div>
                         </div>
