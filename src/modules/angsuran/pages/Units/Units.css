@@ -69,19 +69,12 @@
     gap: 16px;
 }
 
-/* Filter Controls Card - Vertical Layout */
+/* Filter Controls - Horizontal Inline Layout */
 .filter-controls {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px 24px;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.8));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-    max-width: 400px;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 /* Search Box - iOS Style */
@@ -119,22 +112,21 @@
     color: #64748b;
 }
 
-/* Filter Group - Vertical Layout */
+/* Filter Group - Horizontal Inline */
 .filter-group {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
 }
 
 .filter-group label {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #94a3b8;
+    white-space: nowrap;
 }
 
 .filter-group label svg {
@@ -145,7 +137,7 @@
 
 /* Filter Select - Clean Style */
 .filter-select {
-    width: 100%;
+    min-width: 140px;
     padding: 12px 36px 12px 14px;
     background: rgba(15, 23, 42, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);

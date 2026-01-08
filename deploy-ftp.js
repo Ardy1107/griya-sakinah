@@ -100,7 +100,7 @@ async function deploy() {
         await client.access({
             host: "145.79.26.43",
             user: "u254488293.griyasakinah",
-            password: "Samarinda2026!",
+            password: "Samarinda2026???",
             port: 21,
             secure: false
         });

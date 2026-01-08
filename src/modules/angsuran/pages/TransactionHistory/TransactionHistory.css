@@ -78,14 +78,8 @@
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 8px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .filter-group select {
