@@ -320,9 +320,9 @@ const Settings = () => {
                     >
                         <Cloud size={20} />
                         <div>
-                            <span className="button-title">Backup ke Google Drive</span>
+                            <span className="button-title">Backup ke Cloud</span>
                             <span className="button-desc">
-                                {driveLoading ? 'Mengupload...' : 'Simpan backup aman di Cloud'}
+                                {driveLoading ? 'Mengupload...' : 'Simpan backup aman di Supabase Storage'}
                             </span>
                         </div>
                     </button>

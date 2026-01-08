@@ -1,9 +1,10 @@
-import { uploadFile, isGoogleDriveConfigured, isAuthenticated, authenticate } from '../lib/googleDrive';
-import { getUnitsSync, getPaymentsSync } from './database';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { getUnits, getPayments } from './database';
 
 const BACKUP_INFO_KEY = 'gs_last_backup_info';
 const AUTO_BACKUP_ENABLED_KEY = 'gs_auto_backup_enabled';
 const BACKUP_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const BACKUP_BUCKET = 'backups';
 
 // Get last backup info
 export const getBackupInfo = () => {
@@ -16,11 +17,11 @@ export const getBackupInfo = () => {
 };
 
 // Save backup info
-export const saveBackupInfo = (method = 'manual', fileId = null) => {
+export const saveBackupInfo = (method = 'manual', filePath = null) => {
     const info = {
         lastBackupTime: new Date().toISOString(),
         method, // 'manual' or 'auto'
-        fileId,
+        filePath,
         success: true
     };
     localStorage.setItem(BACKUP_INFO_KEY, JSON.stringify(info));
@@ -53,34 +54,115 @@ export const isBackupOverdue = () => {
     return new Date() >= nextBackup;
 };
 
-export const backupDatabaseToDrive = async (method = 'manual') => {
+// Check if backup storage is configured
+export const isBackupConfigured = () => {
+    return isSupabaseConfigured();
+};
+
+// Backup to Supabase Storage (PRIVATE)
+export const backupToSupabase = async (method = 'manual') => {
     try {
-        if (!isGoogleDriveConfigured()) {
-            throw new Error("Google Drive belum dikonfigurasi");
+        if (!isSupabaseConfigured()) {
+            throw new Error("Supabase belum dikonfigurasi");
         }
 
-        if (!isAuthenticated()) {
-            await authenticate();
-        }
+        // Get data from database
+        const units = await getUnits();
+        const { data: payments } = await supabase
+            .from('payments')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-        const data = {
+        const backupData = {
             timestamp: new Date().toISOString(),
-            units: getUnitsSync(),
-            payments: getPaymentsSync()
+            version: '2.0',
+            method,
+            units: units || [],
+            payments: payments || [],
+            totalUnits: units?.length || 0,
+            totalPayments: payments?.length || 0
         };
 
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const file = new File([blob], `backup_sakinah_${new Date().toISOString().split('T')[0]}.json`, { type: 'application/json' });
+        // Generate filename with timestamp
+        const dateStr = new Date().toISOString().split('T')[0];
+        const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
+        const fileName = `backup_griyasakinah_${dateStr}_${timeStr}.json`;
 
-        const result = await uploadFile(file);
+        // Convert to blob
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+
+        // Upload to Supabase Storage (private bucket)
+        const { data, error } = await supabase.storage
+            .from(BACKUP_BUCKET)
+            .upload(fileName, blob, {
+                contentType: 'application/json',
+                upsert: false
+            });
+
+        if (error) {
+            // If bucket doesn't exist error, provide helpful message
+            if (error.message.includes('not found') || error.message.includes('Bucket')) {
+                throw new Error('Bucket "backups" belum ada. Buat dulu di Supabase Dashboard > Storage.');
+            }
+            throw error;
+        }
 
         // Save backup info
-        saveBackupInfo(method, result.id);
+        saveBackupInfo(method, data.path);
 
-        return result;
+        return {
+            success: true,
+            path: data.path,
+            fileName,
+            size: blob.size,
+            timestamp: backupData.timestamp
+        };
     } catch (error) {
         console.error("Backup failed:", error);
         throw error;
+    }
+};
+
+// List all backups from Supabase Storage
+export const listBackups = async () => {
+    if (!isSupabaseConfigured()) return [];
+
+    try {
+        const { data, error } = await supabase.storage
+            .from(BACKUP_BUCKET)
+            .list('', {
+                limit: 20,
+                sortBy: { column: 'created_at', order: 'desc' }
+            });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error("Failed to list backups:", error);
+        return [];
+    }
+};
+
+// Download a backup file
+export const downloadBackup = async (fileName) => {
+    if (!isSupabaseConfigured()) throw new Error("Supabase not configured");
+
+    const { data, error } = await supabase.storage
+        .from(BACKUP_BUCKET)
+        .download(fileName);
+
+    if (error) throw error;
+    return data;
+};
+
+// Delete old backups (keep last N backups)
+export const cleanupOldBackups = async (keepCount = 5) => {
+    const backups = await listBackups();
+    if (backups.length <= keepCount) return;
+
+    const toDelete = backups.slice(keepCount);
+    for (const file of toDelete) {
+        await supabase.storage.from(BACKUP_BUCKET).remove([file.name]);
     }
 };
 
@@ -91,8 +173,10 @@ export const checkAndRunAutoBackup = async () => {
     if (isBackupOverdue()) {
         try {
             console.log('[AutoBackup] Running scheduled backup...');
-            const result = await backupDatabaseToDrive('auto');
-            console.log('[AutoBackup] Complete:', result.id);
+            const result = await backupToSupabase('auto');
+            console.log('[AutoBackup] Complete:', result.path);
+            // Cleanup old backups after auto-backup
+            await cleanupOldBackups(10);
             return result;
         } catch (error) {
             console.error('[AutoBackup] Failed:', error);
@@ -101,3 +185,7 @@ export const checkAndRunAutoBackup = async () => {
     }
     return null;
 };
+
+// Legacy export for compatibility
+export const backupDatabaseToDrive = backupToSupabase;
+
