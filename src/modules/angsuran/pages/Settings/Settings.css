@@ -239,3 +239,104 @@
 .action-button.google-drive svg {
     color: #fbbf24;
 }
+
+/* Backup Status Card */
+.backup-status {
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.backup-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.backup-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+}
+
+.backup-info-item svg {
+    color: #60a5fa;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.backup-info-item>div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 14px;
+    color: #f1f5f9;
+    font-weight: 500;
+}
+
+.info-value.muted {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Auto-backup Toggle */
+.auto-backup-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toggle-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.toggle-desc {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.toggle-button.active {
+    color: #10b981;
+}
+
+.toggle-button:hover {
+    color: #94a3b8;
+}
+
+.toggle-button.active:hover {
+    color: #34d399;
+}

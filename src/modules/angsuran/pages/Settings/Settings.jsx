@@ -1,7 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { createAuditLog } from '../../utils/database';
-import { backupDatabaseToDrive } from '../../utils/backupService';
+import {
+    backupDatabaseToDrive,
+    getBackupInfo,
+    isAutoBackupEnabled,
+    setAutoBackupEnabled,
+    getNextBackupTime,
+    saveBackupInfo
+} from '../../utils/backupService';
 import {
     Download,
     Upload,
@@ -11,7 +18,11 @@ import {
     AlertTriangle,
     Shield,
     RefreshCw,
-    Cloud
+    Cloud,
+    Clock,
+    Calendar,
+    ToggleLeft,
+    ToggleRight
 } from 'lucide-react';
 import './Settings.css';
 
@@ -28,10 +39,33 @@ const Settings = () => {
     const [message, setMessage] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
     const [driveLoading, setDriveLoading] = useState(false);
+    const [backupInfo, setBackupInfo] = useState(null);
+    const [autoBackup, setAutoBackup] = useState(false);
+
+    useEffect(() => {
+        setBackupInfo(getBackupInfo());
+        setAutoBackup(isAutoBackupEnabled());
+    }, []);
 
     const showMessage = (type, text) => {
         setMessage({ type, text });
         setTimeout(() => setMessage({ type: '', text: '' }), 5000);
+    };
+
+    const formatDateTime = (isoString) => {
+        if (!isoString) return null;
+        const date = new Date(isoString);
+        return {
+            date: date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+            time: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+        };
+    };
+
+    const handleToggleAutoBackup = () => {
+        const newValue = !autoBackup;
+        setAutoBackup(newValue);
+        setAutoBackupEnabled(newValue);
+        showMessage('success', newValue ? 'Auto-backup mingguan diaktifkan!' : 'Auto-backup dimatikan');
     };
 
     const handleBackup = () => {
@@ -72,6 +106,8 @@ const Settings = () => {
             setDriveLoading(true);
             const result = await backupDatabaseToDrive();
             await createAuditLog({ userId: user.id, action: 'BACKUP_DRIVE', details: 'Database backup uploaded to Google Drive' });
+            // Refresh backup info display
+            setBackupInfo(getBackupInfo());
             showMessage('success', `Backup berhasil! File ID: ${result.id}`);
         } catch (error) {
             console.error(error);
@@ -197,7 +233,64 @@ const Settings = () => {
                 </div>
             </div>
 
-            {/* Backup Section */}
+            {/* Backup Status - NEW */}
+            <div className="settings-card backup-status">
+                <div className="card-header">
+                    <Cloud size={20} />
+                    <h3>Status Backup</h3>
+                </div>
+
+                <div className="backup-info-grid">
+                    <div className="backup-info-item">
+                        <Clock size={18} />
+                        <div>
+                            <span className="info-label">Backup Terakhir</span>
+                            {backupInfo ? (
+                                <span className="info-value">
+                                    {formatDateTime(backupInfo.lastBackupTime)?.date} pukul {formatDateTime(backupInfo.lastBackupTime)?.time}
+                                </span>
+                            ) : (
+                                <span className="info-value muted">Belum pernah backup</span>
+                            )}
+                        </div>
+                    </div>
+
+                    {backupInfo && (
+                        <div className="backup-info-item">
+                            <Database size={18} />
+                            <div>
+                                <span className="info-label">Metode</span>
+                                <span className="info-value">{backupInfo.method === 'auto' ? '🔄 Otomatis' : '👆 Manual'}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="backup-info-item">
+                        <Calendar size={18} />
+                        <div>
+                            <span className="info-label">Backup Berikutnya</span>
+                            <span className="info-value">
+                                {autoBackup ? formatDateTime(getNextBackupTime().toISOString())?.date : 'Auto-backup tidak aktif'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="auto-backup-toggle">
+                    <div className="toggle-info">
+                        <span className="toggle-label">Auto-Backup Mingguan</span>
+                        <span className="toggle-desc">Backup otomatis setiap 7 hari ke Google Drive</span>
+                    </div>
+                    <button
+                        className={`toggle-button ${autoBackup ? 'active' : ''}`}
+                        onClick={handleToggleAutoBackup}
+                    >
+                        {autoBackup ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
+                    </button>
+                </div>
+            </div>
+
+            {/* Backup & Restore Section */}
             <div className="settings-card">
                 <div className="card-header">
                     <Shield size={20} />
