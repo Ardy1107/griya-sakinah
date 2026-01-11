@@ -18,6 +18,7 @@ const WargaPortal = lazy(() => import('./pages/WargaPortal/WargaPortal'));
 const SuperadminLogin = lazy(() => import('./pages/SuperadminPortal/SuperadminLogin'));
 const SuperadminDashboard = lazy(() => import('./pages/SuperadminPortal/SuperadminDashboard'));
 const KelolaWarga = lazy(() => import('./pages/SuperadminPortal/KelolaWarga'));
+const SpiritualApp = lazy(() => import('./modules/spiritual/App'));
 
 // Loading Fallback
 const LoadingScreen = () => (
@@ -43,6 +44,9 @@ function App() {
                         <Route path="/superadmin/login" element={<SuperadminLogin />} />
                         <Route path="/superadmin" element={<SuperadminDashboard />} />
                         <Route path="/superadmin/warga" element={<KelolaWarga />} />
+
+                        {/* Spiritual Abundance Module */}
+                        <Route path="/spiritual/*" element={<SpiritualApp />} />
 
                         {/* Module Routes */}
                         <Route path="/angsuran/*" element={<AngsuranApp />} />

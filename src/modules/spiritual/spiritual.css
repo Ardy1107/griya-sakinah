@@ -1,0 +1,854 @@
+/* =====================================================
+   SPIRITUAL ABUNDANCE - MAIN STYLES
+   Premium UI for spiritual features
+   ===================================================== */
+
+/* =====================================================
+   CSS Variables
+   ===================================================== */
+.spiritual-module {
+    --spiritual-primary: #7c3aed;
+    --spiritual-primary-light: #a78bfa;
+    --spiritual-primary-dark: #5b21b6;
+    --spiritual-secondary: #10b981;
+    --spiritual-accent: #f59e0b;
+    --spiritual-danger: #ef4444;
+    --spiritual-success: #22c55e;
+
+    --spiritual-bg: #0f172a;
+    --spiritual-card: #1e293b;
+    --spiritual-card-hover: #334155;
+    --spiritual-border: #334155;
+    --spiritual-text: #f8fafc;
+    --spiritual-text-muted: #94a3b8;
+
+    --spiritual-radius: 16px;
+    --spiritual-radius-sm: 8px;
+    --spiritual-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --spiritual-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+/* =====================================================
+   Layout
+   ===================================================== */
+.spiritual-module {
+    min-height: 100vh;
+    background: var(--spiritual-bg);
+    color: var(--spiritual-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.spiritual-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* =====================================================
+   Header
+   ===================================================== */
+.spiritual-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, var(--spiritual-primary) 0%, var(--spiritual-primary-dark) 100%);
+    border-radius: var(--spiritual-radius);
+    margin-bottom: 24px;
+    box-shadow: var(--spiritual-shadow-lg);
+    position: relative;
+}
+
+.spiritual-header .back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.spiritual-header .back-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.spiritual-header .header-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+}
+
+.spiritual-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.spiritual-header p,
+.spiritual-header .subtitle {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin: 0;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.spiritual-header .step-indicator {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* =====================================================
+   Cards
+   ===================================================== */
+.spiritual-card {
+    background: var(--spiritual-card);
+    border-radius: var(--spiritual-radius);
+    padding: 24px;
+    border: 1px solid var(--spiritual-border);
+    transition: all 0.3s ease;
+}
+
+.spiritual-card:hover {
+    background: var(--spiritual-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--spiritual-shadow-lg);
+}
+
+.spiritual-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.spiritual-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.spiritual-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.spiritual-card-subtitle {
+    font-size: 0.875rem;
+    color: var(--spiritual-text-muted);
+}
+
+/* =====================================================
+   Menu Grid
+   ===================================================== */
+.spiritual-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.spiritual-menu-card {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.spiritual-menu-card .spiritual-card-icon.abundance {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.seft {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.doa {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.zikir {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.habit {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.muhasabah {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.kebaikan {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.spiritual-menu-card .spiritual-card-icon.syukur {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+/* =====================================================
+   Progress Bar
+   ===================================================== */
+.spiritual-progress {
+    height: 8px;
+    background: var(--spiritual-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.spiritual-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--spiritual-primary) 0%, var(--spiritual-secondary) 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* =====================================================
+   Stats Cards
+   ===================================================== */
+.spiritual-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.spiritual-stat-card {
+    background: var(--spiritual-card);
+    border-radius: var(--spiritual-radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--spiritual-border);
+}
+
+.spiritual-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--spiritual-primary-light);
+}
+
+.spiritual-stat-label {
+    font-size: 0.75rem;
+    color: var(--spiritual-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   Streak Badge
+   ===================================================== */
+.spiritual-streak {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* =====================================================
+   Buttons
+   ===================================================== */
+.spiritual-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--spiritual-radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spiritual-btn-primary {
+    background: linear-gradient(135deg, var(--spiritual-primary) 0%, var(--spiritual-primary-dark) 100%);
+    color: white;
+}
+
+.spiritual-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+
+.spiritual-btn-secondary {
+    background: var(--spiritual-card);
+    color: var(--spiritual-text);
+    border: 1px solid var(--spiritual-border);
+}
+
+.spiritual-btn-success {
+    background: linear-gradient(135deg, var(--spiritual-success) 0%, #16a34a 100%);
+    color: white;
+}
+
+.spiritual-btn-danger {
+    background: linear-gradient(135deg, var(--spiritual-danger) 0%, #dc2626 100%);
+    color: white;
+}
+
+/* =====================================================
+   Forms
+   ===================================================== */
+.spiritual-form-group {
+    margin-bottom: 20px;
+}
+
+.spiritual-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--spiritual-text);
+}
+
+.spiritual-input,
+.spiritual-select,
+.spiritual-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--spiritual-bg);
+    border: 1px solid var(--spiritual-border);
+    border-radius: var(--spiritual-radius-sm);
+    color: var(--spiritual-text);
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.spiritual-input:focus,
+.spiritual-select:focus,
+.spiritual-textarea:focus {
+    outline: none;
+    border-color: var(--spiritual-primary);
+}
+
+.spiritual-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* =====================================================
+   Rating Slider
+   ===================================================== */
+.spiritual-rating {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.spiritual-rating-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--spiritual-border);
+    border-radius: 4px;
+    outline: none;
+}
+
+.spiritual-rating-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--spiritual-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.5);
+}
+
+.spiritual-rating-value {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--spiritual-primary-light);
+}
+
+/* =====================================================
+   Checklist
+   ===================================================== */
+.spiritual-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.spiritual-check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--spiritual-bg);
+    border-radius: var(--spiritual-radius-sm);
+    border: 1px solid var(--spiritual-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spiritual-check-item:hover {
+    border-color: var(--spiritual-primary);
+}
+
+.spiritual-check-item.completed {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--spiritual-success);
+}
+
+.spiritual-check-item.completed .spiritual-check-text {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.spiritual-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid var(--spiritual-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.spiritual-check-item.completed .spiritual-checkbox {
+    background: var(--spiritual-success);
+    border-color: var(--spiritual-success);
+    color: white;
+}
+
+/* =====================================================
+   Ring Indicator (for Doa Diam-diam)
+   ===================================================== */
+.spiritual-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.spiritual-ring.ring-0 {
+    background: #3b82f6;
+}
+
+.spiritual-ring.ring-1 {
+    background: #f97316;
+}
+
+.spiritual-ring.ring-2 {
+    background: #eab308;
+}
+
+.spiritual-ring.ring-3 {
+    background: #22c55e;
+}
+
+.spiritual-ring.ring-4 {
+    background: #06b6d4;
+}
+
+.spiritual-ring.ring-5 {
+    background: #a855f7;
+}
+
+/* =====================================================
+   Qalbu Meter
+   ===================================================== */
+.spiritual-qalbu-meter {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.spiritual-qalbu-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.spiritual-qalbu-label {
+    width: 120px;
+    font-size: 0.875rem;
+}
+
+.spiritual-qalbu-bar {
+    flex: 1;
+    height: 12px;
+    background: var(--spiritual-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.spiritual-qalbu-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.spiritual-qalbu-fill.ketenangan {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.spiritual-qalbu-fill.syukur {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.spiritual-qalbu-fill.cinta {
+    background: linear-gradient(90deg, #ec4899, #f472b6);
+}
+
+.spiritual-qalbu-fill.welas {
+    background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.spiritual-qalbu-fill.ikhlas {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+/* =====================================================
+   Back Button
+   ===================================================== */
+.spiritual-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--spiritual-text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    transition: color 0.2s ease;
+}
+
+.spiritual-back-btn:hover {
+    color: var(--spiritual-text);
+}
+
+/* =====================================================
+   Responsive - MOBILE FIRST
+   ===================================================== */
+
+/* Base mobile styles (default) */
+.spiritual-container {
+    padding: 12px;
+    padding-bottom: 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+.spiritual-header {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.spiritual-header .back-button {
+    align-self: flex-start;
+    margin-bottom: 4px;
+}
+
+.spiritual-header .header-content {
+    width: 100%;
+}
+
+.spiritual-header h1 {
+    font-size: 1.15rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.spiritual-header p,
+.spiritual-header .subtitle {
+    font-size: 0.75rem;
+    max-width: 100%;
+}
+
+.spiritual-header .step-indicator {
+    position: static;
+    margin-top: 4px;
+}
+
+.spiritual-card {
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.spiritual-card:hover {
+    transform: none;
+    /* Disable hover transform on mobile */
+}
+
+.spiritual-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.spiritual-card-title {
+    font-size: 1rem;
+}
+
+.spiritual-card-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+
+.spiritual-menu-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.spiritual-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.spiritual-stat-card {
+    padding: 12px;
+}
+
+.spiritual-stat-value {
+    font-size: 1.5rem;
+}
+
+.spiritual-stat-label {
+    font-size: 0.65rem;
+}
+
+.spiritual-streak {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+}
+
+/* Buttons - Touch friendly (min 44px height) */
+.spiritual-btn {
+    padding: 14px 20px;
+    min-height: 48px;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.spiritual-btn-primary:hover,
+.spiritual-btn-success:hover,
+.spiritual-btn-danger:hover {
+    transform: none;
+    /* Disable hover transform on mobile */
+}
+
+/* Forms - Touch friendly */
+.spiritual-input,
+.spiritual-select,
+.spiritual-textarea {
+    padding: 14px 16px;
+    font-size: 16px;
+    /* Prevents iOS zoom on focus */
+    border-radius: 10px;
+    min-height: 48px;
+}
+
+.spiritual-textarea {
+    min-height: 100px;
+}
+
+.spiritual-label {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+}
+
+/* Rating Slider - Larger touch target */
+.spiritual-rating-slider {
+    height: 12px;
+}
+
+.spiritual-rating-slider::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+}
+
+.spiritual-rating-value {
+    font-size: 2.5rem;
+}
+
+/* Checklist - Touch friendly */
+.spiritual-check-item {
+    padding: 14px;
+    min-height: 56px;
+    gap: 14px;
+}
+
+.spiritual-checkbox {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+/* Ring indicators */
+.spiritual-ring {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+}
+
+/* Back button - Touch friendly */
+.spiritual-back-btn {
+    padding: 8px 0;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    min-height: 36px;
+}
+
+/* Qalbu meter labels */
+.spiritual-qalbu-label {
+    width: 100px;
+    font-size: 0.75rem;
+}
+
+/* Full width buttons on mobile */
+.spiritual-btn+.spiritual-btn {
+    margin-top: 8px;
+}
+
+/* Button groups on mobile */
+div[style*="display: flex"][style*="gap"]>.spiritual-btn {
+    flex: 1;
+}
+
+/* =====================================================
+   Tablet and up (768px+)
+   ===================================================== */
+@media (min-width: 768px) {
+    .spiritual-container {
+        padding: 24px;
+        max-width: 800px;
+    }
+
+    .spiritual-header {
+        flex-direction: row;
+        text-align: left;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+    }
+
+    .spiritual-header h1 {
+        font-size: 1.75rem;
+        justify-content: flex-start;
+    }
+
+    .spiritual-card {
+        padding: 24px;
+        border-radius: 16px;
+    }
+
+    .spiritual-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .spiritual-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .spiritual-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .spiritual-btn {
+        width: auto;
+        min-height: 44px;
+    }
+}
+
+/* =====================================================
+   Desktop (1024px+)
+   ===================================================== */
+@media (min-width: 1024px) {
+    .spiritual-container {
+        max-width: 1200px;
+    }
+
+    .spiritual-menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* =====================================================
+   Safe Area Support (iPhone notch, etc)
+   ===================================================== */
+@supports (padding: env(safe-area-inset-top)) {
+    .spiritual-module {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .spiritual-container {
+        padding-left: calc(12px + env(safe-area-inset-left));
+        padding-right: calc(12px + env(safe-area-inset-right));
+    }
+}
+
+/* =====================================================
+   Touch Feedback
+   ===================================================== */
+.spiritual-card:active,
+.spiritual-btn:active,
+.spiritual-check-item:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+/* =====================================================
+   Prevent Text Selection on Interactive Elements
+   ===================================================== */
+.spiritual-btn,
+.spiritual-check-item,
+.spiritual-card,
+.spiritual-back-btn {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* =====================================================
+   Smooth Scrolling
+   ===================================================== */
+.spiritual-module {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* =====================================================
+   Fix for iOS Safari 100vh issue
+   ===================================================== */
+.spiritual-module {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}

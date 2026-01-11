@@ -11,7 +11,8 @@ import {
     Shield,
     TrendingUp,
     Activity,
-    Gift
+    Gift,
+    Sparkles
 } from 'lucide-react';
 import { useSuperadmin } from '../../contexts/SuperadminContext';
 import './SuperadminPortal.css';
@@ -43,6 +44,16 @@ export default function SuperadminDashboard() {
     };
 
     const adminCards = [
+        {
+            id: 'spiritual',
+            title: 'Spiritual Abundance',
+            description: 'SEFT, Doa, Zikir, Habit Tracker & Syukur',
+            icon: Sparkles,
+            color: 'violet',
+            gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+            link: '/spiritual',
+            stats: '8 Fitur Lengkap'
+        },
         {
             id: 'angsuran',
             title: 'Angsuran Admin',

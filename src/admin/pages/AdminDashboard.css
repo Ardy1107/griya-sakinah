@@ -252,6 +252,125 @@
     margin-bottom: 1rem;
 }
 
+/* Featured Spiritual Card - Premium Large */
+.spiritual-featured-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 50%, #4c1d95 100%);
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 1.25rem;
+    text-decoration: none;
+    color: white;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.spiritual-featured-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+.spiritual-featured-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(139, 92, 246, 0.4);
+    border-color: rgba(167, 139, 250, 0.5);
+}
+
+.spiritual-featured-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    backdrop-filter: blur(8px);
+}
+
+.spiritual-featured-content {
+    flex: 1;
+}
+
+.spiritual-featured-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.spiritual-featured-content p {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.75rem;
+}
+
+.spiritual-featured-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.spiritual-featured-badges .badge {
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+}
+
+.spiritual-featured-arrow {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* Mobile responsive for featured card */
+@media (max-width: 768px) {
+    .spiritual-featured-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .spiritual-featured-icon {
+        width: 72px;
+        height: 72px;
+    }
+
+    .spiritual-featured-content h2 {
+        font-size: 1.25rem;
+    }
+
+    .spiritual-featured-badges {
+        justify-content: center;
+    }
+
+    .spiritual-featured-arrow {
+        display: none;
+    }
+}
+
 /* Module Cards */
 .module-cards {
     display: grid;
@@ -287,6 +406,14 @@
 
 .module-card.purple .module-icon {
     background: linear-gradient(135deg, #a855f7, #7c3aed);
+}
+
+.module-card.violet .module-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.module-card.amber .module-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .module-icon {

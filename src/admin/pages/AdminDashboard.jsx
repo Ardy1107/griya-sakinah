@@ -4,7 +4,7 @@ import { useAdminAuth, ROLES, ROLE_PERMISSIONS } from '../contexts/AdminAuthCont
 import {
     Home, Wifi, Heart, Users, Settings, LogOut, Shield,
     TrendingUp, ChevronRight, Plus, Edit2, Trash2, X, Check,
-    Moon, Sun, UserPlus, LayoutDashboard, Gift
+    Moon, Sun, UserPlus, LayoutDashboard, Gift, Sparkles
 } from 'lucide-react';
 import CommunityAdmin from './CommunityAdmin';
 import './AdminDashboard.css';
@@ -38,6 +38,15 @@ const AdminDashboard = () => {
     };
 
     const moduleCards = [
+        {
+            id: 'spiritual',
+            title: 'Spiritual Abundance',
+            description: 'SEFT, Doa, Zikir, Habit & Syukur',
+            icon: Sparkles,
+            color: 'violet',
+            link: '/spiritual',
+            stats: { label: 'Fitur Lengkap', value: '8' }
+        },
         {
             id: 'angsuran',
             title: 'Angsuran Sakinah',
@@ -76,7 +85,8 @@ const AdminDashboard = () => {
         }
     ];
 
-    const filteredModules = moduleCards.filter(m => hasModuleAccess(m.id));
+    // Spiritual is always visible for all users (personal tool), others are filtered by module access
+    const filteredModules = moduleCards.filter(m => m.id === 'spiritual' || hasModuleAccess(m.id));
 
     const handleDeleteUser = (userId) => {
         if (window.confirm('Yakin ingin menghapus user ini?')) {
@@ -292,9 +302,26 @@ const AdminDashboard = () => {
                     {/* Overview Tab */}
                     {activeTab === 'overview' && (
                         <div className="overview-content">
-                            <h2 className="section-title">Modul yang Dapat Diakses</h2>
+                            {/* Featured Spiritual Card - Premium Large */}
+                            <Link to="/spiritual" className="spiritual-featured-card">
+                                <div className="spiritual-featured-icon">
+                                    <Sparkles size={48} />
+                                </div>
+                                <div className="spiritual-featured-content">
+                                    <h2>Spiritual Abundance</h2>
+                                    <p>SEFT Tracker • Doa Para Nabi • Zikir • Habit Tracker • Muhasabah • Syukur</p>
+                                    <div className="spiritual-featured-badges">
+                                        <span className="badge">🎯 SEFT Release</span>
+                                        <span className="badge">🤲 11 Ring Doa</span>
+                                        <span className="badge">💝 Qalbu Meter</span>
+                                    </div>
+                                </div>
+                                <ChevronRight size={28} className="spiritual-featured-arrow" />
+                            </Link>
+
+                            <h2 className="section-title" style={{ marginTop: '1.5rem' }}>Modul Administrasi</h2>
                             <div className="module-cards">
-                                {filteredModules.map(module => (
+                                {filteredModules.filter(m => m.id !== 'spiritual').map(module => (
                                     <Link
                                         key={module.id}
                                         to={module.link}
