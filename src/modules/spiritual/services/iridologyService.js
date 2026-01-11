@@ -283,7 +283,7 @@ export async function generateRecommendations(selectedOrgans) {
     const allEmotions = emotionsResults.flat();
     const allHerbs = herbsResults.flat();
 
-    // Sort emotions by Hawkins level (lower = higher priority)
+    // Sort emotions by priority (penyakit hati berat lebih prioritas)
     const sortedEmotions = allEmotions.sort((a, b) => {
         if (a.emosi_level_hawkins !== b.emosi_level_hawkins) {
             return a.emosi_level_hawkins - b.emosi_level_hawkins;

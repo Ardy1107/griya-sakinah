@@ -34,6 +34,7 @@ export function VideoPlayerProvider({ children }) {
         return saved ? parseInt(saved, 10) : 500;
     });
     const [isResizing, setIsResizing] = useState(false);
+    const [inlineMode, setInlineMode] = useState(false); // When true, hide popup player
     const resizeRef = useRef(null);
 
     // Save size preference
@@ -95,12 +96,14 @@ export function VideoPlayerProvider({ children }) {
             minimizePlayer,
             closePlayer,
             isMinimized,
-            isVisible
+            isVisible,
+            inlineMode,
+            setInlineMode
         }}>
             {children}
 
-            {/* Floating Mini Player */}
-            {isVisible && currentVideo && isMinimized && (
+            {/* Floating Mini Player - hide when inline mode is active */}
+            {isVisible && currentVideo && isMinimized && !inlineMode && (
                 <div style={{
                     position: 'fixed',
                     bottom: '20px',
@@ -191,8 +194,8 @@ export function VideoPlayerProvider({ children }) {
                 </div>
             )}
 
-            {/* Full Resizable Player */}
-            {isVisible && currentVideo && !isMinimized && (
+            {/* Full Resizable Player - hide when inline mode is active */}
+            {isVisible && currentVideo && !isMinimized && !inlineMode && (
                 <div
                     ref={resizeRef}
                     style={{

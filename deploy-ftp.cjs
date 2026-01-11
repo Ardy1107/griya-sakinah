@@ -9,12 +9,12 @@ const FtpDeploy = require('ftp-deploy');
 const ftpDeploy = new FtpDeploy();
 
 // ⚠️ Credentials Hostinger
-const FTP_PASSWORD = process.env.FTP_PASSWORD || 'Samarinda2026@@@';
+const FTP_PASSWORD = process.env.FTP_PASSWORD || 'Samarinda2026...';
 
 const config = {
-    user: 'u254488293.griyasakinah2',
+    user: 'u254488293.GS',
     password: FTP_PASSWORD,
-    host: 'ftp.griyasakinah.org',
+    host: '145.79.26.43',
     port: 21,
     localRoot: './dist',
     remoteRoot: '/',

@@ -4,20 +4,20 @@ import { ArrowLeft, Sparkles, Flame, BookOpen, Check } from 'lucide-react';
 export default function AbundanceDashboard() {
     const dailyPractice = [
         { id: 1, name: 'Doa Para Nabi', completed: true },
-        { id: 2, name: 'ABC Clearing', completed: true },
-        { id: 3, name: 'Light of Abundance', completed: false },
-        { id: 4, name: 'Doa Logos', completed: false },
+        { id: 2, name: 'Istighfar & Taubat', completed: true },
+        { id: 3, name: 'Dzikir Pagi Petang', completed: false },
+        { id: 4, name: 'Shalawat Nabi ﷺ', completed: false },
         { id: 5, name: 'Toples Syukur (TOSCA)', completed: false },
     ];
 
     const principles = [
-        { id: 1, name: 'Abundance Identity (Be-1)', desc: 'Sadar kita adalah Masterpiece ciptaan Tuhan' },
-        { id: 2, name: 'Abundance Mission (Be-2)', desc: 'Sadar tujuan diciptakan untuk mencintai-Nya' },
-        { id: 3, name: 'Abundance Mind (Be-3)', desc: 'Bersihkan hambatan pikiran' },
-        { id: 4, name: 'Abundance Heart (Be-4)', desc: 'Luaskan hati, luaskan rezeki' },
-        { id: 5, name: 'Abundance Spirit (Be-5)', desc: 'Ask, and it is given' },
-        { id: 6, name: 'Abundance Soul (Be-6)', desc: 'Rahasia hati para Nabi' },
-        { id: 7, name: 'Abundance Action (Do)', desc: 'Ambition for Greater Good' },
+        { id: 1, name: 'Mengenal Diri (Be-1)', desc: 'Sadar kita adalah hamba Allah yang diciptakan dalam sebaik-baik bentuk' },
+        { id: 2, name: 'Mengenal Tujuan (Be-2)', desc: 'QS. Adz-Dzariyat:56 - Diciptakan untuk beribadah kepada Allah' },
+        { id: 3, name: 'Bersihkan Pikiran (Be-3)', desc: 'Husnudzan kepada Allah, bersihkan prasangka buruk' },
+        { id: 4, name: 'Luaskan Hati (Be-4)', desc: 'QS. Alam Nasyrah:1 - Alam nasyrah laka sadrak' },
+        { id: 5, name: 'Bermunajat (Be-5)', desc: 'QS. Ghafir:60 - Berdoalah kepada-Ku, niscaya Aku kabulkan' },
+        { id: 6, name: 'Rahasia Nabi (Be-6)', desc: 'Tawakal, sabar, syukur - sifat para Nabi' },
+        { id: 7, name: 'Ikhtiar Terbaik (Do)', desc: 'Berusaha maksimal, hasil serahkan kepada Allah' },
     ];
 
     return (
@@ -41,19 +41,21 @@ export default function AbundanceDashboard() {
                 </div>
             </div>
 
-            {/* Formula */}
+            {/* Formula Islami */}
             <div className="spiritual-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
-                <h3 style={{ marginBottom: '12px' }}>Abundance Formula</h3>
+                <h3 style={{ marginBottom: '12px' }}>Kunci Keberkahan Rezeki</h3>
                 <div style={{
-                    fontSize: '2rem',
+                    fontSize: '1.4rem',
                     fontWeight: '700',
                     color: '#f59e0b',
-                    marginBottom: '8px'
+                    marginBottom: '8px',
+                    lineHeight: '1.6'
                 }}>
-                    Be² × Do = Have
+                    Istighfar + Taqwa = Rezeki dari Arah Tidak Disangka
                 </div>
-                <p style={{ fontSize: '0.875rem', color: 'var(--spiritual-text-muted)' }}>
-                    "Be" jauh lebih penting daripada "Do"
+                <p style={{ fontSize: '0.875rem', color: 'var(--spiritual-text-muted)', fontStyle: 'italic' }}>
+                    "Barangsiapa bertakwa kepada Allah, niscaya Dia akan membukakan jalan keluar baginya, dan memberinya rezeki dari arah yang tidak disangka-sangkanya."<br />
+                    <strong>— QS. At-Talaq: 2-3</strong>
                 </p>
             </div>
 
@@ -97,9 +99,9 @@ export default function AbundanceDashboard() {
                 </div>
             </div>
 
-            {/* 7 Principles */}
+            {/* 7 Prinsip Islami */}
             <div className="spiritual-card">
-                <h3 style={{ marginBottom: '16px' }}>7 Spiritual Principles</h3>
+                <h3 style={{ marginBottom: '16px' }}>7 Prinsip Keberkahan</h3>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {principles.map(p => (

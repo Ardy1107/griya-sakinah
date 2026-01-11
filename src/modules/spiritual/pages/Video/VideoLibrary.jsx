@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft, Play, Clock, CheckCircle,
-    ChevronRight, Sparkles, Target, BookOpen, Minimize2
+    ChevronRight, Sparkles, Target, BookOpen, Minimize2, Maximize2, ExternalLink
 } from 'lucide-react';
 import { useVideoPlayer } from '../../context/VideoPlayerContext';
 import '../../spiritual.css';
@@ -58,11 +58,12 @@ const VIDEOS = {
 export default function VideoLibrary() {
     const navigate = useNavigate();
     const { category } = useParams();
-    const { playVideo, minimizePlayer, currentVideo, isVisible } = useVideoPlayer();
+    const { playVideo, minimizePlayer, currentVideo, isVisible, setInlineMode } = useVideoPlayer();
     const [watchedVideos, setWatchedVideos] = useState(() => {
         const saved = localStorage.getItem('spiritual_watched_videos');
         return saved ? JSON.parse(saved) : [];
     });
+    const [showInlinePlayer, setShowInlinePlayer] = useState(false);
 
     const markAsWatched = (videoId, categoryId) => {
         const key = `${categoryId}_${videoId}`;
@@ -71,6 +72,12 @@ export default function VideoLibrary() {
             setWatchedVideos(updated);
             localStorage.setItem('spiritual_watched_videos', JSON.stringify(updated));
         }
+    };
+
+    // Toggle inline player and sync with context
+    const toggleInlinePlayer = (show) => {
+        setShowInlinePlayer(show);
+        setInlineMode(show); // Tell context to hide popup when inline is active
     };
 
     const handlePlayVideo = (video) => {
@@ -106,43 +113,99 @@ export default function VideoLibrary() {
                     {/* Now Playing Indicator */}
                     {isVisible && currentVideo && (
                         <div style={{
-                            padding: '12px 16px',
-                            background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(34,197,94,0.1))',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(34,197,94,0.3)',
-                            marginBottom: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
+                            padding: '14px 16px',
+                            background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(34,197,94,0.08))',
+                            borderRadius: '14px',
+                            border: '1px solid rgba(34,197,94,0.25)',
+                            marginBottom: '16px'
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div style={{
-                                    width: '8px', height: '8px',
-                                    borderRadius: '50%',
-                                    background: '#22c55e',
-                                    animation: 'pulse 2s infinite'
-                                }} />
-                                <span style={{ fontSize: '13px', color: '#22c55e' }}>
-                                    ▶ Sedang Diputar: <strong>{currentVideo.title}</strong>
-                                </span>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '12px'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div style={{
+                                        width: '10px', height: '10px',
+                                        borderRadius: '50%',
+                                        background: '#22c55e',
+                                        animation: 'pulse 2s infinite'
+                                    }} />
+                                    <div>
+                                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '2px' }}>
+                                            Sedang Diputar
+                                        </div>
+                                        <div style={{ fontSize: '14px', color: '#fff', fontWeight: '600' }}>
+                                            {currentVideo.title}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => toggleInlinePlayer(!showInlinePlayer)}
+                                        style={{
+                                            background: showInlinePlayer ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)',
+                                            border: '1px solid rgba(255,255,255,0.15)',
+                                            borderRadius: '8px',
+                                            padding: '8px 12px',
+                                            color: '#fff',
+                                            fontSize: '12px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        {showInlinePlayer ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                                        {showInlinePlayer ? 'Kecilkan' : 'Buka di Sini'}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            toggleInlinePlayer(false); // Turn off inline
+                                            minimizePlayer(); // Show popup
+                                        }}
+                                        style={{
+                                            background: !showInlinePlayer ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)',
+                                            border: '1px solid rgba(255,255,255,0.15)',
+                                            borderRadius: '8px',
+                                            padding: '8px 12px',
+                                            color: '#fff',
+                                            fontSize: '12px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        <ExternalLink size={14} /> Popup
+                                    </button>
+                                </div>
                             </div>
-                            <button
-                                onClick={minimizePlayer}
-                                style={{
-                                    background: 'rgba(255,255,255,0.1)',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    padding: '6px 10px',
-                                    color: '#fff',
-                                    fontSize: '12px',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                }}
-                            >
-                                <Minimize2 size={14} /> Mini
-                            </button>
+
+                            {/* Inline Video Player */}
+                            {showInlinePlayer && (
+                                <div style={{
+                                    marginTop: '16px',
+                                    borderRadius: '12px',
+                                    overflow: 'hidden',
+                                    background: '#000',
+                                    aspectRatio: '16/9'
+                                }}>
+                                    <iframe
+                                        src={`https://drive.google.com/file/d/${currentVideo.fileId}/preview`}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            border: 'none'
+                                        }}
+                                        allow="autoplay; encrypted-media"
+                                        allowFullScreen
+                                        title={currentVideo.title}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
 

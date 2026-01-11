@@ -632,3 +632,54 @@ export async function getAbundanceMateri() {
     if (error) throw error;
     return data;
 }
+
+// =====================================================
+// SEFT PROXY SERVICES
+// =====================================================
+
+// Create a new SEFT Proxy session
+export async function createSeftProxy(proxyData) {
+    const { data, error } = await supabase
+        .from('spiritual_seft_proxy')
+        .insert([proxyData])
+        .select()
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
+// Get SEFT Proxy history
+export async function getSeftProxyHistory(deviceId, limit = 50) {
+    const { data, error } = await supabase
+        .from('spiritual_seft_proxy')
+        .select('*')
+        .eq('device_id', deviceId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+}
+
+// Delete a SEFT Proxy session
+export async function deleteSeftProxy(id) {
+    const { error } = await supabase
+        .from('spiritual_seft_proxy')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+    return true;
+}
+
+// Get total count of SEFT Proxy sessions
+export async function getSeftProxyCount(deviceId) {
+    const { count, error } = await supabase
+        .from('spiritual_seft_proxy')
+        .select('id', { count: 'exact' })
+        .eq('device_id', deviceId);
+
+    if (error) throw error;
+    return count || 0;
+}

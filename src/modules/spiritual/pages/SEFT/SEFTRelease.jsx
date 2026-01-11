@@ -3,21 +3,67 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Check, ChevronDown, AlertTriangle, Info, Trophy, History, X, Heart, Activity, HelpCircle, Lightbulb, Loader2 } from 'lucide-react';
 import { createSeftSession, getSeftHistory, getTodaySeftCount, getDeviceId } from '../../services/spiritualService';
 
-// ============ SKALA HAWKINS - WARNA & TINGKAT KEPARAHAN ============
-// Semakin RENDAH level = semakin PARAH, semakin perlu dirilis DULUAN
-const HAWKINS_LEVELS = {
-    20: { label: 'KRITIS', color: '#dc2626', bgColor: 'rgba(220, 38, 38, 0.2)', emoji: '🔴', prioritas: 1 },
-    30: { label: 'SANGAT BERAT', color: '#ea580c', bgColor: 'rgba(234, 88, 12, 0.2)', emoji: '🟠', prioritas: 2 },
-    50: { label: 'BERAT', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.2)', emoji: '🟡', prioritas: 3 },
-    75: { label: 'SEDANG', color: '#eab308', bgColor: 'rgba(234, 179, 8, 0.2)', emoji: '🟡', prioritas: 4 },
-    100: { label: 'RINGAN-SEDANG', color: '#84cc16', bgColor: 'rgba(132, 204, 22, 0.2)', emoji: '🟢', prioritas: 5 },
-    125: { label: 'RINGAN', color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.2)', emoji: '🟢', prioritas: 6 },
-    150: { label: 'LEBIH BAIK', color: '#14b8a6', bgColor: 'rgba(20, 184, 166, 0.2)', emoji: '🔵', prioritas: 7 },
-    175: { label: 'MENDEKATI NETRAL', color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.2)', emoji: '🔵', prioritas: 8 },
+// ============ PENYAKIT HATI DALAM ISLAM - BERDASARKAN QURAN & SUNNAH ============
+// Prioritas berdasarkan tingkat kerusakan menurut Al-Quran dan Hadith
+// Semakin tinggi prioritas (angka kecil) = semakin perlu ditangani duluan
+const TINGKAT_PENYAKIT = {
+    1: {
+        label: 'DOSA BESAR',
+        color: '#dc2626',
+        bgColor: 'rgba(220, 38, 38, 0.2)',
+        emoji: '🔴',
+        dalil: 'QS. An-Nisa: 48 - "Sesungguhnya Allah tidak akan mengampuni dosa syirik"'
+    },
+    2: {
+        label: 'PENGHALANG SURGA',
+        color: '#ea580c',
+        bgColor: 'rgba(234, 88, 12, 0.2)',
+        emoji: '🟠',
+        dalil: 'HR. Muslim - "Tidak masuk surga orang yang di hatinya ada sebesar biji sawi kesombongan"'
+    },
+    3: {
+        label: 'PEMAKAN AMAL',
+        color: '#f59e0b',
+        bgColor: 'rgba(245, 158, 11, 0.2)',
+        emoji: '🟡',
+        dalil: 'HR. Abu Dawud - "Jauhilah hasad, karena hasad memakan kebaikan seperti api memakan kayu bakar"'
+    },
+    4: {
+        label: 'MERUSAK IMAN',
+        color: '#eab308',
+        bgColor: 'rgba(234, 179, 8, 0.2)',
+        emoji: '🟡',
+        dalil: 'HR. Bukhari - "Bukan orang kuat yang menang gulat, tapi yang mengendalikan diri saat marah"'
+    },
+    5: {
+        label: 'PERLU DIWASPADAI',
+        color: '#84cc16',
+        bgColor: 'rgba(132, 204, 22, 0.2)',
+        emoji: '🟢',
+        dalil: 'QS. At-Taubah: 40 - "Janganlah engkau bersedih, sesungguhnya Allah bersama kita"'
+    },
+    6: {
+        label: 'UJIAN HATI',
+        color: '#22c55e',
+        bgColor: 'rgba(34, 197, 94, 0.2)',
+        emoji: '🟢',
+        dalil: 'QS. Ali Imran: 175 - "Maka janganlah kamu takut kepada mereka, tetapi takutlah kepada-Ku"'
+    },
 };
 
-// ============ DAMPAK FISIK BERDASARKAN PENELITIAN PSIKOSOMATIS ============
-// Berdasarkan: Dr. David Hawkins, Chinese Medicine, Louise Hay, Dr. Gabor Maté
+// Alias for backward compatibility (gradual migration)
+const HAWKINS_LEVELS = {
+    20: TINGKAT_PENYAKIT[1],  // DOSA BESAR
+    30: TINGKAT_PENYAKIT[1],  // DOSA BESAR
+    50: TINGKAT_PENYAKIT[3],  // PEMAKAN AMAL
+    75: TINGKAT_PENYAKIT[4],  // MERUSAK IMAN
+    100: TINGKAT_PENYAKIT[5], // PERLU DIWASPADAI
+    125: TINGKAT_PENYAKIT[6], // UJIAN HATI
+    150: TINGKAT_PENYAKIT[4], // MERUSAK IMAN (Marah)
+    175: TINGKAT_PENYAKIT[2], // PENGHALANG SURGA (Sombong)
+};
+// ============ DAMPAK FISIK - HUBUNGAN HATI DAN TUBUH ============
+// Islam mengakui hubungan hati dan tubuh. Rasulullah ﷺ bersabda tentang hati yang sakit mempengaruhi seluruh tubuh.
 const DAMPAK_FISIK = {
     'Malu': {
         organs: ['Kulit', 'Sistem Imun'],
@@ -99,6 +145,22 @@ const SAKIT_KE_EMOSI = {
     'Vertigo': ['Menolak Kenyataan', 'Putus Asa', 'Takut Perubahan', 'Tidak Grounded'],
     'Tuli/Gangguan Pendengaran': ['Merasa Ditolak', 'Ditinggalkan', 'Tidak Ingin Diganggu', 'Menutup Diri'],
 
+    // MATA
+    'Mata Minus/Plus': ['Menolak Melihat Kenyataan', 'Takut Masa Depan', 'Trauma Masa Lalu'],
+    'Mata Kering': ['Menahan Kesedihan', 'Tidak Bisa Menangis', 'Stres Emosional'],
+    'Katarak': ['Tidak Ingin Melihat Masa Depan', 'Pesimis', 'Putus Asa'],
+    'Glaukoma': ['Tekanan Emosional', 'Tidak Mau Melihat Kebenaran', 'Marah Terpendam'],
+
+    // TELINGA
+    'Telinga Berdenging': ['Menolak Mendengar', 'Overthinking', 'Tidak Mau Menerima Kritik'],
+    'Infeksi Telinga': ['Marah Terhadap Apa yang Didengar', 'Konflik Komunikasi'],
+
+    // TENGGOROKAN & MULUT
+    'Tenggorokan/Radang': ['Tidak Berani Bicara', 'Menelan Emosi', 'Takut Dikritik'],
+    'Amandel': ['Emosi yang Ditekan', 'Tidak Berani Menolak', 'Menyimpan Rahasia'],
+    'Sariawan': ['Kata-kata Pedas', 'Marah yang Ditahan', 'Frustrasi Komunikasi'],
+    'Gigi Berlubang': ['Tidak Tegas', 'Sulit Mengambil Keputusan', 'Agresi Terpendam'],
+
     // LEHER & BAHU
     'Leher Kaku': ['Sombong', 'Keras Kepala', 'Konflik dengan Atasan', 'Tidak Fleksibel'],
     'Bahu Tegang': ['Beban Tanggung Jawab', 'Stres', 'Takut Gagal', 'Terlalu Banyak Pikul'],
@@ -107,67 +169,263 @@ const SAKIT_KE_EMOSI = {
     'Dada/Jantung': ['Sedih', 'Patah Hati', 'Kesepian', 'Konflik dengan Pasangan'],
     'Paru-paru/Asma': ['Sedih', 'Duka', 'Merasa Ditinggalkan', 'Grief'],
     'TBC/Paru': ['Sombong Berlebihan', 'Posesif', 'Pikiran Kejam', 'Dendam'],
+    'Sesak Napas': ['Cemas', 'Panik', 'Takut Terjebak', 'Claustrophobia'],
 
     // PERUT & PENCERNAAN
     'Lambung/Maag': ['Cemas', 'Khawatir', 'Inner Child Terluka', 'Konflik dengan Orang Tua'],
     'Hati': ['Marah', 'Dengki', 'Dendam', 'Benci', 'Toxic Relationship'],
     'Hernia': ['Tidak Mampu Menjalin Relasi', 'Tertekan', 'Stress Sosial'],
     'Tumor/Benjolan': ['Dendam Masa Lalu', 'Menyesal Mendalam', 'Tidak Bisa Melepaskan'],
+    'Usus/Diare': ['Cemas Berlebihan', 'Takut', 'Sulit Menerima Kenyataan'],
+    'Sembelit': ['Sulit Melepaskan', 'Kikir', 'Kontrol Berlebihan', 'Tidak Mau Move On'],
 
     // PUNGGUNG & PINGGANG
     'Punggung Bawah': ['Masalah Keuangan', 'Takut Miskin', 'Stres Keuangan', 'Rasa Bersalah'],
     'Punggung Atas': ['Tidak Didukung', 'Merasa Sendiri', 'Tidak Ada Backing'],
+    'Tulang Belakang': ['Tidak Punya Pendirian', 'Lemah', 'Mudah Dipengaruhi'],
 
     // GINJAL & KANDUNG KEMIH
     'Ginjal': ['Takut', 'Cemas', 'Takut Masa Depan', 'Trauma Mendalam'],
+    'Kandung Kemih': ['Cemas', 'Takut Melepaskan', 'Marah Terhadap Pasangan'],
+
+    // TANGAN & LENGAN
+    'Tangan Kesemutan': ['Tidak Mau Menerima', 'Sulit Memberi', 'Kikir Emosi'],
+    'Tangan Gemetar': ['Cemas', 'Takut', 'Trauma', 'Panik'],
+    'Nyeri Sendi Tangan': ['Kaku Berpikir', 'Tidak Fleksibel', 'Egois'],
+    'Carpal Tunnel': ['Frustrasi Pekerjaan', 'Stres Karier', 'Burnout'],
+    'Lengan Nyeri': ['Tidak Bisa Merangkul', 'Sulit Menerima Kasih Sayang'],
+    'Jari Kaku': ['Kontrol Berlebihan', 'Perfeksionis', 'Keras Kepala'],
+
+    // KAKI & TUNGKAI
+    'Kaki Kesemutan': ['Takut Maju', 'Takut Perubahan', 'Ragu-ragu'],
+    'Nyeri Lutut': ['Sombong', 'Keras Kepala', 'Tidak Mau Menyerah', 'Ego Tinggi'],
+    'Nyeri Tumit': ['Takut Melangkah', 'Takut Masa Depan', 'Tidak Grounded'],
+    'Varises': ['Beban Berlebihan', 'Stres Berdiri Terlalu Lama', 'Overwork'],
+    'Kaki Bengkak': ['Menahan Emosi', 'Sulit Melepaskan', 'Beban Pikiran'],
+    'Asam Urat/Kaki': ['Marah Terpendam', 'Dendam', 'Frustrasi Mendalam'],
+    'Kaki Dingin': ['Takut', 'Cemas', 'Tidak Berani Maju'],
+    'Jari Kaki Nyeri': ['Khawatir Masa Depan', 'Takut Detail Kecil'],
 
     // KULIT
     'Kulit/Psoriasis': ['Malu', 'Merasa Tidak Berharga', 'Merasa Rendah Diri', 'Tidak Menerima Diri'],
     'Jerawat': ['Tidak Menerima Diri', 'Tidak Suka Diri Sendiri', 'Low Self-Esteem'],
+    'Eksim': ['Frustrasi', 'Iritasi', 'Tidak Nyaman dengan Diri'],
+    'Gatal-gatal': ['Frustrasi', 'Tidak Sabar', 'Iritasi Emosional'],
+    'Rambut Rontok': ['Stres', 'Cemas', 'Kehilangan Identitas', 'Takut Kehilangan'],
 
     // DARAH & KARDIOVASKULAR
     'Tekanan Darah Rendah': ['Kurang Kasih Sayang', 'Inner Child Terluka', 'Tidak Ingin Berubah'],
     'Tekanan Darah Tinggi': ['Marah Terpendam', 'Stres Kronis', 'Perfeksionis'],
+    'Kolesterol Tinggi': ['Takut Kehilangan', 'Kikir', 'Menyimpan Terlalu Banyak'],
+    'Anemia': ['Kurang Semangat', 'Tidak Berdaya', 'Apatis'],
+
+    // SISTEM REPRODUKSI
+    'Haid Tidak Teratur': ['Menolak Kewanitaan', 'Konflik dengan Ibu', 'Trauma Hubungan'],
+    'Nyeri Haid': ['Marah pada Diri Sendiri', 'Rasa Bersalah', 'Menolak Siklus'],
+    'Prostat': ['Rasa Bersalah Seksual', 'Takut Menua', 'Masalah Maskulinitas'],
+    'Infertilitas': ['Takut Menjadi Orang Tua', 'Inner Child Terluka', 'Rasa Tidak Layak'],
 
     // IMUN & ENERGI
     'Imun Lemah': ['Malu', 'Apatis', 'Putus Asa', 'Depresi', 'Merasa Tidak Berharga'],
     'Kelelahan Kronis': ['Apatis', 'Burnout', 'Hampa', 'Tidak Berdaya', 'Kehilangan Motivasi'],
     'Autoimun': ['Menyerang Diri Sendiri', 'Self-Hate', 'Rasa Bersalah Mendalam'],
+    'Alergi': ['Menolak Sesuatu/Seseorang', 'Iritasi', 'Tidak Menerima'],
+    'Demam': ['Marah yang Memuncak', 'Emosi yang Meledak', 'Stres Akut'],
+
+    // TIDUR
+    'Insomnia': ['Cemas', 'Overthinking', 'Takut', 'Tidak Bisa Melepaskan Kontrol'],
+    'Sleep Apnea': ['Takut Melepaskan', 'Cemas Tidur', 'Trauma'],
+    'Mimpi Buruk': ['Trauma', 'Ketakutan Terpendam', 'Inner Child Terluka'],
 };
 
-// Penjelasan untuk setiap kategori emosi
+// Penjelasan untuk setiap kategori penyakit hati - BERDASARKAN QURAN & SUNNAH
 const KATEGORI_INFO = {
-    'Malu': '🔴 LEVEL 20 - KRITIS. Energi paling rendah. Perasaan tidak berharga. PRIORITAS TINGGI untuk dirilis.',
-    'Bersalah': '🟠 LEVEL 30 - SANGAT BERAT. Rasa bersalah menghambat kebahagiaan. PRIORITAS TINGGI.',
-    'Apatis': '🟡 LEVEL 50 - BERAT. Kehilangan minat dan harapan. Perlu segera ditangani.',
-    'Sedih': '🟡 LEVEL 75 - SEDANG. Kesedihan mendalam. Mempengaruhi paru-paru dan jantung.',
-    'Takut': '🟢 LEVEL 100 - RINGAN-SEDANG. Ketakutan yang menghambat. Mempengaruhi ginjal.',
-    'Hasrat': '🟢 LEVEL 125 - RINGAN. Keinginan berlebihan yang mengikat.',
-    'Marah': '🔵 LEVEL 150 - LEBIH BAIK. Meski energi lebih tinggi, amarah merusak hati dan jantung.',
-    'Sombong': '🔵 LEVEL 175 - MENDEKATI NETRAL. Kesombongan menghalangi pertumbuhan.',
-    'Finansial': '💰 Emosi terkait uang. Blocking abundance. Menyerang punggung bawah.',
-    'Hubungan': '💔 Emosi terkait pasangan. Menyerang jantung dan dada.',
-    'Keluarga': '👨‍👩‍👧 Emosi keluarga. Menyerang lambung dan solar plexus.',
-    'Karier': '💼 Emosi pekerjaan. Menyerang bahu dan leher.',
-    'Kesehatan': '🏥 Kecemasan kesehatan. Memperburuk sistem saraf.',
-    'Spiritual': '🤲 Jauh dari Allah. Menyebabkan kehampaan eksistensial.'
+    'Syirik': '🔴 DOSA BESAR - QS. An-Nisa:48 - Syirik tidak diampuni jika tidak bertaubat. PRIORITAS TERTINGGI.',
+    'Riya': '🔴 DOSA BESAR - HR. Muslim - Riya adalah syirik tersembunyi. Mengikis pahala amal.',
+    'Kibr': '🟠 PENGHALANG SURGA - HR. Muslim - Tidak masuk surga yang ada kesombongan sebesar biji sawi.',
+    'Sombong': '🟠 PENGHALANG SURGA - HR. Muslim - Allah tidak menyukai orang yang sombong.',
+    'Hasad': '🟡 PEMAKAN AMAL - HR. Abu Dawud - Hasad memakan kebaikan seperti api memakan kayu.',
+    'Dengki': '🟡 PEMAKAN AMAL - Dengki menghancurkan pahala dan kebahagiaan.',
+    'Ghadab': '🟡 MERUSAK IMAN - HR. Bukhari - Orang kuat adalah yang mengendalikan diri saat marah.',
+    'Marah': '🟡 MERUSAK IMAN - HR. Bukhari - "Jangan marah" diulang 3x oleh Rasulullah ﷺ.',
+    'Huzn': '🟢 PERLU DIWASPADAI - QS. At-Taubah:40 - Jangan bersedih, Allah bersama kita.',
+    'Sedih': '🟢 PERLU DIWASPADAI - Kesedihan berlebihan bisa menjauhkan dari Allah.',
+    'Khauf': '🟢 UJIAN HATI - QS. Ali Imran:175 - Takutlah hanya kepada Allah.',
+    'Takut': '🟢 UJIAN HATI - Takut selain Allah melemahkan tawakal.',
+    'Bersalah': '🟡 MERUSAK IMAN - Rasa bersalah berlebihan menghambat taubat dan harapan kepada Allah.',
+    'Malu': '🟡 MERUSAK IMAN - Malu yang berlebihan berbeda dengan malu yang baik (haya).',
+    'Apatis': '🟡 MERUSAK IMAN - Kehilangan harapan bertentangan dengan husnudzan kepada Allah.',
+    'Finansial': '💰 UJIAN DUNIA - QS. Al-Baqarah:155 - Ujian harta untuk menguji kesabaran.',
+    'Hubungan': '💔 UJIAN DUNIA - Hubungan manusia adalah ujian untuk melatih sabar dan pemaaf.',
+    'Keluarga': '👨‍👩‍👧 UJIAN DUNIA - QS. At-Taghabun:14 - Keluarga bisa menjadi ujian.',
+    'Karier': '💼 UJIAN DUNIA - Rezeki sudah diatur, yang penting ikhtiar dan tawakal.',
+    'Kesehatan': '🏥 UJIAN DUNIA - Sakit adalah penghapus dosa bagi mukmin.',
+    'Spiritual': '🤲 PERLU DIWASPADAI - Jauh dari Allah adalah sumber segala kegelisahan.'
+};
+
+// ============ DESKRIPSI MASALAH / SUGESTI UNTUK SETIAP EMOSI ============
+// Membantu user mengidentifikasi dan mendeskripsikan masalahnya
+const DESKRIPSI_MASALAH = {
+    // Penyakit Hati Berat
+    'Syirik': 'Mengandalkan selain Allah, jimat, dukun, ramalan, percaya nasib ditentukan bintang',
+    'Riya': 'Ingin dipuji, pamer ibadah, amal untuk dilihat orang, tidak ikhlas',
+    'Kufur Nikmat': 'Tidak mensyukuri nikmat, selalu merasa kurang, mengeluh terus-menerus',
+
+    // Penghalang Surga
+    'Sombong': 'Merasa lebih baik dari orang lain, merendahkan orang, tidak mau dikritik',
+    'Kibr': 'Menolak kebenaran, menolak nasihat, merasa paling benar sendiri',
+
+    // Pemakan Amal
+    'Hasad': 'Iri dengan keberhasilan orang, ingin nikmat orang hilang, tidak ridho takdir',
+    'Dengki': 'Membenci kebahagiaan orang lain, senang melihat orang susah, hati panas',
+
+    // Merusak Iman
+    'Marah': 'Emosi meledak, tidak bisa kontrol amarah, menyakiti dengan kata-kata, memukul',
+    'Ghadab': 'Amarah yang menggebu-gebu, dendam, ingin balas dendam',
+    'Khauf': 'Takut pada makhluk melebihi takut pada Allah, takut miskin, takut mati',
+
+    // Emosi Negatif Umum
+    'Cemas': 'Khawatir berlebihan tentang masa depan, tidak bisa tenang, pikiran racing',
+    'Takut': 'Takut gagal, takut ditolak, takut sendirian, takut tidak mampu',
+    'Takut Gagal': 'Prokrastinasi, tidak berani mencoba, perfeksionis berlebihan',
+    'Sedih': 'Hati berat, ingin menangis, merasa hampa, kehilangan semangat hidup',
+    'Kesepian': 'Merasa tidak punya teman, tidak ada yang peduli, sendirian di dunia',
+    'Malu': 'Tidak percaya diri, merasa rendah, takut dilihat orang, tidak mau tampil',
+    'Bersalah': 'Menyesal masa lalu, merasa berdosa, tidak bisa memaafkan diri sendiri',
+    'Menyesal': 'Andai saja..., menyesali keputusan, terjebak masa lalu',
+    'Kecewa': 'Merasa dikhianati, harapan tidak terwujud, patah hati',
+    'Frustasi': 'Usaha tidak berhasil, stuck, tidak ada jalan keluar',
+    'Stres': 'Overwhelmed, terlalu banyak beban, tidak bisa handle pekerjaan',
+    'Overthinking': 'Mikir terus, tidak bisa berhenti khawatir, worst case scenario',
+    'Apatis': 'Tidak peduli, mati rasa, tidak ada keinginan, malas hidup',
+    'Putus Asa': 'Merasa sudah tidak ada harapan, ingin menyerah, sia-sia semua',
+    'Trauma': 'Luka masa lalu yang belum sembuh, flashback, mimpi buruk',
+    'Inner Child Terluka': 'Luka masa kecil, kurang kasih sayang, diabaikan orang tua',
+    'Insecure': 'Merasa tidak cukup baik, membandingkan diri, iri pada orang lain',
+    'Perfeksionis': 'Takut tidak sempurna, terlalu keras pada diri sendiri, standar terlalu tinggi',
+    'Dendam': 'Tidak bisa memaafkan, ingin membalas sakit hati, menyimpan luka',
+    'Benci': 'Membenci seseorang, benci diri sendiri, benci keadaan',
+
+    // Masalah Spesifik
+    'Konflik dengan Orang Tua': 'Tidak akur dengan ibu/bapak, merasa tidak dimengerti, luka dari orang tua',
+    'Konflik dengan Pasangan': 'Pertengkaran rumah tangga, tidak harmonis, masalah komunikasi',
+    'Masalah Finansial': 'Hutang, penghasilan kurang, takut tidak cukup uang',
+    'Stres Pekerjaan': 'Burnout, overwork, konflik di kantor, takut dipecat',
+    'Grief': 'Kehilangan orang tersayang, sedih ditinggalkan, proses duka',
+    'Patah Hati': 'Putus cinta, ditolak, cinta bertepuk sebelah tangan',
 };
 
 // Safety rules dari SEFT
 const MAX_EMOSI_PER_HARI = 5; // Rekomendasi Pak Faiz: 3-5 emosi per hari
 const SAFETY_MESSAGE = "⚠️ Rekomendasi: Maksimal 3-5 emosi per hari untuk hasil optimal dan aman. Istirahat jika merasa lelah.";
 
-// 4 Pilar Setup Generator
-function generate4PilarSetup(emosi, masalah) {
+// ============ KALIMAT SETUP 4 PILAR - METODE PAK FAIZ ZAINUDIN ============
+// Pilar 1: IKHLAS - Menerima kenyataan
+// Pilar 2: RIDHO - Rela dengan keadaan
+// Pilar 3: PASRAH - Serahkan kepada Allah
+// Pilar 4: SYUKUR - Tetap bersyukur dalam segala keadaan
+
+// VERSI PENDEK (Quick Setup) - Untuk sesi cepat
+function generateSetupPendek(emosi, masalah) {
+    const konteks = masalah ? ` karena ${masalah}` : '';
     return `Ya Allah...
 
-Meskipun saat ini hati saya merasa ${emosi.toLowerCase()}, ${masalah ? `karena ${masalah}` : 'dan tidak nyaman'}...
+Meskipun saya merasa ${emosi.toLowerCase()}${konteks}...
 
-...saat ini aku ikhlas menerima kenyataan ini dan aku ridho atas perasaan tidak nyaman ini...
+...saya IKHLAS menerima, RIDHO atas kondisi ini, PASRAHKAN kepada-Mu, dan tetap BERSYUKUR.
 
-...aku pasrahkan sepenuhnya kepada-Mu untuk membersihkan rasa ${emosi.toLowerCase()} di dadaku, dan aku pasrahkan masa depan serta penyelesaiannya hanya kepada-Mu...
+Ya Allah, bersihkan hati saya dari rasa ${emosi.toLowerCase()} ini.
 
-...dan aku tetap bersyukur atas semua yang ada, karena aku yakin Engkau adalah sebaik-baiknya pemberi solusi yang tidak akan membiarkan hamba-Mu dalam kesulitan.`;
+آمِينَ يَا رَبَّ الْعَالَمِينَ`;
+}
+
+// VERSI PANJANG (Full Setup) - Untuk sesi mendalam
+function generateSetupPanjang(emosi, masalah) {
+    const konteks = masalah ? `karena ${masalah}` : '';
+
+    return `بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+
+Ya Allah, Ya Rahman, Ya Rahim...
+
+═══════════════════════════════════
+🤲 PILAR 1: IKHLAS (Menerima Kenyataan)
+═══════════════════════════════════
+
+Meskipun saat ini hati saya merasa ${emosi.toLowerCase()}${konteks ? ` ${konteks}` : ''}...
+
+Meskipun ada rasa ${emosi.toLowerCase()} yang mengganggu di dalam dada saya ini...
+
+Meskipun perasaan ${emosi.toLowerCase()} ini terasa berat dan menyesakkan...
+
+...saya sepenuhnya IKHLAS menerima kenyataan ini sebagai bagian dari ujian hidup saya.
+
+═══════════════════════════════════
+💚 PILAR 2: RIDHO (Merelakan)
+═══════════════════════════════════
+
+...saya RIDHO dan RELA atas perasaan tidak nyaman ini...
+
+...saya ridho bahwa Allah mengizinkan perasaan ini hadir dalam diri saya, karena pasti ada hikmah di baliknya...
+
+...saya tidak melawan, tidak menolak, tapi memeluk perasaan ini dengan penuh kasih sayang kepada diri sendiri...
+
+"Radhitu billahi Rabba" - Aku ridho Allah sebagai Tuhanku.
+
+═══════════════════════════════════
+🙏 PILAR 3: PASRAH (Menyerahkan kepada Allah)
+═══════════════════════════════════
+
+Ya Allah, aku PASRAHKAN sepenuhnya rasa ${emosi.toLowerCase()} ini kepada-Mu...
+
+...aku pasrahkan akar masalah ini kepada-Mu...
+
+...aku pasrahkan masa laluku, masa kiniku, dan masa depanku kepada-Mu...
+
+...aku pasrahkan penyelesaian ini hanya kepada-Mu, karena Engkau Maha Tahu apa yang terbaik untuk hamba-Mu...
+
+"Hasbunallahu wa ni'mal wakil" - Cukuplah Allah sebagai penolong kami.
+
+═══════════════════════════════════
+✨ PILAR 4: SYUKUR (Bersyukur dalam Segala Keadaan)
+═══════════════════════════════════
+
+...dan meskipun begitu, aku tetap BERSYUKUR atas semua yang ada...
+
+...syukur atas nikmat iman dan Islam...
+
+...syukur atas kesempatan untuk membersihkan hati ini...
+
+...syukur karena Engkau memberikan aku kekuatan untuk menghadapi ini...
+
+Aku yakin Engkau adalah sebaik-baiknya pemberi solusi yang tidak akan pernah menyia-nyiakan hamba-Mu.
+
+"Alhamdulillahi 'ala kulli hal" - Segala puji bagi Allah dalam setiap keadaan.
+
+Ya Allah, bersihkanlah hati saya dari rasa ${emosi.toLowerCase()} ini...
+Gantikan dengan ketenangan, kedamaian, dan cinta-Mu...
+
+آمِينَ يَا رَبَّ الْعَالَمِينَ`;
+}
+
+// KALIMAT TAPPING - VERSI PENDEK
+function generateTappingPendek(emosi) {
+    return `Saya ikhlas... saya pasrah...
+${emosi.toLowerCase()}... lepas...`;
+}
+
+// KALIMAT TAPPING - VERSI PANJANG  
+function generateTappingPanjang(emosi) {
+    return `Ya Allah, saya ikhlas dan pasrah...
+Saya lepaskan rasa ${emosi.toLowerCase()} ini...
+Saya ridho dan bersyukur...
+Bersihkan hati saya, Ya Allah...`;
+}
+
+// Wrapper function (for backward compatibility)
+function generate4PilarSetup(emosi, masalah, mode = 'panjang') {
+    return mode === 'pendek'
+        ? generateSetupPendek(emosi, masalah)
+        : generateSetupPanjang(emosi, masalah);
 }
 
 export default function SEFTRelease() {
@@ -192,6 +450,8 @@ export default function SEFTRelease() {
     const [showHelp, setShowHelp] = useState(false);
     const [loading, setLoading] = useState(true);
     const [deviceId] = useState(() => getDeviceId());
+    const [setupMode, setSetupMode] = useState('panjang'); // 'pendek' atau 'panjang'
+    const [tappingMode, setTappingMode] = useState('pendek'); // 'pendek' atau 'panjang'
 
     useEffect(() => {
         loadData();
@@ -302,6 +562,9 @@ export default function SEFTRelease() {
             { id: 131, nama: 'Konflik dengan Orang Tua', level_hawkins: 150, kategori: 'Keluarga', deskripsi: 'Hubungan buruk dengan orang tua.' },
             { id: 132, nama: 'Konflik dengan Pasangan', level_hawkins: 150, kategori: 'Hubungan', deskripsi: 'Pertengkaran terus-menerus.' },
             { id: 133, nama: 'Konflik dengan Atasan', level_hawkins: 150, kategori: 'Karier', deskripsi: 'Hubungan buruk dengan bos.' },
+            { id: 134, nama: 'Toxic Relationship', level_hawkins: 100, kategori: 'Hubungan', deskripsi: 'Hubungan yang tidak sehat dan merusak.' },
+            { id: 135, nama: 'Self-Hate', level_hawkins: 20, kategori: 'Malu', deskripsi: 'Membenci diri sendiri.' },
+            { id: 136, nama: 'Menyerang Diri Sendiri', level_hawkins: 20, kategori: 'Malu', deskripsi: 'Pikiran/perilaku menyakiti diri sendiri.' },
 
             // LEVEL 175 - SOMBONG (Pride Negatif)
             { id: 150, nama: 'Sombong', level_hawkins: 175, kategori: 'Sombong', deskripsi: 'Merasa lebih baik dari orang lain.' },
@@ -333,10 +596,19 @@ export default function SEFTRelease() {
         // Filter by category
         const matchKategori = !filterKategori || e.kategori === filterKategori;
 
-        // Filter by physical symptom recommendation
-        const matchSakit = !filterSakit || (SAKIT_KE_EMOSI[filterSakit]?.some(emosiName =>
-            e.nama.toLowerCase().includes(emosiName.toLowerCase())
-        ));
+        // Filter by physical symptom recommendation - looser matching
+        let matchSakit = true;
+        if (filterSakit && SAKIT_KE_EMOSI[filterSakit]) {
+            matchSakit = SAKIT_KE_EMOSI[filterSakit].some(emosiName => {
+                const emosiLower = e.nama.toLowerCase();
+                const rekomendasiLower = emosiName.toLowerCase();
+                // Match if emotion name contains recommendation OR vice versa
+                return emosiLower.includes(rekomendasiLower) ||
+                    rekomendasiLower.includes(emosiLower) ||
+                    // Also check partial word match
+                    rekomendasiLower.split(' ').some(word => word.length > 3 && emosiLower.includes(word));
+            });
+        }
 
         // Hide released emotions if toggle is on
         const isReleased = releasedEmosi.some(r => r.emosi_id === e.id);
@@ -345,7 +617,7 @@ export default function SEFTRelease() {
         return matchSearch && matchKategori && matchSakit && shouldShow;
     });
 
-    // Sort by Hawkins level (lowest = most urgent, prioritized first)
+    // Sort by priority (tingkat penyakit hati - berdasarkan dampak terhadap iman)
     const sortedEmosi = [...filteredEmosi].sort((a, b) => a.level_hawkins - b.level_hawkins);
 
     // Get unique categories
@@ -364,7 +636,7 @@ export default function SEFTRelease() {
                 setShowSafetyWarning(true);
                 return;
             }
-            setKalimatSetup(generate4PilarSetup(selectedEmosi.nama, masalah));
+            setKalimatSetup(generate4PilarSetup(selectedEmosi.nama, masalah, setupMode));
             setStep(2);
         } else if (step === 2) {
             setStep(3);
@@ -515,7 +787,7 @@ export default function SEFTRelease() {
                 </div>
             </div>
 
-            {/* Hawkins Scale Legend */}
+            {/* Tingkat Penyakit Hati - Berdasarkan Quran & Sunnah */}
             <div style={{
                 background: 'var(--spiritual-bg)',
                 padding: '12px 16px',
@@ -523,9 +795,9 @@ export default function SEFTRelease() {
                 marginBottom: '16px',
                 fontSize: '0.7rem'
             }}>
-                <div style={{ marginBottom: '8px', fontWeight: '600' }}>📊 Skala Hawkins (level rendah = prioritas tinggi):</div>
+                <div style={{ marginBottom: '8px', fontWeight: '600' }}>🤲 Tingkat Penyakit Hati (berdasarkan Al-Quran & Sunnah):</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {Object.entries(HAWKINS_LEVELS).map(([level, info]) => (
+                    {Object.entries(TINGKAT_PENYAKIT).map(([level, info]) => (
                         <span key={level} style={{
                             padding: '2px 8px',
                             borderRadius: '4px',
@@ -533,7 +805,7 @@ export default function SEFTRelease() {
                             color: info.color,
                             fontWeight: '500'
                         }}>
-                            {info.emoji} Lv.{level}: {info.label}
+                            {info.emoji} {info.label}
                         </span>
                     ))}
                 </div>
@@ -665,18 +937,49 @@ export default function SEFTRelease() {
                                 }}>
                                     <strong style={{ color: '#22c55e' }}>✅ Rekomendasi emosi untuk "{filterSakit}":</strong>
                                     <p style={{ fontSize: '0.7rem', margin: '4px 0 8px 0', color: 'var(--spiritual-text-muted)' }}>
-                                        Pilih salah satu emosi di bawah ini yang paling resonan dengan perasaan Anda:
+                                        👆 <strong>Klik langsung</strong> salah satu emosi di bawah untuk memilihnya:
                                     </p>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                        {SAKIT_KE_EMOSI[filterSakit].map(e => (
-                                            <span key={e} style={{
-                                                padding: '4px 10px',
-                                                background: 'rgba(34, 197, 94, 0.2)',
-                                                borderRadius: '16px',
-                                                fontWeight: '500',
-                                                cursor: 'pointer'
-                                            }} title={`Klik dropdown emosi dan cari "${e}"`}>{e}</span>
-                                        ))}
+                                        {SAKIT_KE_EMOSI[filterSakit].map(emosiName => {
+                                            // Find matching emotion in sortedEmosi
+                                            const matchingEmosi = sortedEmosi.find(e =>
+                                                e.nama.toLowerCase().includes(emosiName.toLowerCase()) ||
+                                                emosiName.toLowerCase().includes(e.nama.toLowerCase()) ||
+                                                emosiName.toLowerCase().split(' ').some(word => word.length > 3 && e.nama.toLowerCase().includes(word))
+                                            );
+
+                                            return (
+                                                <button
+                                                    key={emosiName}
+                                                    onClick={() => {
+                                                        if (matchingEmosi) {
+                                                            handleSelectEmosi(matchingEmosi);
+                                                        } else {
+                                                            alert(`Emosi "${emosiName}" tidak ditemukan di daftar saat ini. Coba cari manual di dropdown.`);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        padding: '6px 14px',
+                                                        background: selectedEmosi?.nama === matchingEmosi?.nama
+                                                            ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                                            : 'rgba(34, 197, 94, 0.2)',
+                                                        borderRadius: '20px',
+                                                        fontWeight: '600',
+                                                        cursor: 'pointer',
+                                                        border: selectedEmosi?.nama === matchingEmosi?.nama
+                                                            ? '2px solid #22c55e'
+                                                            : '1px solid rgba(34, 197, 94, 0.4)',
+                                                        color: selectedEmosi?.nama === matchingEmosi?.nama ? '#fff' : 'inherit',
+                                                        fontSize: '0.8rem',
+                                                        transition: 'all 0.2s ease'
+                                                    }}
+                                                    title={matchingEmosi ? `Klik untuk memilih: ${matchingEmosi.nama}` : `"${emosiName}" tidak tersedia`}
+                                                >
+                                                    {emosiName}
+                                                    {selectedEmosi?.nama === matchingEmosi?.nama && ' ✓'}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             )}
@@ -872,6 +1175,105 @@ export default function SEFTRelease() {
                             </div>
                         </div>
 
+                        {/* Deskripsi Masalah - Muncul saat emosi dipilih */}
+                        {selectedEmosi && (
+                            <div style={{
+                                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                borderRadius: '12px',
+                                padding: '16px',
+                                marginBottom: '16px'
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    marginBottom: '8px',
+                                    color: '#ef4444',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600'
+                                }}>
+                                    💡 Deskripsi & Contoh Masalah:
+                                </div>
+                                <p style={{
+                                    fontSize: '0.9rem',
+                                    color: '#fff',
+                                    lineHeight: '1.6',
+                                    margin: 0
+                                }}>
+                                    <strong>{selectedEmosi.nama}:</strong> {selectedEmosi.deskripsi}
+                                </p>
+                                {DESKRIPSI_MASALAH[selectedEmosi.nama] && (
+                                    <p style={{
+                                        fontSize: '0.8rem',
+                                        color: 'rgba(255,255,255,0.7)',
+                                        marginTop: '10px',
+                                        marginBottom: 0,
+                                        fontStyle: 'italic'
+                                    }}>
+                                        📝 Contoh: {DESKRIPSI_MASALAH[selectedEmosi.nama]}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Mode Setup Toggle */}
+                        <div className="spiritual-form-group">
+                            <label className="spiritual-label">Mode Kalimat Setup</label>
+                            <div style={{
+                                display: 'flex',
+                                gap: '10px',
+                                marginTop: '8px'
+                            }}>
+                                <button
+                                    onClick={() => setSetupMode('pendek')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        background: setupMode === 'pendek'
+                                            ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                            : 'rgba(255,255,255,0.05)',
+                                        border: setupMode === 'pendek'
+                                            ? 'none'
+                                            : '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '10px',
+                                        color: '#fff',
+                                        fontSize: '0.85rem',
+                                        fontWeight: setupMode === 'pendek' ? '600' : '400',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    ⚡ Pendek
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '4px' }}>
+                                        Quick (~2 menit)
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setSetupMode('panjang')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        background: setupMode === 'panjang'
+                                            ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                                            : 'rgba(255,255,255,0.05)',
+                                        border: setupMode === 'panjang'
+                                            ? 'none'
+                                            : '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '10px',
+                                        color: '#fff',
+                                        fontSize: '0.85rem',
+                                        fontWeight: setupMode === 'panjang' ? '600' : '400',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    🧘 Panjang
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '4px' }}>
+                                        Mendalam (~10 menit)
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
                         <button
                             className="spiritual-btn spiritual-btn-primary"
                             style={{ width: '100%' }}
@@ -942,11 +1344,92 @@ export default function SEFTRelease() {
                 step === 3 && (
                     <div className="spiritual-card">
                         <h3 style={{ marginBottom: '20px' }}>Langkah 3: Tapping 18 Titik</h3>
-                        <p style={{ marginBottom: '16px', color: 'var(--spiritual-text-muted)' }}>
-                            Ketuk setiap titik 5-7x sambil mengucapkan: "Ya Allah... aku ikhlas, aku pasrah"
+
+                        {/* Tapping Mode Toggle */}
+                        <div style={{
+                            display: 'flex',
+                            gap: '10px',
+                            marginBottom: '16px'
+                        }}>
+                            <button
+                                onClick={() => setTappingMode('pendek')}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px',
+                                    background: tappingMode === 'pendek'
+                                        ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                        : 'rgba(255,255,255,0.05)',
+                                    border: tappingMode === 'pendek'
+                                        ? 'none'
+                                        : '1px solid rgba(255,255,255,0.15)',
+                                    borderRadius: '8px',
+                                    color: '#fff',
+                                    fontSize: '0.8rem',
+                                    fontWeight: tappingMode === 'pendek' ? '600' : '400',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                ⚡ Afirmasi Pendek
+                            </button>
+                            <button
+                                onClick={() => setTappingMode('panjang')}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px',
+                                    background: tappingMode === 'panjang'
+                                        ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                                        : 'rgba(255,255,255,0.05)',
+                                    border: tappingMode === 'panjang'
+                                        ? 'none'
+                                        : '1px solid rgba(255,255,255,0.15)',
+                                    borderRadius: '8px',
+                                    color: '#fff',
+                                    fontSize: '0.8rem',
+                                    fontWeight: tappingMode === 'panjang' ? '600' : '400',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                🧘 Afirmasi Panjang
+                            </button>
+                        </div>
+
+                        {/* Kalimat Tapping */}
+                        <div style={{
+                            background: tappingMode === 'pendek'
+                                ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1))'
+                                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1))',
+                            border: `1px solid ${tappingMode === 'pendek' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(99, 102, 241, 0.3)'}`,
+                            borderRadius: '12px',
+                            padding: '16px',
+                            marginBottom: '16px'
+                        }}>
+                            <div style={{
+                                fontSize: '0.75rem',
+                                color: tappingMode === 'pendek' ? '#22c55e' : '#8b5cf6',
+                                fontWeight: '600',
+                                marginBottom: '8px'
+                            }}>
+                                🎯 Ucapkan sambil mengetuk:
+                            </div>
+                            <p style={{
+                                fontSize: '1rem',
+                                color: '#fff',
+                                lineHeight: '1.8',
+                                margin: 0,
+                                fontStyle: 'italic',
+                                whiteSpace: 'pre-line'
+                            }}>
+                                "{tappingMode === 'pendek'
+                                    ? generateTappingPendek(selectedEmosi?.nama || 'emosi ini')
+                                    : generateTappingPanjang(selectedEmosi?.nama || 'emosi ini')}"
+                            </p>
+                        </div>
+
+                        <p style={{ marginBottom: '16px', color: 'var(--spiritual-text-muted)', fontSize: '0.85rem' }}>
+                            Ketuk setiap titik 5-7x sambil mengucapkan kalimat di atas
                         </p>
-                        <div style={{ fontSize: '0.9rem', marginBottom: '20px' }}>
-                            <ol style={{ paddingLeft: '20px', lineHeight: '2' }}>
+                        <div style={{ fontSize: '0.85rem', marginBottom: '20px' }}>
+                            <ol style={{ paddingLeft: '20px', lineHeight: '1.8' }}>
                                 <li>Alis (UB) - Ujung alis dalam</li>
                                 <li>Samping Mata (SE) - Tulang samping mata</li>
                                 <li>Bawah Mata (UE) - Tulang bawah mata</li>
@@ -1219,7 +1702,7 @@ export default function SEFTRelease() {
                             <div style={{ marginBottom: '20px' }}>
                                 <h4 style={{ marginBottom: '12px' }}>✨ Tips untuk Hasil Optimal:</h4>
                                 <ul style={{ fontSize: '0.85rem', paddingLeft: '20px', lineHeight: '1.8' }}>
-                                    <li>Prioritaskan emosi dengan <strong>level Hawkins rendah</strong> (warna merah/oranye)</li>
+                                    <li>Prioritaskan <strong>penyakit hati berat</strong> (warna merah/oranye) seperti syirik, riya, kibr</li>
                                     <li>Maksimal <strong>3-5 emosi per hari</strong> untuk keamanan</li>
                                     <li>Lakukan dengan <strong>khusyuk dan fokus</strong> pada perasaan</li>
                                     <li>Boleh <strong>menangis</strong> - ini tanda pelepasan yang baik</li>

@@ -262,26 +262,26 @@ export default function Dashboard() {
                 }
             `}</style>
 
-            {/* Quick Stats */}
+            {/* Quick Stats - Clickable */}
             <div className="spiritual-stats-grid">
-                <div className="spiritual-stat-card">
+                <Link to="/spiritual/seft" className="spiritual-stat-card" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
                     <div className="spiritual-stat-value">28</div>
                     <div className="spiritual-stat-label">Sesi SEFT</div>
-                </div>
-                <div className="spiritual-stat-card">
+                </Link>
+                <Link to="/spiritual/abundance" className="spiritual-stat-card" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
                     <div className="spiritual-stat-value">85%</div>
                     <div className="spiritual-stat-label">Progress</div>
-                </div>
-                <div className="spiritual-stat-card">
+                </Link>
+                <Link to="/spiritual/seft/proxy" className="spiritual-stat-card" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
                     <div className="spiritual-stat-value">77</div>
                     <div className="spiritual-stat-label">Didoakan</div>
-                </div>
-                <div className="spiritual-stat-card">
+                </Link>
+                <Link to="/spiritual/syukur/qalbu" className="spiritual-stat-card" style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
                     <div className="spiritual-stat-value">
                         <TrendingUp size={24} />
                     </div>
                     <div className="spiritual-stat-label">Qalbu</div>
-                </div>
+                </Link>
             </div>
 
             {/* ========== UTAMA - Program Inti ========== */}

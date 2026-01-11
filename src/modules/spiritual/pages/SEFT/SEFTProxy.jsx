@@ -4,9 +4,10 @@
  * Dengan setup awal (menjadi proxy) dan penutup (keluar dari proxy)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Users, Play, CheckCircle, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Heart, Users, Play, CheckCircle, ChevronRight, History, X, Trash2, Loader2 } from 'lucide-react';
+import { createSeftProxy, getSeftProxyHistory, deleteSeftProxy, getDeviceId } from '../../services/spiritualService';
 
 const PROXY_EMOSI = [
     { category: 'Kesehatan', emotions: ['Sakit', 'Tidak Enak Badan', 'Kelelahan Kronis', 'Insomnia', 'Nyeri'] },
@@ -33,41 +34,112 @@ export default function SEFTProxy() {
     const [step, setStep] = useState(1);
     const [targetName, setTargetName] = useState('');
     const [relationship, setRelationship] = useState('');
-    const [selectedEmotions, setSelectedEmotions] = useState([]);
+    const [selectedEmotion, setSelectedEmotion] = useState(''); // Fokus 1 masalah per sesi (rekomendasi Pak Faiz)
+    const [customProblem, setCustomProblem] = useState(''); // Untuk masalah spesifik
     const [currentPoint, setCurrentPoint] = useState(0);
     const [setupDone, setSetupDone] = useState(false);
+    const [setupPhase, setSetupPhase] = useState(1); // 1 = Setup Mewakili, 2 = Setup Ikhlas Pasrah
 
-    const toggleEmotion = (emotion) => {
-        setSelectedEmotions(prev =>
-            prev.includes(emotion)
-                ? prev.filter(e => e !== emotion)
-                : [...prev, emotion]
-        );
+    // History tracking
+    const [proxyHistory, setProxyHistory] = useState([]);
+    const [showHistory, setShowHistory] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [deviceId] = useState(() => getDeviceId());
+
+    // Load history from Supabase
+    useEffect(() => {
+        loadHistory();
+    }, []);
+
+    const loadHistory = async () => {
+        try {
+            const data = await getSeftProxyHistory(deviceId);
+            setProxyHistory(data);
+        } catch (error) {
+            console.error('Error loading proxy history:', error);
+        }
     };
 
-    // Generate kalimat setup menjadi proxy
-    const getSetupPhrase = () => {
-        return `Ya Allah, dengan izin-Mu, saya menjadi wakil dari ${targetName}. 
-Saya adalah ${targetName}. ${targetName} adalah saya.
-Semua yang saya rasakan adalah yang ${targetName} rasakan.
-Semua healing yang saya terima, diterima juga oleh ${targetName}.`;
+    // Save session to Supabase
+    const saveToHistory = async () => {
+        setLoading(true);
+        try {
+            const proxyData = {
+                device_id: deviceId,
+                target_name: targetName,
+                relationship: relationship,
+                problem: customProblem || selectedEmotion,
+                category: PROXY_EMOSI.find(p => p.emotions.includes(selectedEmotion))?.category || 'Lainnya',
+                tanggal: new Date().toISOString().split('T')[0],
+                completed: true
+            };
+
+            await createSeftProxy(proxyData);
+            await loadHistory(); // Reload history
+        } catch (error) {
+            console.error('Error saving proxy session:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Generate kalimat afirmasi untuk setiap titik
+    // Delete from Supabase
+    const deleteFromHistory = async (id) => {
+        try {
+            await deleteSeftProxy(id);
+            setProxyHistory(prev => prev.filter(h => h.id !== id));
+        } catch (error) {
+            console.error('Error deleting proxy session:', error);
+        }
+    };
+
+    const selectEmotion = (emotion) => {
+        setSelectedEmotion(prev => prev === emotion ? '' : emotion);
+    };
+
+    // ============ KALIMAT SETUP SURROGATE SEFT - METODE PAK FAIZ ZAINUDIN ============
+    // Surrogate SEFT = SEFTing Jarak Jauh, dilakukan 3 KALI Setup
+
+    // Setup 1: Menjadi Wakil (Proxy)
+    const getSetup1MenjadiProxy = () => {
+        const masalah = customProblem || selectedEmotion.toLowerCase();
+        return `Ya Allah, mulai sekarang saya mewakili ${relationship.toLowerCase()} saya, ${targetName}, yang sedang ${masalah || 'mengalami masalah'}.`;
+    };
+
+    // Setup 2: SEFTing sebagai Proxy (ikhlas + pasrah)
+    const getSetup2SebagaiProxy = () => {
+        const masalah = customProblem || selectedEmotion.toLowerCase();
+        return `Ya Allah, meskipun saya (seakan menjadi ${targetName}) sedang ${masalah || 'mengalami masalah'}...
+
+...tapi saya IKHLAS menerima kondisi ini...
+
+...saya PASRAHKAN pada-Mu kesembuhan saya, kedamaian hati saya, dan penyelesaian masalah ini.`;
+    };
+
+    // Tune-In phrase (saat tapping)
+    const getTuneInPhrase = () => {
+        return `Ya Allah, saya ikhlas... saya pasrah...
+
+(Pusatkan pikiran pada ${targetName}, berusaha berempati dengan kondisinya)`;
+    };
+
+    // Setup 3: Keluar dari Proxy (WAJIB! agar tidak terpapar energi negatif)
+    const getSetup3KeluarProxy = () => {
+        const harapan = ['Sakit', 'Tidak Enak Badan', 'Kelelahan Kronis', 'Insomnia', 'Nyeri'].includes(selectedEmotion)
+            ? 'kesembuhan' : 'kedamaian hati';
+
+        return `Ya Allah, sekarang saya sudah TIDAK mewakili ${relationship.toLowerCase()} saya, ${targetName}.
+
+Saya kembali menjadi diri saya sendiri.
+
+Semoga Engkau karuniai ${targetName} ${harapan}, ketenangan jiwa, dan keberkahan dalam hidupnya.
+
+آمِينَ يَا رَبَّ الْعَالَمِينَ`;
+    };
+
+    // Affirmation saat tapping
     const getAffirmation = () => {
-        const masalah = selectedEmotions.join(', ');
-        return `Ya Allah, meskipun ${targetName} mengalami ${masalah}, 
-saya ikhlas menerima kondisi ini sepenuhnya.
-Saya pasrah kepada-Mu Ya Allah.
-Saya mohon kesembuhan untuk ${targetName}.`;
-    };
-
-    // Generate kalimat penutup keluar dari proxy
-    const getClosingPhrase = () => {
-        return `Ya Allah, dengan izin-Mu, saya keluar dari ${targetName}.
-Saya adalah saya sendiri kembali.
-Saya ikhlas dan pasrah atas hasil terapi ini.
-Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
+        return `Ya Allah, saya ikhlas, saya pasrah...`;
     };
 
     const startTapping = () => {
@@ -89,6 +161,7 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
     };
 
     const finishSession = () => {
+        saveToHistory(); // Save to history before finishing
         setStep(5); // Completed
     };
 
@@ -99,7 +172,7 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                 Kembali
             </Link>
 
-            {/* Header */}
+            {/* Header with History Button */}
             <div className="spiritual-header" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
                 <div>
                     <h1 style={{ fontSize: '22px' }}>
@@ -108,7 +181,148 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                     </h1>
                     <p className="subtitle" style={{ fontSize: '13px' }}>Terapi untuk Orang Tersayang</p>
                 </div>
+                <button
+                    onClick={() => setShowHistory(true)}
+                    style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        border: 'none',
+                        borderRadius: '10px',
+                        padding: '8px 12px',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.8rem'
+                    }}
+                >
+                    <History size={16} />
+                    {proxyHistory.length}
+                </button>
             </div>
+
+            {/* History Modal */}
+            {showHistory && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '20px'
+                }} onClick={() => setShowHistory(false)}>
+                    <div style={{
+                        background: 'linear-gradient(145deg, #1e293b, #0f172a)',
+                        borderRadius: '20px',
+                        padding: '24px',
+                        maxWidth: '500px',
+                        width: '100%',
+                        maxHeight: '80vh',
+                        overflow: 'auto',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <History size={20} style={{ color: '#8b5cf6' }} />
+                                Riwayat Didoakan
+                            </h3>
+                            <button
+                                onClick={() => setShowHistory(false)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    color: '#fff'
+                                }}
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {proxyHistory.length === 0 ? (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '40px',
+                                color: 'rgba(255,255,255,0.5)'
+                            }}>
+                                Belum ada sesi proxy yang tercatat
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                {proxyHistory.map(session => (
+                                    <div
+                                        key={session.id}
+                                        style={{
+                                            background: 'rgba(139, 92, 246, 0.1)',
+                                            border: '1px solid rgba(139, 92, 246, 0.2)',
+                                            borderRadius: '12px',
+                                            padding: '14px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <div>
+                                            <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+                                                {session.target_name}
+                                                <span style={{
+                                                    fontSize: '0.75rem',
+                                                    color: 'rgba(255,255,255,0.5)',
+                                                    marginLeft: '8px'
+                                                }}>
+                                                    ({session.relationship})
+                                                </span>
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', color: '#8b5cf6' }}>
+                                                {session.problem}
+                                            </div>
+                                            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '4px' }}>
+                                                {session.tanggal} • {new Date(session.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <CheckCircle size={18} style={{ color: '#22c55e' }} />
+                                            <button
+                                                onClick={() => deleteFromHistory(session.id)}
+                                                style={{
+                                                    background: 'rgba(239, 68, 68, 0.2)',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    padding: '6px',
+                                                    color: '#ef4444',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <div style={{
+                            marginTop: '20px',
+                            textAlign: 'center',
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.5)'
+                        }}>
+                            Total: {proxyHistory.length} orang sudah didoakan
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Step 1: Target Info */}
             {step === 1 && (
@@ -207,12 +421,12 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                 </div>
             )}
 
-            {/* Step 2: Select Emotions */}
+            {/* Step 2: Select ONE Problem (Rekomendasi Pak Faiz: 1 masalah per sesi) */}
             {step === 2 && (
                 <div className="spiritual-card">
-                    <h3 style={{ marginBottom: '6px', fontSize: '16px' }}>Pilih Masalah {targetName}</h3>
+                    <h3 style={{ marginBottom: '6px', fontSize: '16px' }}>Pilih 1 Masalah {targetName}</h3>
                     <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
-                        Pilih satu atau lebih masalah yang dialami
+                        ⚠️ Fokus 1 masalah per sesi (rekomendasi Pak Faiz untuk hasil optimal)
                     </p>
 
                     {PROXY_EMOSI.map(category => (
@@ -224,25 +438,47 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                                 {category.emotions.map(emotion => (
                                     <button
                                         key={emotion}
-                                        onClick={() => toggleEmotion(emotion)}
+                                        onClick={() => selectEmotion(emotion)}
                                         style={{
                                             padding: '8px 12px',
-                                            background: selectedEmotions.includes(emotion)
+                                            background: selectedEmotion === emotion
                                                 ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
                                                 : 'rgba(255,255,255,0.05)',
-                                            border: selectedEmotions.includes(emotion) ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                                            border: selectedEmotion === emotion ? 'none' : '1px solid rgba(255,255,255,0.1)',
                                             borderRadius: '20px',
                                             color: '#fff',
                                             fontSize: '12px',
                                             cursor: 'pointer'
                                         }}
                                     >
-                                        {emotion}
+                                        {selectedEmotion === emotion && '✓ '}{emotion}
                                     </button>
                                 ))}
                             </div>
                         </div>
                     ))}
+
+                    {/* Custom Problem Input */}
+                    <div style={{ marginTop: '20px', marginBottom: '16px' }}>
+                        <label style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '8px' }}>
+                            Atau tuliskan masalah spesifik (opsional):
+                        </label>
+                        <input
+                            type="text"
+                            value={customProblem}
+                            onChange={(e) => setCustomProblem(e.target.value)}
+                            placeholder="Contoh: sakit perut mules, cemas ujian, dll..."
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                borderRadius: '10px',
+                                color: '#fff',
+                                fontSize: '14px'
+                            }}
+                        />
+                    </div>
 
                     <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                         <button
@@ -262,18 +498,18 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         </button>
                         <button
                             onClick={startTapping}
-                            disabled={selectedEmotions.length === 0}
+                            disabled={!selectedEmotion && !customProblem}
                             style={{
                                 flex: 2,
                                 padding: '14px',
-                                background: selectedEmotions.length > 0 ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'rgba(255,255,255,0.1)',
+                                background: (selectedEmotion || customProblem) ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'rgba(255,255,255,0.1)',
                                 border: 'none',
                                 borderRadius: '12px',
                                 color: '#fff',
                                 fontSize: '14px',
                                 fontWeight: '600',
-                                cursor: selectedEmotions.length > 0 ? 'pointer' : 'not-allowed',
-                                opacity: selectedEmotions.length > 0 ? 1 : 0.5
+                                cursor: (selectedEmotion || customProblem) ? 'pointer' : 'not-allowed',
+                                opacity: (selectedEmotion || customProblem) ? 1 : 0.5
                             }}
                         >
                             Mulai Terapi
@@ -282,8 +518,8 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                 </div>
             )}
 
-            {/* Step 3: Setup & Tapping Session */}
-            {step === 3 && !setupDone && (
+            {/* Step 3: Setup Phase 1 - Menjadi Proxy */}
+            {step === 3 && !setupDone && setupPhase === 1 && (
                 <div className="spiritual-card" style={{ textAlign: 'center' }}>
                     <div style={{
                         background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
@@ -299,9 +535,21 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         🙏
                     </div>
 
-                    <h3 style={{ marginBottom: '6px', fontSize: '16px' }}>Setup - Menjadi Proxy</h3>
+                    <div style={{
+                        background: 'rgba(99,102,241,0.3)',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        display: 'inline-block',
+                        marginBottom: '12px',
+                        fontSize: '11px',
+                        fontWeight: '600'
+                    }}>
+                        SETUP 1 dari 3
+                    </div>
+
+                    <h3 style={{ marginBottom: '6px', fontSize: '16px' }}>Menjadi Wakil (Proxy)</h3>
                     <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '16px', fontSize: '12px' }}>
-                        Tekan titik Sore Spot di dada sambil membaca
+                        Tekan titik Sore Spot di dada sambil membaca dengan penghayatan
                     </p>
 
                     <div style={{
@@ -313,22 +561,23 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         border: '1px solid rgba(99,102,241,0.2)'
                     }}>
                         <p style={{
-                            fontSize: '14px',
+                            fontSize: '15px',
                             color: '#fff',
                             lineHeight: '1.8',
                             margin: 0,
-                            fontStyle: 'italic'
+                            fontStyle: 'italic',
+                            fontWeight: '500'
                         }}>
-                            "{getSetupPhrase()}"
+                            "{getSetup1MenjadiProxy()}"
                         </p>
                     </div>
 
                     <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
-                        Baca dengan penuh penghayatan 3x sambil tekan dada kiri
+                        Baca 1x dengan khusyuk, lalu lanjut ke Setup 2
                     </p>
 
                     <button
-                        onClick={completeSetup}
+                        onClick={() => setSetupPhase(2)}
                         style={{
                             width: '100%',
                             padding: '16px',
@@ -346,8 +595,111 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         }}
                     >
                         <Play size={18} />
-                        Sudah, Lanjut Tapping
+                        Sudah, Lanjut Setup 2
                     </button>
+                </div>
+            )}
+
+            {/* Step 3: Setup Phase 2 - Ikhlas & Pasrah sebagai Proxy */}
+            {step === 3 && !setupDone && setupPhase === 2 && (
+                <div className="spiritual-card" style={{ textAlign: 'center' }}>
+                    <div style={{
+                        background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                        borderRadius: '50%',
+                        width: '70px',
+                        height: '70px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 16px',
+                        fontSize: '28px'
+                    }}>
+                        💚
+                    </div>
+
+                    <div style={{
+                        background: 'rgba(34,197,94,0.3)',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        display: 'inline-block',
+                        marginBottom: '12px',
+                        fontSize: '11px',
+                        fontWeight: '600'
+                    }}>
+                        SETUP 2 dari 3
+                    </div>
+
+                    <h3 style={{ marginBottom: '6px', fontSize: '16px' }}>Ikhlas & Pasrah</h3>
+                    <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '16px', fontSize: '12px' }}>
+                        Bayangkan Anda adalah {targetName}, rasakan empati dengan kondisinya
+                    </p>
+
+                    <div style={{
+                        background: 'rgba(34,197,94,0.12)',
+                        borderRadius: '12px',
+                        padding: '16px',
+                        marginBottom: '20px',
+                        textAlign: 'left',
+                        border: '1px solid rgba(34,197,94,0.2)'
+                    }}>
+                        <p style={{
+                            fontSize: '15px',
+                            color: '#fff',
+                            lineHeight: '1.9',
+                            margin: 0,
+                            fontStyle: 'italic',
+                            fontWeight: '500',
+                            whiteSpace: 'pre-line'
+                        }}>
+                            "{getSetup2SebagaiProxy()}"
+                        </p>
+                    </div>
+
+                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
+                        Tekan Sore Spot, baca dengan penuh penghayatan, lalu mulai Tapping
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            onClick={() => setSetupPhase(1)}
+                            style={{
+                                flex: 1,
+                                padding: '14px',
+                                background: 'rgba(255,255,255,0.1)',
+                                border: 'none',
+                                borderRadius: '12px',
+                                color: '#fff',
+                                fontSize: '14px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Kembali
+                        </button>
+                        <button
+                            onClick={() => {
+                                setSetupDone(true);
+                                setCurrentPoint(0);
+                            }}
+                            style={{
+                                flex: 2,
+                                padding: '14px',
+                                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                                border: 'none',
+                                borderRadius: '12px',
+                                color: '#fff',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <Play size={18} />
+                            Mulai Tapping
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -446,7 +798,7 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                 </div>
             )}
 
-            {/* Step 4: Closing - Keluar dari Proxy */}
+            {/* Step 4: Setup 3 - Keluar dari Proxy (WAJIB!) */}
             {step === 4 && (
                 <div className="spiritual-card" style={{ textAlign: 'center' }}>
                     <div style={{
@@ -463,12 +815,38 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         🤲
                     </div>
 
+                    <div style={{
+                        background: 'rgba(245,158,11,0.3)',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        display: 'inline-block',
+                        marginBottom: '12px',
+                        fontSize: '11px',
+                        fontWeight: '600'
+                    }}>
+                        SETUP 3 dari 3 ⚠️ WAJIB
+                    </div>
+
                     <h3 style={{ marginBottom: '6px', fontSize: '16px', color: '#f59e0b' }}>
-                        Penutup - Keluar dari Proxy
+                        Keluar dari Proxy
                     </h3>
                     <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '16px', fontSize: '12px' }}>
-                        Tekan titik Sore Spot sambil membaca doa penutup
+                        ⚠️ INI WAJIB dilakukan agar tidak terpapar energi negatif!
                     </p>
+
+                    {/* Breathing instruction */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        marginBottom: '16px',
+                        border: '1px dashed rgba(255,255,255,0.2)'
+                    }}>
+                        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: 0 }}>
+                            🌬️ Tarik napas dalam... hembuskan perlahan... (ulangi 3x)<br />
+                            Lalu baca doa penutup berikut:
+                        </p>
+                    </div>
 
                     <div style={{
                         background: 'rgba(245,158,11,0.12)',
@@ -479,18 +857,20 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         border: '1px solid rgba(245,158,11,0.2)'
                     }}>
                         <p style={{
-                            fontSize: '14px',
+                            fontSize: '15px',
                             color: '#fff',
-                            lineHeight: '1.8',
+                            lineHeight: '1.9',
                             margin: 0,
-                            fontStyle: 'italic'
+                            fontStyle: 'italic',
+                            fontWeight: '500',
+                            whiteSpace: 'pre-line'
                         }}>
-                            "{getClosingPhrase()}"
+                            "{getSetup3KeluarProxy()}"
                         </p>
                     </div>
 
                     <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '16px' }}>
-                        Baca dengan khusyuk, tarik napas dalam, hembuskan
+                        Tekan Sore Spot, baca dengan khusyuk, rasakan kembali menjadi diri sendiri
                     </p>
 
                     <button
@@ -512,7 +892,7 @@ Semoga ${targetName} mendapat kesembuhan dari-Mu. Aamiin.`;
                         }}
                     >
                         <CheckCircle size={18} />
-                        Selesai
+                        Selesai - Kembali Menjadi Diri Sendiri
                     </button>
                 </div>
             )}

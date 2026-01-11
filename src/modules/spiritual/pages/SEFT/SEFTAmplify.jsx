@@ -35,32 +35,111 @@ export default function SEFTAmplify() {
 
     const loadEmosi = async () => {
         try {
-            // Mock data for now
+            // Emosi positif dengan kategori Islami dan kalimat sugesti
             setEmosiList([
-                { id: 1, nama: 'Syukur Mendalam', level_hawkins: 700 },
-                { id: 2, nama: 'Cinta pada Allah', level_hawkins: 700 },
-                { id: 3, nama: 'Bahagia', level_hawkins: 540 },
-                { id: 4, nama: 'Damai', level_hawkins: 600 },
-                { id: 5, nama: 'Tenang', level_hawkins: 250 },
-                { id: 6, nama: 'Percaya Diri', level_hawkins: 200 },
-                { id: 7, nama: 'Berani', level_hawkins: 200 },
-                { id: 8, nama: 'Ikhlas', level_hawkins: 350 },
-                { id: 9, nama: 'Sabar', level_hawkins: 350 },
-                { id: 10, nama: 'Welas Asih', level_hawkins: 500 },
-                { id: 11, nama: 'Disiplin Kebahagiaan', level_hawkins: 540 },
-                { id: 12, nama: 'Hubungan Saling Menguntungkan', level_hawkins: 500 },
-                { id: 13, nama: 'Inspirasi Terus Mengalir', level_hawkins: 400 },
-                { id: 14, nama: 'Jago Menghasilkan Uang', level_hawkins: 350 },
-                { id: 15, nama: 'Allah Selalu Menjagaku', level_hawkins: 600 },
-                { id: 16, nama: 'Impian Tercapai dengan Mudah', level_hawkins: 540 },
-                { id: 17, nama: 'Rezeki Melimpah', level_hawkins: 500 },
-                { id: 18, nama: 'Sehat Wal Afiat', level_hawkins: 400 },
-                { id: 19, nama: 'Berkah dalam Keluarga', level_hawkins: 500 },
-                { id: 20, nama: 'Penuh Energi', level_hawkins: 310 },
-                { id: 21, nama: 'Fokus dan Produktif', level_hawkins: 310 },
-                { id: 22, nama: 'Dikelilingi Orang Baik', level_hawkins: 350 },
-                { id: 23, nama: 'Selalu Dilindungi Allah', level_hawkins: 600 },
-                { id: 24, nama: 'Hati Lapang', level_hawkins: 400 },
+                // MAQAM TERTINGGI - Hubungan dengan Allah
+                {
+                    id: 1, nama: 'Syukur Mendalam', kategori: 'Maqam Tertinggi', dalil: 'QS. Ibrahim:7',
+                    sugesti: 'Alhamdulillah, makin hari makin bersyukur, nikmat Allah tak terhitung, selalu cukup, bahagia dengan yang ada'
+                },
+                {
+                    id: 2, nama: 'Cinta pada Allah', kategori: 'Maqam Tertinggi', dalil: 'QS. Al-Baqarah:165',
+                    sugesti: 'Makin cinta Allah, rindu bertemu Allah, Allah di atas segalanya, hati penuh mahabbah'
+                },
+                {
+                    id: 15, nama: 'Allah Selalu Menjagaku', kategori: 'Maqam Tertinggi', dalil: 'QS. Ar-Ra\'d:11',
+                    sugesti: 'Aman, dilindungi, dijaga Allah 24 jam, tak perlu khawatir, Allah cukup bagiku'
+                },
+                {
+                    id: 23, nama: 'Selalu Dilindungi Allah', kategori: 'Maqam Tertinggi', dalil: 'QS. At-Taubah:51',
+                    sugesti: 'Hasbunallah, Allah pelindungku, aman di mana saja, dalam genggaman Allah'
+                },
+                {
+                    id: 4, nama: 'Damai', kategori: 'Maqam Tertinggi', dalil: 'QS. Al-Fajr:27-28',
+                    sugesti: 'Tenang, damai, sejuk hati, tidak gelisah, hati tenteram, jiwa muthmainnah'
+                },
+
+                // AKHLAQUL MAHMUDAH - Sifat Terpuji
+                {
+                    id: 8, nama: 'Ikhlas', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Az-Zumar:2',
+                    sugesti: 'Lillahi ta\'ala, tanpa pamrih, tidak mengharap balasan manusia, murni karena Allah'
+                },
+                {
+                    id: 9, nama: 'Sabar', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Al-Baqarah:153',
+                    sugesti: 'Tenang menghadapi cobaan, tidak terburu-buru, tabah, yakin ada hikmah, Allah bersama orang sabar'
+                },
+                {
+                    id: 10, nama: 'Welas Asih', kategori: 'Akhlaqul Mahmudah', dalil: 'HR. Muslim',
+                    sugesti: 'Penuh kasih sayang, lembut, mudah memaafkan, rahmatan lil alamin, mengasihi semua makhluk'
+                },
+                {
+                    id: 3, nama: 'Bahagia', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Yunus:58',
+                    sugesti: 'Bahagia dengan Islam, bahagia dengan takdir, hati riang, hidup penuh makna, selalu tersenyum'
+                },
+                {
+                    id: 5, nama: 'Tenang', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Ar-Ra\'d:28',
+                    sugesti: 'Hati tenang dengan dzikir, tidak cemas, rileks, santai tapi produktif, khusyuk'
+                },
+                {
+                    id: 6, nama: 'Percaya Diri', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Ali Imran:139',
+                    sugesti: 'Yakin dengan kemampuan, tidak minder, berani tampil, mukmin yang kuat, aku bisa dengan izin Allah'
+                },
+                {
+                    id: 7, nama: 'Berani', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. At-Taubah:51',
+                    sugesti: 'Berani mengambil keputusan, berani berubah, berani jujur, takut hanya pada Allah'
+                },
+                {
+                    id: 24, nama: 'Hati Lapang', kategori: 'Akhlaqul Mahmudah', dalil: 'QS. Alam Nasyrah:1',
+                    sugesti: 'Dada lapang, tidak sempit, tidak pendendam, mudah memaafkan, legowo'
+                },
+
+                // KEBERKAHAN DUNIAWI - Rezeki & Keluarga
+                {
+                    id: 17, nama: 'Rezeki Melimpah', kategori: 'Keberkahan Duniawi', dalil: 'QS. At-Talaq:2-3',
+                    sugesti: 'Rezeki datang dari arah tak terduga, selalu berkecukupan, pintu rezeki terbuka, berlimpah berkah'
+                },
+                {
+                    id: 19, nama: 'Berkah dalam Keluarga', kategori: 'Keberkahan Duniawi', dalil: 'QS. Ar-Rum:21',
+                    sugesti: 'Keluarga sakinah mawaddah warahmah, rumah penuh cinta, anak-anak shalih, harmonis'
+                },
+                {
+                    id: 18, nama: 'Sehat Wal Afiat', kategori: 'Keberkahan Duniawi', dalil: 'HR. Tirmidzi',
+                    sugesti: 'Sehat jasmani rohani, bugar, energik, badan kuat, imun tinggi, jauh dari penyakit'
+                },
+                {
+                    id: 12, nama: 'Hubungan Baik dengan Sesama', kategori: 'Keberkahan Duniawi', dalil: 'HR. Bukhari',
+                    sugesti: 'Disukai banyak orang, mudah akrab, silaturahmi lancar, tidak ada musuh, dicintai'
+                },
+                {
+                    id: 22, nama: 'Dikelilingi Orang Baik', kategori: 'Keberkahan Duniawi', dalil: 'HR. Abu Dawud',
+                    sugesti: 'Teman-teman shalih, lingkungan positif, berteman dengan ahli dzikir, jauh dari orang toxic'
+                },
+
+                // PRODUKTIVITAS HALAL
+                {
+                    id: 11, nama: 'Bahagia dengan Halal', kategori: 'Produktivitas Halal', dalil: 'QS. Al-Baqarah:172',
+                    sugesti: 'Puas dengan yang halal, tidak tertarik haram, berkah dalam kesederhanaan'
+                },
+                {
+                    id: 13, nama: 'Inspirasi dari Allah', kategori: 'Produktivitas Halal', dalil: 'QS. An-Nahl:68',
+                    sugesti: 'Ide cemerlang terus mengalir, kreatif, inovatif, ilham dari Allah, pikiran jernih'
+                },
+                {
+                    id: 14, nama: 'Rezeki Halal Berkah', kategori: 'Produktivitas Halal', dalil: 'QS. Al-Baqarah:168',
+                    sugesti: 'Penghasilan halal, bisnis berkah, tidak korupsi, kerja jujur, amanah'
+                },
+                {
+                    id: 16, nama: 'Doa Terkabul', kategori: 'Produktivitas Halal', dalil: 'QS. Ghafir:60',
+                    sugesti: 'Doa ijabah, Allah dengar doaku, yakin dikabulkan, doa tanpa ragu'
+                },
+                {
+                    id: 20, nama: 'Penuh Energi', kategori: 'Produktivitas Halal', dalil: 'HR. Bukhari',
+                    sugesti: 'Semangat 45, tidak malas, produktif, bangun pagi, stamina kuat'
+                },
+                {
+                    id: 21, nama: 'Fokus dan Produktif', kategori: 'Produktivitas Halal', dalil: 'HR. Tirmidzi',
+                    sugesti: 'Konsentrasi tinggi, tidak mudah terdistraksi, kerja efektif, hasil maksimal'
+                },
             ]);
         } catch (error) {
             console.error('Failed to load emosi:', error);
@@ -195,14 +274,20 @@ export default function SEFTAmplify() {
                                                 cursor: 'pointer',
                                                 borderBottom: '1px solid var(--spiritual-border)',
                                                 display: 'flex',
-                                                justifyContent: 'space-between'
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
                                             }}
                                             onMouseOver={(e) => e.currentTarget.style.background = 'var(--spiritual-bg)'}
                                             onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                         >
                                             <span>{emosi.nama}</span>
-                                            <span style={{ fontSize: '0.75rem', color: '#22c55e' }}>
-                                                Level {emosi.level_hawkins}
+                                            <span style={{
+                                                fontSize: '0.7rem',
+                                                color: '#22c55e',
+                                                textAlign: 'right',
+                                                maxWidth: '120px'
+                                            }}>
+                                                {emosi.dalil}
                                             </span>
                                         </div>
                                     ))}
@@ -210,6 +295,46 @@ export default function SEFTAmplify() {
                             )}
                         </div>
                     </div>
+
+                    {/* Sugesti Box - Muncul saat emosi dipilih */}
+                    {selectedEmosi && selectedEmosi.sugesti && (
+                        <div style={{
+                            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1))',
+                            border: '1px solid rgba(34, 197, 94, 0.3)',
+                            borderRadius: '12px',
+                            padding: '16px',
+                            marginTop: '12px'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginBottom: '8px',
+                                color: '#22c55e',
+                                fontSize: '0.8rem',
+                                fontWeight: '600'
+                            }}>
+                                💡 Kata-kata Sugesti:
+                            </div>
+                            <p style={{
+                                fontSize: '0.9rem',
+                                color: '#fff',
+                                lineHeight: '1.6',
+                                margin: 0,
+                                fontStyle: 'italic'
+                            }}>
+                                "{selectedEmosi.sugesti}"
+                            </p>
+                            <p style={{
+                                fontSize: '0.75rem',
+                                color: 'rgba(255,255,255,0.5)',
+                                marginTop: '10px',
+                                marginBottom: 0
+                            }}>
+                                📖 {selectedEmosi.dalil} | {selectedEmosi.kategori}
+                            </p>
+                        </div>
+                    )}
 
                     {/* Target */}
                     <div className="spiritual-form-group">
