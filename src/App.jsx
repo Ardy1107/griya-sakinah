@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage/LandingPage';
 import { SuperadminProvider } from './contexts/SuperadminContext';
 import UpdateChecker from './components/UpdateChecker';
+import OTAUpdater from './components/OTAUpdater';
 import './index.css';
 
 // Lazy load modules for better performance
@@ -33,6 +34,7 @@ function App() {
     return (
         <SuperadminProvider>
             <UpdateChecker />
+            <OTAUpdater />
             <BrowserRouter>
                 <Suspense fallback={<LoadingScreen />}>
                     <Routes>
