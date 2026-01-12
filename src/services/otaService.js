@@ -1,11 +1,11 @@
 /**
  * OTA (Over-The-Air) Update Service
- * Self-hosted updates using Supabase Storage
+ * Self-hosted updates using Supabase Storage (Internet Sakinah project)
  */
 
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 import { Capacitor } from '@capacitor/core';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../modules/internet/config/supabase';
 
 // Current app version (should match package.json)
 export const APP_VERSION = '1.0.0';
