@@ -8,8 +8,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Angsuran Supabase credentials not found. Check .env file.');
 }
 
+// Session persistence: stay logged in
 export const supabase = supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
+    ? createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            persistSession: true,
+            storageKey: 'griya-angsuran-auth',
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+        }
+    })
     : null;
 
 export const isSupabaseConfigured = () => !!supabase;
