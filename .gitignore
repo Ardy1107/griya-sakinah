@@ -24,10 +24,18 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment files
-.env
-.env.local
-.env.*.local
+# Environment files (uncomment if repo is PUBLIC)
+# .env
+# .env.local
+# .env.*.local
 
 # Testing
 coverage
+
+# Android - Build outputs (keep source files)
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+*.apk
+*.keystore

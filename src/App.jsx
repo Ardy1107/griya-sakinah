@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage/LandingPage';
 import { SuperadminProvider } from './contexts/SuperadminContext';
+import UpdateChecker from './components/UpdateChecker';
 import './index.css';
 
 // Lazy load modules for better performance
@@ -31,6 +32,7 @@ const LoadingScreen = () => (
 function App() {
     return (
         <SuperadminProvider>
+            <UpdateChecker />
             <BrowserRouter>
                 <Suspense fallback={<LoadingScreen />}>
                     <Routes>

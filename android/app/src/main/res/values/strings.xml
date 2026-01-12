@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Griya Sakinah</string>
+    <string name="title_activity_main">Griya Sakinah</string>
+    <string name="package_name">org.griyasakinah.app</string>
+    <string name="custom_url_scheme">org.griyasakinah.app</string>
+</resources>

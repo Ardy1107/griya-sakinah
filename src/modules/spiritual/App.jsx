@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { VideoPlayerProvider } from './context/VideoPlayerContext';
+import { initializeNotifications } from '../../services/notificationService';
 import Dashboard from './pages/Dashboard';
 import SEFTDashboard from './pages/SEFT/SEFTDashboard';
 import SEFTRelease from './pages/SEFT/SEFTRelease';
@@ -29,6 +31,11 @@ import MotivasiHarian from './pages/Motivasi/MotivasiHarian';
 import './spiritual.css';
 
 export default function App() {
+    // Initialize notifications when app loads (only works on native Android)
+    useEffect(() => {
+        initializeNotifications();
+    }, []);
+
     return (
         <VideoPlayerProvider>
             <div className="spiritual-module">
