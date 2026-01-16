@@ -6,14 +6,14 @@
 -- Table for storing user agreements
 CREATE TABLE IF NOT EXISTS internet_agreements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    resident_id UUID REFERENCES residents(id) ON DELETE CASCADE,
+    resident_id UUID,  -- Reference to resident (no FK constraint for flexibility)
     blok_rumah TEXT NOT NULL,
     nama_warga TEXT NOT NULL,
     signature_data TEXT NOT NULL,  -- Base64 encoded signature image
     agreed_at TIMESTAMPTZ DEFAULT NOW(),
     ip_address TEXT,
     user_agent TEXT,
-    block_id TEXT REFERENCES block_config(id),
+    block_id TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -39,3 +39,4 @@ CREATE POLICY "Allow public insert on internet_agreements"
 ON internet_agreements FOR INSERT 
 TO anon, authenticated 
 WITH CHECK (true);
+

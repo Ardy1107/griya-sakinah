@@ -58,22 +58,29 @@ export default function Agreement() {
     const canvasRef = useRef(null)
     const ctxRef = useRef(null)
 
-    // Initialize canvas
+    // Initialize canvas when resident is selected (canvas becomes visible)
     useEffect(() => {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const ctx = canvas.getContext('2d')
-            ctx.strokeStyle = '#1e293b'
-            ctx.lineWidth = 2
-            ctx.lineCap = 'round'
-            ctx.lineJoin = 'round'
-            ctxRef.current = ctx
+        // Small delay to ensure canvas is rendered
+        const timer = setTimeout(() => {
+            const canvas = canvasRef.current
+            if (canvas && selectedResident && !existingAgreement) {
+                const ctx = canvas.getContext('2d')
+                ctx.strokeStyle = '#1e293b'
+                ctx.lineWidth = 3
+                ctx.lineCap = 'round'
+                ctx.lineJoin = 'round'
+                ctxRef.current = ctx
 
-            // Fill with white background
-            ctx.fillStyle = '#ffffff'
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-        }
-    }, [])
+                // Fill with white background
+                ctx.fillStyle = '#ffffff'
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+                console.log('Canvas initialized:', canvas.width, canvas.height)
+            }
+        }, 100)
+
+        return () => clearTimeout(timer)
+    }, [selectedResident, existingAgreement])
 
     // Check if resident already signed
     useEffect(() => {
@@ -108,14 +115,27 @@ export default function Agreement() {
         checkExistingAgreement()
     }, [selectedResident])
 
-    // Drawing handlers
+    // Drawing handlers - with proper coordinate scaling
+    const getCanvasCoordinates = (e) => {
+        const canvas = canvasRef.current
+        const rect = canvas.getBoundingClientRect()
+        const clientX = e.clientX || e.touches?.[0]?.clientX
+        const clientY = e.clientY || e.touches?.[0]?.clientY
+
+        // Scale coordinates from CSS size to canvas resolution
+        const scaleX = canvas.width / rect.width
+        const scaleY = canvas.height / rect.height
+
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        }
+    }
+
     const startDrawing = (e) => {
         if (existingAgreement) return
 
-        const canvas = canvasRef.current
-        const rect = canvas.getBoundingClientRect()
-        const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left
-        const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top
+        const { x, y } = getCanvasCoordinates(e)
 
         ctxRef.current.beginPath()
         ctxRef.current.moveTo(x, y)
@@ -126,10 +146,7 @@ export default function Agreement() {
         if (!isDrawing || existingAgreement) return
 
         e.preventDefault()
-        const canvas = canvasRef.current
-        const rect = canvas.getBoundingClientRect()
-        const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left
-        const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top
+        const { x, y } = getCanvasCoordinates(e)
 
         ctxRef.current.lineTo(x, y)
         ctxRef.current.stroke()
@@ -250,12 +267,12 @@ export default function Agreement() {
                     </div>
 
                     {/* Select Resident */}
-                    <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+                    <div className="card" style={{ marginBottom: 'var(--space-lg)', overflow: 'visible', position: 'relative', zIndex: 50 }}>
                         <h3 className="card-title" style={{ marginBottom: 'var(--space-md)' }}>
                             👤 Pilih Nama Anda
                         </h3>
 
-                        <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'relative', zIndex: 60 }}>
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 className="form-input"
@@ -287,10 +304,10 @@ export default function Agreement() {
                                     background: 'var(--bg-card)',
                                     border: '1px solid var(--color-border)',
                                     borderRadius: 'var(--radius-md)',
-                                    maxHeight: '250px',
+                                    maxHeight: '300px',
                                     overflowY: 'auto',
-                                    zIndex: 100,
-                                    boxShadow: 'var(--shadow-lg)'
+                                    zIndex: 9999,
+                                    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
                                 }}>
                                     {residents.map(r => (
                                         <div
