@@ -118,8 +118,11 @@ export default function PublicDashboard() {
                     © {new Date().getFullYear()} Griya Sakinah Internet Management {isBlockSpecific && `• ${blockName}`}
                 </p>
                 <p style={{ marginTop: 'var(--space-sm)' }}>
+                    <a href={`${urlPrefix}/peraturan`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+                        📋 Peraturan & Persetujuan
+                    </a>
                     <a href={`${urlPrefix}/cek-status`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
-                        🔍 Cek Status Mandiri
+                        🔍 Cek Status
                     </a>
                     <a href={`${urlPrefix}/admin/login`} className="footer-link">
                         🔐 Admin

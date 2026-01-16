@@ -8,6 +8,7 @@ import PublicDashboard from './pages/PublicDashboard'
 import AdminLogin from './pages/AdminLogin'
 import AdminPanel from './pages/AdminPanel'
 import CekStatus from './pages/CekStatus'
+import Agreement from './pages/Agreement'
 import './index.css'
 
 // Helper to get default redirect based on current path
@@ -31,6 +32,7 @@ function InternetApp() {
               {/* Public Routes */}
               <Route index element={<PublicDashboard />} />
               <Route path="cek-status" element={<CekStatus />} />
+              <Route path="peraturan" element={<Agreement />} />
 
               {/* Admin Routes */}
               <Route path="admin/login" element={<AdminLogin />} />
