@@ -4,21 +4,39 @@ import { Home, Shield, Moon, Sun, Menu } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
+import { useBlock } from '../context/BlockContext'
 
 export default function Header() {
     const { theme, toggleTheme } = useTheme()
     const isDark = theme === 'dark'
     const location = useLocation()
     const { isAuthenticated, signOut } = useAuth()
-    const isAdmin = location.pathname.startsWith('/internet/admin')
+    const { blockId, blockName, urlPrefix, isBlockSpecific } = useBlock()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+    // Determine if we're on admin page (considering block-specific paths)
+    const isAdmin = location.pathname.includes('/admin')
 
     return (
         <header className="header">
             <div className="header-content">
-                <Link to="/internet" className="logo">
+                <Link to={urlPrefix} className="logo">
                     <div className="logo-icon-text">
-                        <span className="logo-text-main">INTERNET SAKINAH</span>
+                        <span className="logo-text-main">
+                            INTERNET SAKINAH
+                            {isBlockSpecific && (
+                                <span style={{
+                                    marginLeft: '8px',
+                                    padding: '2px 8px',
+                                    background: blockId === 'A' ? 'var(--color-primary)' : 'var(--color-secondary)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    fontSize: '0.7em',
+                                    fontWeight: 600
+                                }}>
+                                    {blockName}
+                                </span>
+                            )}
+                        </span>
                     </div>
                 </Link>
 
@@ -27,19 +45,19 @@ export default function Header() {
                         ← Kembali ke Portal Griya Sakinah
                     </a>
 
-                    <Link to="/internet" className={`nav-link ${location.pathname === '/internet' ? 'active' : ''}`}>
+                    <Link to={urlPrefix} className={`nav-link ${location.pathname === urlPrefix ? 'active' : ''}`}>
                         <Home size={16} />
                         Dashboard
                     </Link>
 
-                    <Link to="/internet/cek-status" className={`nav-link ${location.pathname === '/internet/cek-status' ? 'active' : ''}`}>
+                    <Link to={`${urlPrefix}/cek-status`} className={`nav-link ${location.pathname.includes('/cek-status') ? 'active' : ''}`}>
                         Cek Status
                     </Link>
 
                     {isAuthenticated ? (
                         <>
                             {!isAdmin && (
-                                <Link to="/internet/admin" className="btn btn-primary btn-sm">
+                                <Link to={`${urlPrefix}/admin`} className="btn btn-primary btn-sm">
                                     <Shield size={16} />
                                     Admin
                                 </Link>
@@ -79,14 +97,14 @@ export default function Header() {
                     <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                         Portal Griya Sakinah
                     </Link>
-                    <Link to="/internet" onClick={() => setMobileMenuOpen(false)}>
-                        <Home size={16} /> Dashboard
+                    <Link to={urlPrefix} onClick={() => setMobileMenuOpen(false)}>
+                        <Home size={16} /> Dashboard {isBlockSpecific && `(${blockName})`}
                     </Link>
-                    <Link to="/internet/cek-status" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to={`${urlPrefix}/cek-status`} onClick={() => setMobileMenuOpen(false)}>
                         Cek Status
                     </Link>
                     {isAuthenticated && !isAdmin && (
-                        <Link to="/internet/admin" onClick={() => setMobileMenuOpen(false)}>
+                        <Link to={`${urlPrefix}/admin`} onClick={() => setMobileMenuOpen(false)}>
                             <Shield size={16} /> Admin Panel
                         </Link>
                     )}

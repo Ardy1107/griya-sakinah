@@ -6,12 +6,14 @@ import { useResidents, usePayments } from '../hooks/useSupabase'
 import { formatCurrency, getMonthName, formatDate } from '../utils/helpers'
 import { downloadReceiptPDF } from '../utils/receiptPdf'
 import { downloadReceiptImage } from '../utils/receiptImage'
+import { useBlock } from '../context/BlockContext'
 
 export default function CekStatus() {
     const [searchBlok, setSearchBlok] = useState('')
     const [selectedResident, setSelectedResident] = useState(null)
     const { residents } = useResidents()
     const { payments } = usePayments()
+    const { blockName, isBlockSpecific } = useBlock()
 
     const handleSearch = (e) => {
         e.preventDefault()
@@ -59,7 +61,7 @@ export default function CekStatus() {
                 <div className="cek-status-page">
                     {/* Title */}
                     <div className="text-center mb-4">
-                        <h1>Cek Status Pembayaran</h1>
+                        <h1>Cek Status Pembayaran {isBlockSpecific && <span style={{ color: 'var(--color-primary)' }}>• {blockName}</span>}</h1>
                         <p className="text-muted">
                             Masukkan nomor blok rumah untuk melihat status pembayaran Anda
                         </p>
@@ -214,7 +216,7 @@ export default function CekStatus() {
             {/* Footer */}
             <footer className="footer">
                 <p className="footer-text">
-                    © {new Date().getFullYear()} Griya Sakinah Internet Management
+                    © {new Date().getFullYear()} Griya Sakinah Internet Management {isBlockSpecific && `• ${blockName}`}
                 </p>
             </footer>
         </div>

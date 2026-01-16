@@ -8,6 +8,7 @@ import ProgressBar from '../components/ProgressBar'
 import PeriodPicker from '../components/PeriodPicker'
 import { useFinancialSummary, usePaymentStatus, useResidents, usePayments } from '../hooks/useSupabase'
 import { getMonthName } from '../utils/helpers'
+import { useBlock } from '../context/BlockContext'
 
 // Default to current month/year
 const DEFAULT_PERIOD = (() => {
@@ -17,6 +18,7 @@ const DEFAULT_PERIOD = (() => {
 
 export default function PublicDashboard() {
     const [selectedPeriod, setSelectedPeriod] = useState(DEFAULT_PERIOD)
+    const { blockId, blockName, urlPrefix, isBlockSpecific } = useBlock()
 
     const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
     const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
@@ -38,10 +40,10 @@ export default function PublicDashboard() {
                     <div className="flex items-center justify-between" style={{ flexWrap: 'wrap', gap: 'var(--space-md)' }}>
                         <div>
                             <h1 style={{ fontSize: '1.75rem', marginBottom: 'var(--space-xs)' }}>
-                                Dashboard Transparansi
+                                Dashboard Transparansi {isBlockSpecific && <span style={{ color: 'var(--color-primary)' }}>• {blockName}</span>}
                             </h1>
                             <p className="text-muted">
-                                Pantau status pembayaran iuran internet Griya Sakinah secara transparan
+                                Pantau status pembayaran iuran internet {isBlockSpecific ? blockName : 'Griya Sakinah'} secara transparan
                             </p>
                         </div>
 
@@ -113,13 +115,13 @@ export default function PublicDashboard() {
             {/* Footer */}
             <footer className="footer">
                 <p className="footer-text">
-                    © {new Date().getFullYear()} Griya Sakinah Internet Management
+                    © {new Date().getFullYear()} Griya Sakinah Internet Management {isBlockSpecific && `• ${blockName}`}
                 </p>
                 <p style={{ marginTop: 'var(--space-sm)' }}>
-                    <a href="/internet/cek-status" className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+                    <a href={`${urlPrefix}/cek-status`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
                         🔍 Cek Status Mandiri
                     </a>
-                    <a href="/internet/admin/login" className="footer-link">
+                    <a href={`${urlPrefix}/admin/login`} className="footer-link">
                         🔐 Admin
                     </a>
                 </p>

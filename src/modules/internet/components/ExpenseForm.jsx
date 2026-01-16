@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import { Receipt, FileText, DollarSign, Tag, Calendar, Loader2, Check, Plus, Trash2, List, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAdminOperations } from '../hooks/useSupabase'
 import { formatCurrency, getMonthName } from '../utils/helpers'
+import { useBlock } from '../context/BlockContext'
 
 // NOTE: Categories must match database constraint
 // Run supabase_update_v4.sql to enable new categories
@@ -16,6 +17,7 @@ const EMPTY_ITEM = { nama: '', qty: 1, harga: 0 }
 
 export default function ExpenseForm({ onSuccess, expenses = [] }) {
     const { createExpense, loading } = useAdminOperations()
+    const { blockId, blockName, isBlockSpecific } = useBlock()
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     const currentYear = now.getFullYear()
@@ -208,7 +210,9 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
             const expenseData = {
                 ...formData,
                 keterangan: finalKeterangan,
-                nominal: finalNominal
+                nominal: finalNominal,
+                // Auto-assign block_id if in block-specific mode
+                ...(blockId && { block_id: blockId })
                 // Note: items field disabled until database is updated
                 // items: useDetailItems ? items.filter(item => item.nama.trim()) : []
             }

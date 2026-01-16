@@ -1,6 +1,7 @@
 // Supabase Data Hooks
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, supabaseAdmin } from '../config/supabase'
+import { useBlock } from '../context/BlockContext'
 
 // Get current month and year
 export function useCurrentPeriod() {
@@ -11,11 +12,12 @@ export function useCurrentPeriod() {
     }
 }
 
-// Fetch all residents
+// Fetch all residents (filtered by block)
 export function useResidents() {
     const [residents, setResidents] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const { blockId, filterByBlock } = useBlock()
 
     const fetchResidents = useCallback(async () => {
         try {
@@ -26,14 +28,17 @@ export function useResidents() {
                 .order('blok_rumah')
 
             if (error) throw error
-            setResidents(data || [])
+
+            // Filter by block if in block-specific mode
+            const filteredData = filterByBlock(data || [])
+            setResidents(filteredData)
         } catch (err) {
             setError(err.message)
             console.error('Error fetching residents:', err)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [blockId, filterByBlock])
 
     useEffect(() => {
         fetchResidents()
@@ -42,11 +47,12 @@ export function useResidents() {
     return { residents, loading, error, refetch: fetchResidents }
 }
 
-// Fetch payments with optional filtering
+// Fetch payments with optional filtering (filtered by block via resident)
 export function usePayments(bulan = null, tahun = null) {
     const [payments, setPayments] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const { blockId } = useBlock()
 
     const fetchPayments = useCallback(async () => {
         try {
@@ -65,14 +71,23 @@ export function usePayments(bulan = null, tahun = null) {
             const { data, error } = await query
 
             if (error) throw error
-            setPayments(data || [])
+
+            // Filter payments by resident's block
+            let filteredData = data || []
+            if (blockId) {
+                filteredData = filteredData.filter(p => {
+                    const residentBlock = p.resident?.blok_rumah?.charAt(0)?.toUpperCase()
+                    return residentBlock === blockId
+                })
+            }
+            setPayments(filteredData)
         } catch (err) {
             setError(err.message)
             console.error('Error fetching payments:', err)
         } finally {
             setLoading(false)
         }
-    }, [bulan, tahun])
+    }, [bulan, tahun, blockId])
 
     useEffect(() => {
         fetchPayments()
@@ -81,11 +96,12 @@ export function usePayments(bulan = null, tahun = null) {
     return { payments, loading, error, refetch: fetchPayments }
 }
 
-// Fetch expenses
+// Fetch expenses (filtered by block_id)
 export function useExpenses(bulan, tahun) {
     const [expenses, setExpenses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const { blockId } = useBlock()
 
     const fetchExpenses = useCallback(async () => {
         try {
@@ -94,6 +110,11 @@ export function useExpenses(bulan, tahun) {
                 .from('expenses')
                 .select('*')
                 .order('tanggal', { ascending: false })
+
+            // Filter by block_id if in block-specific mode
+            if (blockId) {
+                query = query.eq('block_id', blockId)
+            }
 
             if (bulan && tahun) {
                 const startDate = `${tahun}-${String(bulan).padStart(2, '0')}-01`
@@ -111,7 +132,7 @@ export function useExpenses(bulan, tahun) {
         } finally {
             setLoading(false)
         }
-    }, [bulan, tahun])
+    }, [bulan, tahun, blockId])
 
     useEffect(() => {
         fetchExpenses()

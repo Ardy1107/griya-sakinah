@@ -54,7 +54,12 @@ function App() {
 
                         {/* Module Routes */}
                         <Route path="/angsuran/*" element={<AngsuranApp />} />
+
+                        {/* Internet Module - Block-specific routes */}
+                        <Route path="/blok-a/internet/*" element={<InternetApp />} />
+                        <Route path="/blok-b/internet/*" element={<InternetApp />} />
                         <Route path="/internet/*" element={<InternetApp />} />
+
                         <Route path="/musholla/*" element={<MushollaApp />} />
 
                         {/* Admin Portal */}

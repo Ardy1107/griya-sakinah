@@ -1,0 +1,717 @@
+/* =====================================================
+   SEFT ANALYTICS DASHBOARD STYLES
+   Premium dark theme with modern gradients
+   ===================================================== */
+
+.seft-analytics {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+/* Period Selector */
+.seft-analytics-period-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 6px;
+}
+
+.seft-analytics-period-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seft-analytics-period-btn.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Summary Cards */
+.seft-analytics-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.seft-analytics-summary-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.seft-analytics-summary-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.seft-analytics-summary-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.seft-analytics-summary-sublabel {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 4px;
+}
+
+/* Progress Bar */
+.seft-analytics-progress-container {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seft-analytics-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.seft-analytics-progress-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.seft-analytics-progress-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #10b981;
+}
+
+.seft-analytics-progress-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.seft-analytics-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #22c55e);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.seft-analytics-progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* AI Analyzer Section */
+.seft-analytics-ai-section {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.seft-analytics-ai-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.seft-analytics-ai-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+}
+
+.seft-analytics-ai-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+}
+
+.seft-analytics-ai-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 14px;
+    color: white;
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 12px;
+}
+
+.seft-analytics-ai-textarea:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.seft-analytics-ai-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.seft-analytics-ai-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.seft-analytics-ai-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.seft-analytics-ai-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* AI Result */
+.seft-analytics-ai-result {
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.seft-analytics-ai-emotions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.seft-analytics-ai-emotion-tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.seft-analytics-ai-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+.seft-analytics-ai-insight {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.seft-analytics-ai-setup {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+}
+
+.seft-analytics-ai-affirmation {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    color: #fbbf24;
+    text-align: center;
+    margin-top: 12px;
+}
+
+/* Suggested Wounds */
+.seft-analytics-suggested-wounds {
+    margin-top: 16px;
+}
+
+.seft-analytics-wound-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seft-analytics-wound-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.seft-analytics-wound-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.seft-analytics-wound-priority {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+.seft-analytics-wound-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.seft-analytics-wound-category {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Top Wounds Chart */
+.seft-analytics-chart-section {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seft-analytics-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.seft-analytics-chart-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.seft-analytics-bar-item {
+    margin-bottom: 12px;
+}
+
+.seft-analytics-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.seft-analytics-bar-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+}
+
+.seft-analytics-bar-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.seft-analytics-bar-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.seft-analytics-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Recurring Wounds */
+.seft-analytics-recurring-item {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 3px solid;
+}
+
+.seft-analytics-recurring-info {
+    flex: 1;
+}
+
+.seft-analytics-recurring-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.seft-analytics-recurring-stats {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.seft-analytics-recurring-alert {
+    padding: 6px 10px;
+    background: rgba(239, 68, 68, 0.2);
+    border-radius: 6px;
+    font-size: 10px;
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* Recommended Section */
+.seft-analytics-recommended-section {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.05));
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.seft-analytics-recommended-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.seft-analytics-recommended-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.seft-analytics-recommended-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 4px 0;
+}
+
+.seft-analytics-recommended-reason {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.4;
+}
+
+/* Timeline Chart */
+.seft-analytics-timeline {
+    margin-bottom: 24px;
+}
+
+.seft-analytics-timeline-chart {
+    height: 150px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 10px 0;
+}
+
+.seft-analytics-timeline-bar {
+    flex: 1;
+    min-width: 20px;
+    background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.seft-analytics-timeline-bar:hover {
+    opacity: 0.8;
+}
+
+.seft-analytics-timeline-bar::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.seft-analytics-timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.seft-analytics-timeline-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Heatmap */
+.seft-analytics-heatmap {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.seft-analytics-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.seft-analytics-heatmap-cell.level-1 {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.seft-analytics-heatmap-cell.level-2 {
+    background: rgba(34, 197, 94, 0.4);
+}
+
+.seft-analytics-heatmap-cell.level-3 {
+    background: rgba(34, 197, 94, 0.6);
+}
+
+.seft-analytics-heatmap-cell.level-4 {
+    background: rgba(34, 197, 94, 0.8);
+}
+
+.seft-analytics-heatmap-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.seft-analytics-heatmap-label {
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Category Filter */
+.seft-analytics-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.seft-analytics-filter-btn {
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seft-analytics-filter-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Settings Modal */
+.seft-analytics-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.seft-analytics-modal {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seft-analytics-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.seft-analytics-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.seft-analytics-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+}
+
+.seft-analytics-form-group {
+    margin-bottom: 20px;
+}
+
+.seft-analytics-form-label {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.seft-analytics-form-input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+}
+
+.seft-analytics-form-input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.seft-analytics-modal-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* Empty State */
+.seft-analytics-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.seft-analytics-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.seft-analytics-empty-text {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Loading Spinner */
+.seft-analytics-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.seft-analytics-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .seft-analytics {
+        padding: 16px;
+    }
+
+    .seft-analytics-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .seft-analytics-summary-value {
+        font-size: 24px;
+    }
+}

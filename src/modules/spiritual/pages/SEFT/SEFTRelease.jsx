@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Check, ChevronDown, AlertTriangle, Info, Trophy, History, X, Heart, Activity, HelpCircle, Lightbulb, Loader2 } from 'lucide-react';
 import { createSeftSession, getSeftHistory, getTodaySeftCount, getDeviceId } from '../../services/spiritualService';
+import SmartEmotionFinder from '../../components/SmartEmotionFinder';
 
 // ============ PENYAKIT HATI DALAM ISLAM - BERDASARKAN QURAN & SUNNAH ============
 // Prioritas berdasarkan tingkat kerusakan menurut Al-Quran dan Hadith
@@ -452,6 +453,7 @@ export default function SEFTRelease() {
     const [deviceId] = useState(() => getDeviceId());
     const [setupMode, setSetupMode] = useState('panjang'); // 'pendek' atau 'panjang'
     const [tappingMode, setTappingMode] = useState('pendek'); // 'pendek' atau 'panjang'
+    const [showSmartFinder, setShowSmartFinder] = useState(false); // Modal Smart Finder
 
     useEffect(() => {
         loadData();
@@ -831,25 +833,36 @@ export default function SEFTRelease() {
                             </span>
                         </h3>
 
-                        {/* Quick Guide */}
-                        <div style={{
-                            background: 'rgba(99, 102, 241, 0.1)',
-                            padding: '12px 16px',
-                            borderRadius: '8px',
-                            marginBottom: '16px',
-                            fontSize: '0.8rem',
-                            border: '1px solid rgba(99, 102, 241, 0.2)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                                <Lightbulb size={16} style={{ color: '#6366f1' }} />
-                                <strong>Cara Cepat Menggunakan:</strong>
-                            </div>
-                            <ol style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
-                                <li><strong>Ada keluhan fisik?</strong> → Pilih dari "Filter Sakit Fisik" untuk rekomendasi emosi</li>
-                                <li><strong>Tahu emosi yang dirasakan?</strong> → Langsung pilih dari dropdown emosi</li>
-                                <li><strong>Prioritaskan warna MERAH/ORANYE</strong> → Level lebih rendah = dampak lebih besar</li>
-                            </ol>
-                        </div>
+                        {/* 🧠 Bantuan AI - Tombol ke Modal */}
+                        <button
+                            onClick={() => setShowSmartFinder(true)}
+                            style={{
+                                width: '100%',
+                                padding: '14px 16px',
+                                marginBottom: '16px',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.1))',
+                                color: '#fff',
+                                fontSize: '0.9rem',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.2rem' }}>🧠</span>
+                            Butuh Bantuan Menemukan Emosi?
+                            <span style={{
+                                fontSize: '0.7rem',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                background: 'rgba(139,92,246,0.3)',
+                                color: '#a78bfa'
+                            }}>AI</span>
+                        </button>
 
                         {/* Toggle Hide Released */}
                         <div style={{ marginBottom: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -1729,6 +1742,70 @@ export default function SEFTRelease() {
                     </div>
                 )
             }
-        </div >
+
+            {/* Smart Emotion Finder Modal */}
+            {showSmartFinder && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px',
+                    overflow: 'auto'
+                }}>
+                    <div style={{
+                        background: 'var(--spiritual-card)',
+                        borderRadius: '20px',
+                        maxWidth: '500px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        overflow: 'auto',
+                        position: 'relative'
+                    }}>
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setShowSmartFinder(false)}
+                            style={{
+                                position: 'absolute',
+                                top: '12px',
+                                right: '12px',
+                                background: 'rgba(255,255,255,0.1)',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '32px',
+                                height: '32px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                color: '#fff'
+                            }}
+                        >
+                            <X size={18} />
+                        </button>
+
+                        {/* Smart Finder Component */}
+                        <div style={{ padding: '20px' }}>
+                            <SmartEmotionFinder
+                                emosiList={emosiList}
+                                onSelectEmosi={(emosi) => {
+                                    handleSelectEmosi(emosi);
+                                    setShowSmartFinder(false);
+                                }}
+                                selectedEmosi={selectedEmosi}
+                                onMasalahChange={setMasalah}
+                                SAKIT_KE_EMOSI={SAKIT_KE_EMOSI}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

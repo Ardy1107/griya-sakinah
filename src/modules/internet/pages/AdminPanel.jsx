@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses } from '../hooks/useSupabase'
+import { useBlock } from '../context/BlockContext'
 import PaymentForm from '../components/PaymentForm'
 import ExpenseForm from '../components/ExpenseForm'
 import ResidentForm from '../components/ResidentForm'
@@ -34,6 +35,7 @@ const TABS = [
 
 export default function AdminPanel() {
     const { user, loading, signOut, isAuthenticated, isSuperadmin } = useAuth()
+    const { blockId, blockName, urlPrefix, isBlockSpecific } = useBlock()
     const [activeTab, setActiveTab] = useState('transparansi')
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [selectedPeriod, setSelectedPeriod] = useState(() => {
@@ -53,7 +55,7 @@ export default function AdminPanel() {
 
     // Redirect to login if not authenticated
     if (!loading && !isAuthenticated) {
-        return <Navigate to="/internet/admin/login" replace />
+        return <Navigate to={`${urlPrefix}/admin/login`} replace />
     }
 
     if (loading) {
@@ -344,7 +346,7 @@ export default function AdminPanel() {
             {/* Sidebar */}
             <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
                 <div className="flex items-center justify-between">
-                    <Link to="/internet" className="logo">
+                    <Link to={urlPrefix} className="logo">
                         <img
                             src="/logo.png"
                             alt="Griya Sakinah"
@@ -352,7 +354,9 @@ export default function AdminPanel() {
                         />
                         <div>
                             <span className="logo-text" style={{ fontSize: '1rem' }}>Griya Sakinah</span>
-                            <span className="logo-subtitle">Admin Panel</span>
+                            <span className="logo-subtitle">
+                                Admin Panel {isBlockSpecific && <span style={{ color: 'var(--color-primary)' }}>• {blockName}</span>}
+                            </span>
                         </div>
                     </Link>
 
