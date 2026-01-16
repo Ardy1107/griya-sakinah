@@ -1,19 +1,27 @@
 // Cek Status Page - Self-service for residents
-import { useState } from 'react'
-import { Search, CheckCircle, XCircle, Download, Calendar, Receipt, Phone } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, CheckCircle, XCircle, Download, Calendar, Receipt, Phone, AlertTriangle, FileText } from 'lucide-react'
 import Header from '../components/Header'
 import { useResidents, usePayments } from '../hooks/useSupabase'
 import { formatCurrency, getMonthName, formatDate } from '../utils/helpers'
 import { downloadReceiptPDF } from '../utils/receiptPdf'
 import { downloadReceiptImage } from '../utils/receiptImage'
 import { useBlock } from '../context/BlockContext'
+import { useAgreementCheck, useMonthlyReminder } from '../hooks/useAgreement'
+import ReminderModal from '../components/ReminderModal'
 
 export default function CekStatus() {
     const [searchBlok, setSearchBlok] = useState('')
     const [selectedResident, setSelectedResident] = useState(null)
+    const [showAgreementWarning, setShowAgreementWarning] = useState(false)
+
     const { residents } = useResidents()
     const { payments } = usePayments()
-    const { blockName, isBlockSpecific } = useBlock()
+    const { blockName, isBlockSpecific, urlPrefix } = useBlock()
+
+    // Agreement and reminder hooks
+    const { hasSigned, loading: checkingAgreement } = useAgreementCheck(selectedResident?.blok_rumah)
+    const { showReminder, dismissReminder } = useMonthlyReminder()
 
     const handleSearch = (e) => {
         e.preventDefault()
@@ -21,7 +29,17 @@ export default function CekStatus() {
             r.blok_rumah.toLowerCase() === searchBlok.toLowerCase().trim()
         )
         setSelectedResident(found || 'not_found')
+        setShowAgreementWarning(false)
     }
+
+    // Check agreement when resident is found
+    useEffect(() => {
+        if (selectedResident && selectedResident !== 'not_found' && hasSigned === false) {
+            setShowAgreementWarning(true)
+        } else {
+            setShowAgreementWarning(false)
+        }
+    }, [selectedResident, hasSigned])
 
     const residentPayments = selectedResident && selectedResident !== 'not_found'
         ? payments.filter(p => p.resident_id === selectedResident.id)
@@ -56,6 +74,9 @@ export default function CekStatus() {
     return (
         <div className="app-container">
             <Header />
+
+            {/* Monthly Reminder Modal */}
+            {showReminder && hasSigned && <ReminderModal onClose={dismissReminder} />}
 
             <main className="main-content">
                 <div className="cek-status-page">
@@ -102,112 +123,144 @@ export default function CekStatus() {
 
                     {selectedResident && selectedResident !== 'not_found' && (
                         <div className="cek-status-result">
-                            {/* Resident Info Card */}
-                            <div className="card cek-status-info">
-                                <div className="cek-status-header">
-                                    <div className="cek-status-blok">{selectedResident.blok_rumah}</div>
-                                    <div className="cek-status-nama">{selectedResident.nama_warga}</div>
+                            {/* Agreement Warning - Block access if not signed */}
+                            {showAgreementWarning && (
+                                <div className="card" style={{
+                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    border: '2px solid var(--color-warning)',
+                                    textAlign: 'center',
+                                    padding: 'var(--space-xl)'
+                                }}>
+                                    <AlertTriangle size={56} style={{ color: 'var(--color-warning)', marginBottom: 'var(--space-md)' }} />
+                                    <h2 style={{ marginBottom: 'var(--space-md)' }}>Persetujuan Diperlukan</h2>
+                                    <p style={{ marginBottom: 'var(--space-lg)', maxWidth: '400px', margin: '0 auto var(--space-lg)' }}>
+                                        Untuk mengakses status pembayaran, Anda wajib menyetujui peraturan pembayaran internet terlebih dahulu.
+                                    </p>
+                                    <a
+                                        href={`${urlPrefix}/peraturan`}
+                                        className="btn btn-primary btn-lg"
+                                        style={{ marginBottom: 'var(--space-md)' }}
+                                    >
+                                        <FileText size={18} />
+                                        Baca & Tanda Tangan Peraturan
+                                    </a>
+                                    <p className="text-muted" style={{ fontSize: '0.8rem' }}>
+                                        Setelah menandatangani, Anda bisa kembali ke halaman ini.
+                                    </p>
                                 </div>
+                            )}
 
-                                {/* Current Month Status */}
-                                <div className={`cek-status-current ${currentMonthPayment ? 'paid' : 'unpaid'}`}>
-                                    {currentMonthPayment ? (
-                                        <>
-                                            <CheckCircle size={32} />
-                                            <div>
-                                                <h3>LUNAS</h3>
-                                                <p>Pembayaran {getMonthName(now.getMonth() + 1)} {now.getFullYear()}</p>
-                                                <span className="cek-status-amount">{formatCurrency(currentMonthPayment.nominal)}</span>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <XCircle size={32} />
-                                            <div>
-                                                <h3>BELUM BAYAR</h3>
-                                                <p>Iuran {getMonthName(now.getMonth() + 1)} {now.getFullYear()}</p>
-                                                <span className="cek-status-amount">{formatCurrency(150000)}</span>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                {/* Download Kwitansi */}
-                                {currentMonthPayment && (
-                                    <div className="cek-status-download">
-                                        <p className="text-muted mb-2">Download Kwitansi:</p>
-                                        <div className="flex gap-2">
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={() => handleDownloadPDF(currentMonthPayment)}
-                                            >
-                                                <Download size={16} />
-                                                PDF
-                                            </button>
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={() => handleDownloadImage(currentMonthPayment)}
-                                            >
-                                                <Download size={16} />
-                                                Gambar
-                                            </button>
+                            {/* Show content only if agreement is signed */}
+                            {!showAgreementWarning && (
+                                <>
+                                    {/* Resident Info Card */}
+                                    <div className="card cek-status-info">
+                                        <div className="cek-status-header">
+                                            <div className="cek-status-blok">{selectedResident.blok_rumah}</div>
+                                            <div className="cek-status-nama">{selectedResident.nama_warga}</div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
 
-                            {/* Payment History */}
-                            <div className="card mt-3">
-                                <div className="card-header">
-                                    <h3 className="card-title">
-                                        <Calendar size={18} />
-                                        Riwayat Pembayaran
-                                    </h3>
-                                </div>
+                                        {/* Current Month Status */}
+                                        <div className={`cek-status-current ${currentMonthPayment ? 'paid' : 'unpaid'}`}>
+                                            {currentMonthPayment ? (
+                                                <>
+                                                    <CheckCircle size={32} />
+                                                    <div>
+                                                        <h3>LUNAS</h3>
+                                                        <p>Pembayaran {getMonthName(now.getMonth() + 1)} {now.getFullYear()}</p>
+                                                        <span className="cek-status-amount">{formatCurrency(currentMonthPayment.nominal)}</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <XCircle size={32} />
+                                                    <div>
+                                                        <h3>BELUM BAYAR</h3>
+                                                        <p>Iuran {getMonthName(now.getMonth() + 1)} {now.getFullYear()}</p>
+                                                        <span className="cek-status-amount">{formatCurrency(150000)}</span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
 
-                                {residentPayments.length === 0 ? (
-                                    <div className="text-center text-muted" style={{ padding: '2rem' }}>
-                                        Belum ada riwayat pembayaran
+                                        {/* Download Kwitansi */}
+                                        {currentMonthPayment && (
+                                            <div className="cek-status-download">
+                                                <p className="text-muted mb-2">Download Kwitansi:</p>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        onClick={() => handleDownloadPDF(currentMonthPayment)}
+                                                    >
+                                                        <Download size={16} />
+                                                        PDF
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        onClick={() => handleDownloadImage(currentMonthPayment)}
+                                                    >
+                                                        <Download size={16} />
+                                                        Gambar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="table-container">
-                                        <table className="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Periode</th>
-                                                    <th>Tanggal Bayar</th>
-                                                    <th>Nominal</th>
-                                                    <th>Kwitansi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {residentPayments.map(payment => (
-                                                    <tr key={payment.id}>
-                                                        <td>
-                                                            <strong>{getMonthName(payment.bulan)} {payment.tahun}</strong>
-                                                        </td>
-                                                        <td>{formatDate(payment.tanggal_bayar)}</td>
-                                                        <td className="text-primary" style={{ fontWeight: 600 }}>
-                                                            {formatCurrency(payment.nominal)}
-                                                        </td>
-                                                        <td>
-                                                            <div className="flex gap-1">
-                                                                <button
-                                                                    className="btn btn-sm btn-secondary"
-                                                                    onClick={() => handleDownloadPDF(payment)}
-                                                                    title="Download PDF"
-                                                                >
-                                                                    <Receipt size={14} />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+
+                                    {/* Payment History */}
+                                    <div className="card mt-3">
+                                        <div className="card-header">
+                                            <h3 className="card-title">
+                                                <Calendar size={18} />
+                                                Riwayat Pembayaran
+                                            </h3>
+                                        </div>
+
+                                        {residentPayments.length === 0 ? (
+                                            <div className="text-center text-muted" style={{ padding: '2rem' }}>
+                                                Belum ada riwayat pembayaran
+                                            </div>
+                                        ) : (
+                                            <div className="table-container">
+                                                <table className="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Periode</th>
+                                                            <th>Tanggal Bayar</th>
+                                                            <th>Nominal</th>
+                                                            <th>Kwitansi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {residentPayments.map(payment => (
+                                                            <tr key={payment.id}>
+                                                                <td>
+                                                                    <strong>{getMonthName(payment.bulan)} {payment.tahun}</strong>
+                                                                </td>
+                                                                <td>{formatDate(payment.tanggal_bayar)}</td>
+                                                                <td className="text-primary" style={{ fontWeight: 600 }}>
+                                                                    {formatCurrency(payment.nominal)}
+                                                                </td>
+                                                                <td>
+                                                                    <div className="flex gap-1">
+                                                                        <button
+                                                                            className="btn btn-sm btn-secondary"
+                                                                            onClick={() => handleDownloadPDF(payment)}
+                                                                            title="Download PDF"
+                                                                        >
+                                                                            <Receipt size={14} />
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
