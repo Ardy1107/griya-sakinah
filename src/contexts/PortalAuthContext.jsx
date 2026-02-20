@@ -82,13 +82,13 @@ export function PortalAuthProvider({ children }) {
 
     const hasModuleAccess = (moduleName) => {
         if (!user) return false;
-        if (user.role === 'superadmin') return true;
+        if (user.role === 'super_admin') return true;
         return user.moduleAccess?.includes(moduleName);
     };
 
     const isAuthenticated = !!user;
-    const isSuperadmin = user?.role === 'superadmin';
-    const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+    const isSuperadmin = user?.role === 'super_admin';
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
     const isWarga = user?.role === 'warga';
 
     return (

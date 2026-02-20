@@ -9,13 +9,14 @@ const ftp = require('basic-ftp');
 const fs = require('fs');
 const path = require('path');
 
-const FTP_PASSWORD = process.env.FTP_PASSWORD || 'Samarinda2026@@@';
+// Load environment variables
+process.loadEnvFile();
 
 const config = {
-    host: 'ftp.griyasakinah.org',
-    user: 'u254488293.griyasakinah2',
-    password: FTP_PASSWORD,
-    port: 21,
+    host: process.env.FTP_HOST || 'ftp.griyasakinah.org',
+    user: process.env.FTP_USER,
+    password: process.env.FTP_PASSWORD,
+    port: parseInt(process.env.FTP_PORT || '21'),
     secure: false
 };
 

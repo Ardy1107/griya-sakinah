@@ -8,14 +8,14 @@
 const FtpDeploy = require('ftp-deploy');
 const ftpDeploy = new FtpDeploy();
 
-// ⚠️ Credentials Hostinger
-const FTP_PASSWORD = process.env.FTP_PASSWORD || 'Samarinda2026...';
+// Load environment variables
+process.loadEnvFile();
 
 const config = {
-    user: 'u254488293.GS',
-    password: FTP_PASSWORD,
-    host: '145.79.26.43',
-    port: 21,
+    user: process.env.FTP_USER,
+    password: process.env.FTP_PASSWORD,
+    host: process.env.FTP_HOST || '145.79.26.43',
+    port: parseInt(process.env.FTP_PORT || '21'),
     localRoot: './dist',
     remoteRoot: '/',
 

@@ -4,6 +4,9 @@ import { dirname, join, relative } from 'path';
 import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 
+// Load environment variables
+process.loadEnvFile();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -98,10 +101,10 @@ async function deploy() {
         // Connect to FTP
         console.log("🔌 Connecting to FTP...");
         await client.access({
-            host: "145.79.26.43",
-            user: "u254488293.griyasakinah",
-            password: "Samarinda2026???",
-            port: 21,
+            host: process.env.FTP_HOST,
+            user: process.env.FTP_USER,
+            password: process.env.FTP_PASSWORD,
+            port: parseInt(process.env.FTP_PORT || '21'),
             secure: false
         });
 

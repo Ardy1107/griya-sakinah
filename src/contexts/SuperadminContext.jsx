@@ -17,7 +17,7 @@ export function SuperadminProvider({ children }) {
         if (storedUser) {
             try {
                 const parsed = JSON.parse(storedUser);
-                if (parsed.role === 'superadmin') {
+                if (parsed.role === 'super_admin') {
                     setIsAuthenticated(true);
                     setUser(parsed);
                 }
@@ -40,7 +40,7 @@ export function SuperadminProvider({ children }) {
                 .select('*')
                 .eq('username', username)
                 .eq('password', password)
-                .eq('role', 'superadmin')
+                .eq('role', 'super_admin')
                 .eq('is_active', true)
                 .single();
 
@@ -58,7 +58,7 @@ export function SuperadminProvider({ children }) {
                 id: data.id,
                 username: data.username,
                 name: data.full_name,
-                role: 'superadmin',
+                role: 'super_admin',
                 moduleAccess: data.module_access || []
             };
 

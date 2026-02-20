@@ -1,70 +1,69 @@
 /**
- * Takjil Admin Management
- * Manage Ramadan takjil donor schedule
+ * Takjil Admin - Edit Schedule + Completion Tracker
+ * All data stored in Supabase for real-time updates
  */
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCommunity } from '../contexts/CommunityContext';
 import {
-    ArrowLeft,
-    Calendar,
-    Plus,
-    Edit2,
-    Trash2,
-    Check,
-    X,
-    Users,
-    UtensilsCrossed,
-    Clock,
-    Shield,
-    Eye,
-    EyeOff,
-    AlertCircle,
-    CheckCircle,
-    ChevronLeft,
-    ChevronRight
+    ArrowLeft, Shield, Eye, EyeOff, AlertCircle,
+    CheckCircle, XCircle, BarChart3, Save, X, Edit2,
+    Loader2, RefreshCw, Share2, Copy, Check
 } from 'lucide-react';
+import { supabaseMusholla as supabase } from '../../lib/supabaseMusholla';
 import './TakjilAdmin.css';
 
 const ADMIN_PASSWORD = 'takjil2026';
+const COLS = ['nasi1', 'nasi2', 'takjil', 'minuman'];
+const COL_LABELS = { nasi1: '🍱 Nasi 1', nasi2: '🍱 Nasi 2', takjil: '🧁 Takjil', minuman: '🥤 Minuman' };
 
 const TakjilAdmin = () => {
-    const { takjilSchedule, updateTakjilSchedule, addTakjilDonatur } = useCommunity();
-
-    // Auth
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [authError, setAuthError] = useState('');
-    const [isSuperadmin, setIsSuperadmin] = useState(false);
-
-    // UI State
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({ donatur: '', menu: '', phone: '' });
-    const [currentMonth, setCurrentMonth] = useState(new Date(2026, 2, 1)); // March 2026 (Ramadan)
+    const [schedule, setSchedule] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(null);
+    const [editCell, setEditCell] = useState(null);
+    const [editNama, setEditNama] = useState('');
+    const [editBlok, setEditBlok] = useState('');
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        // Check SSO from SuperAdmin Portal first
         try {
             const ssoSession = localStorage.getItem('superadmin_session');
             if (ssoSession) {
                 const parsed = JSON.parse(ssoSession);
                 if (parsed.expiry > Date.now() && parsed.user) {
                     setIsAuthenticated(true);
-                    setIsSuperadmin(true);
                     return;
                 }
             }
-        } catch (e) {
-            // Invalid SSO session
-        }
+        } catch (e) { /* ignore */ }
 
-        // Fallback to module auth
         const auth = sessionStorage.getItem('takjil_admin_auth');
         if (auth === 'true') setIsAuthenticated(true);
     }, []);
+
+    useEffect(() => {
+        if (isAuthenticated) fetchSchedule();
+    }, [isAuthenticated]);
+
+    async function fetchSchedule() {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('takjil_schedule')
+                .select('*')
+                .order('no', { ascending: true });
+            if (error) throw error;
+            setSchedule(data || []);
+        } catch (err) {
+            console.error('Error fetching schedule:', err);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -82,110 +81,100 @@ const TakjilAdmin = () => {
         sessionStorage.removeItem('takjil_admin_auth');
     };
 
-    const handleOpenModal = (date) => {
-        const existing = takjilSchedule.schedule?.find(s => s.date === date);
-        setSelectedDate(date);
-        setFormData({
-            donatur: existing?.donatur || '',
-            menu: existing?.menu || '',
-            phone: existing?.phone || ''
+    // Toggle completion status
+    const toggleDone = async (row, col) => {
+        const field = `${col}_done`;
+        const newVal = !row[field];
+        const key = `${row.id}-${col}`;
+        setSaving(key);
+        try {
+            const { error } = await supabase
+                .from('takjil_schedule')
+                .update({ [field]: newVal, updated_at: new Date().toISOString() })
+                .eq('id', row.id);
+            if (error) throw error;
+            setSchedule(prev => prev.map(r => r.id === row.id ? { ...r, [field]: newVal } : r));
+        } catch (err) {
+            console.error('Error toggling done:', err);
+        } finally {
+            setSaving(null);
+        }
+    };
+
+    // Start editing a cell
+    const startEdit = (row, col) => {
+        setEditCell({ id: row.id, col });
+        setEditNama(row[`${col}_nama`] || '');
+        setEditBlok(row[`${col}_blok`] || '');
+    };
+
+    // Cancel editing
+    const cancelEdit = () => {
+        setEditCell(null);
+        setEditNama('');
+        setEditBlok('');
+    };
+
+    // Save cell edit to Supabase
+    const saveEdit = async () => {
+        if (!editCell) return;
+        const { id, col } = editCell;
+        const key = `${id}-edit`;
+        setSaving(key);
+        try {
+            const { error } = await supabase
+                .from('takjil_schedule')
+                .update({
+                    [`${col}_nama`]: editNama || null,
+                    [`${col}_blok`]: editBlok || null,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id);
+            if (error) throw error;
+            setSchedule(prev => prev.map(r =>
+                r.id === id
+                    ? { ...r, [`${col}_nama`]: editNama || null, [`${col}_blok`]: editBlok || null }
+                    : r
+            ));
+            cancelEdit();
+        } catch (err) {
+            console.error('Error saving edit:', err);
+        } finally {
+            setSaving(null);
+        }
+    };
+
+    const handleShareLink = () => {
+        const url = `${window.location.origin}/komunitas/takjil`;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
         });
-        setShowModal(true);
     };
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        if (!formData.donatur) return;
-
-        const updatedSchedule = takjilSchedule.schedule?.map(item => {
-            if (item.date === selectedDate) {
-                return {
-                    ...item,
-                    donatur: formData.donatur,
-                    menu: formData.menu,
-                    phone: formData.phone,
-                    status: 'confirmed'
-                };
-            }
-            return item;
-        }) || [];
-
-        // If date doesn't exist, add it
-        if (!updatedSchedule.find(s => s.date === selectedDate)) {
-            updatedSchedule.push({
-                date: selectedDate,
-                donatur: formData.donatur,
-                menu: formData.menu,
-                phone: formData.phone,
-                status: 'confirmed'
-            });
-        }
-
-        updateTakjilSchedule(updatedSchedule);
-        setShowModal(false);
-        setSelectedDate(null);
-    };
-
-    const handleClear = (date) => {
-        if (!window.confirm('Yakin ingin menghapus donatur ini?')) return;
-        const updatedSchedule = takjilSchedule.schedule?.map(item => {
-            if (item.date === date) {
-                return { ...item, donatur: '', menu: '', phone: '', status: 'available' };
-            }
-            return item;
-        }) || [];
-        updateTakjilSchedule(updatedSchedule);
-    };
-
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const days = [];
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-
-        // Add empty slots for days before first day of month
-        for (let i = 0; i < firstDay.getDay(); i++) {
-            days.push(null);
-        }
-
-        for (let d = 1; d <= lastDay.getDate(); d++) {
-            days.push(new Date(year, month, d));
-        }
-        return days;
-    };
-
-    const formatDate = (date) => {
-        return date.toISOString().split('T')[0];
-    };
-
-    const getScheduleForDate = (date) => {
-        const dateStr = formatDate(date);
-        return takjilSchedule.schedule?.find(s => s.date === dateStr);
-    };
-
-    const prevMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-    };
-
-    const nextMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-    };
-
-    const confirmedCount = takjilSchedule.schedule?.filter(s => s.status === 'confirmed').length || 0;
-    const availableCount = takjilSchedule.schedule?.filter(s => s.status === 'available').length || 0;
+    // Stats
+    const totalCells = schedule.reduce((count, row) => {
+        COLS.forEach(col => {
+            if (row[`${col}_nama`]) count++;
+        });
+        return count;
+    }, 0);
+    const completedCount = schedule.reduce((count, row) => {
+        COLS.forEach(col => {
+            if (row[`${col}_done`] && row[`${col}_nama`]) count++;
+        });
+        return count;
+    }, 0);
+    const percentage = totalCells > 0 ? Math.round((completedCount / totalCells) * 100) : 0;
 
     // Login Screen
     if (!isAuthenticated) {
         return (
             <div className="takjil-login">
                 <div className="login-card">
-                    <div className="login-icon">
-                        <UtensilsCrossed size={48} />
-                    </div>
+                    <div className="login-icon">🌙</div>
                     <h1>Admin Takjil</h1>
-                    <p>Kelola jadwal donatur takjil Ramadhan</p>
-
+                    <p>Kelola jadwal & tracker buka puasa</p>
                     <form onSubmit={handleLogin}>
                         <div className="password-input">
                             <input
@@ -195,32 +184,31 @@ const TakjilAdmin = () => {
                                 placeholder="Password admin"
                                 autoFocus
                             />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
+                            <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
-
                         {authError && (
-                            <div className="auth-error">
-                                <AlertCircle size={16} />
-                                {authError}
-                            </div>
+                            <div className="auth-error"><AlertCircle size={16} />{authError}</div>
                         )}
-
                         <button type="submit" className="login-button">
-                            <Shield size={18} />
-                            Masuk
+                            <Shield size={18} /> Masuk
                         </button>
                     </form>
-
                     <Link to="/komunitas" className="back-link">
-                        <ArrowLeft size={16} />
-                        Kembali ke Komunitas
+                        <ArrowLeft size={16} /> Kembali ke Komunitas
                     </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (loading) {
+        return (
+            <div className="takjil-admin">
+                <div className="loading-state">
+                    <Loader2 size={40} className="spin" />
+                    <p>Memuat jadwal dari database...</p>
                 </div>
             </div>
         );
@@ -231,209 +219,172 @@ const TakjilAdmin = () => {
             {/* Header */}
             <header className="admin-header">
                 <div className="header-left">
-                    <Link to="/komunitas" className="back-btn">
-                        <ArrowLeft size={20} />
-                    </Link>
+                    <Link to="/komunitas" className="back-btn"><ArrowLeft size={20} /></Link>
                     <div>
                         <h1>🌙 Admin Takjil</h1>
-                        <p>Jadwal Donatur Ramadhan {currentMonth.getFullYear()}</p>
+                        <p>Edit jadwal & tandai donatur yang sudah menunaikan</p>
                     </div>
                 </div>
-                <div className="header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    {isSuperadmin && (
-                        <Link to="/admin/dashboard" style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '8px 16px',
-                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                            borderRadius: '8px',
-                            color: 'white',
-                            textDecoration: 'none',
-                            fontSize: '13px',
-                            fontWeight: 600
-                        }}>
-                            🏠 Admin Portal
-                        </Link>
-                    )}
-                    <button className="logout-btn" onClick={handleLogout}>
-                        Logout
+                <div className="header-actions">
+                    <button className="share-btn" onClick={handleShareLink} title="Salin link jadwal">
+                        {copied ? <><Check size={16} /> Tersalin!</> : <><Share2 size={16} /> Share</>}
                     </button>
+                    <button className="refresh-btn" onClick={fetchSchedule} title="Refresh data">
+                        <RefreshCw size={16} />
+                    </button>
+                    <button className="logout-btn" onClick={handleLogout}>Logout</button>
                 </div>
             </header>
 
+            {/* Share Link Banner */}
+            <div className="share-banner">
+                <span>📱 Link untuk donatur:</span>
+                <code>{window.location.origin}/komunitas/takjil</code>
+                <button onClick={handleShareLink}>
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+            </div>
+
             {/* Stats */}
-            <div className="admin-stats">
+            <div className="tracker-stats">
                 <div className="stat-card emerald">
-                    <CheckCircle size={24} />
+                    <CheckCircle size={22} />
                     <div>
-                        <span className="value">{confirmedCount}</span>
-                        <span className="label">Terkonfirmasi</span>
+                        <span className="value">{completedCount}</span>
+                        <span className="label">Sudah</span>
                     </div>
                 </div>
-                <div className="stat-card gold">
-                    <Clock size={24} />
+                <div className="stat-card amber">
+                    <XCircle size={22} />
                     <div>
-                        <span className="value">{availableCount}</span>
-                        <span className="label">Tersedia</span>
+                        <span className="value">{totalCells - completedCount}</span>
+                        <span className="label">Belum</span>
+                    </div>
+                </div>
+                <div className="stat-card blue">
+                    <BarChart3 size={22} />
+                    <div>
+                        <span className="value">{percentage}%</span>
+                        <span className="label">Progress</span>
                     </div>
                 </div>
             </div>
 
-            {/* Calendar Navigation */}
-            <div className="calendar-nav">
-                <button onClick={prevMonth}>
-                    <ChevronLeft size={20} />
-                </button>
-                <h2>
-                    {currentMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
-                </h2>
-                <button onClick={nextMonth}>
-                    <ChevronRight size={20} />
-                </button>
+            {/* Progress Bar */}
+            <div className="progress-section">
+                <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${percentage}%` }}></div>
+                </div>
+                <span className="progress-text">{completedCount}/{totalCells} slot terpenuhi</span>
             </div>
 
-            {/* Calendar Grid */}
-            <div className="calendar-container">
-                <div className="calendar-header">
-                    {['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].map(day => (
-                        <div key={day} className="day-header">{day}</div>
-                    ))}
-                </div>
-                <div className="calendar-grid">
-                    {getDaysInMonth(currentMonth).map((date, index) => {
-                        if (!date) {
-                            return <div key={index} className="calendar-cell empty" />;
-                        }
-
-                        const schedule = getScheduleForDate(date);
-                        const isConfirmed = schedule?.status === 'confirmed';
-
-                        return (
-                            <div
-                                key={index}
-                                className={`calendar-cell ${isConfirmed ? 'confirmed' : 'available'}`}
-                                onClick={() => handleOpenModal(formatDate(date))}
-                            >
-                                <span className="date-number">{date.getDate()}</span>
-                                {schedule?.donatur && (
-                                    <div className="donatur-info">
-                                        <span className="donatur-name">{schedule.donatur}</span>
-                                        {schedule.menu && (
-                                            <span className="donatur-menu">{schedule.menu}</span>
-                                        )}
-                                    </div>
-                                )}
-                                {!schedule?.donatur && (
-                                    <span className="available-label">Tersedia</span>
-                                )}
-                            </div>
-                        );
-                    })}
+            {/* Legend */}
+            <div className="tracker-legend">
+                <span>✅ Klik cell = tandai sudah · ✏️ Double-klik = edit nama</span>
+                <div className="legend-items">
+                    <span className="legend-done">✅ Sudah</span>
+                    <span className="legend-pending">⏳ Belum</span>
                 </div>
             </div>
 
-            {/* Schedule List */}
-            <div className="schedule-list">
-                <h3>Daftar Donatur Bulan Ini</h3>
-                {takjilSchedule.schedule?.filter(s => {
-                    const scheduleDate = new Date(s.date);
-                    return scheduleDate.getMonth() === currentMonth.getMonth() &&
-                        scheduleDate.getFullYear() === currentMonth.getFullYear() &&
-                        s.status === 'confirmed';
-                }).map(item => (
-                    <div key={item.date} className="schedule-item">
-                        <div className="schedule-date">
-                            <Calendar size={16} />
-                            {new Date(item.date).toLocaleDateString('id-ID', {
-                                weekday: 'short',
-                                day: 'numeric',
-                                month: 'short'
-                            })}
-                        </div>
-                        <div className="schedule-info">
-                            <span className="schedule-donatur">{item.donatur}</span>
-                            <span className="schedule-menu">{item.menu}</span>
-                        </div>
-                        <div className="schedule-actions">
-                            <button
-                                className="action-btn edit"
-                                onClick={() => handleOpenModal(item.date)}
-                            >
-                                <Edit2 size={16} />
-                            </button>
-                            <button
-                                className="action-btn delete"
-                                onClick={() => handleClear(item.date)}
-                            >
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            {/* Tracker Table */}
+            <div className="tracker-table-wrapper">
+                <table className="tracker-table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: '4%' }}>No</th>
+                            <th style={{ width: '14%' }}>Tanggal</th>
+                            <th style={{ width: '20.5%' }}>🍱 Nasi 1</th>
+                            <th style={{ width: '20.5%' }}>🍱 Nasi 2</th>
+                            <th style={{ width: '20.5%' }}>🧁 Takjil Kue</th>
+                            <th style={{ width: '20.5%' }}>🥤 Minuman/Es</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {schedule.map((row, i) => {
+                            // Insert divider rows
+                            const rows = [];
+                            if (row.no === 10 || row.no === 21) {
+                                rows.push(<tr key={`div-${i}`} className="divider-row"><td colSpan="6"></td></tr>);
+                            }
+                            rows.push(
+                                <tr key={row.id}>
+                                    <td className="no-cell">{row.no}</td>
+                                    <td className="date-cell">{row.tanggal}</td>
+                                    {COLS.map(col => {
+                                        const nama = row[`${col}_nama`];
+                                        const blok = row[`${col}_blok`];
+                                        const isDone = row[`${col}_done`];
+                                        const isSaving = saving === `${row.id}-${col}`;
+                                        const isEditing = editCell?.id === row.id && editCell?.col === col;
 
-            {/* Modal */}
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>Edit Donatur</h2>
-                            <button className="close-btn" onClick={() => setShowModal(false)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="date-display">
-                            <Calendar size={18} />
-                            {new Date(selectedDate).toLocaleDateString('id-ID', {
-                                weekday: 'long',
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric'
-                            })}
-                        </div>
-                        <form onSubmit={handleSave} className="modal-form">
-                            <div className="form-group">
-                                <label>Nama Donatur</label>
-                                <input
-                                    type="text"
-                                    value={formData.donatur}
-                                    onChange={e => setFormData({ ...formData, donatur: e.target.value })}
-                                    placeholder="Contoh: Pak Ahmad (Blok A1)"
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Menu Takjil</label>
-                                <input
-                                    type="text"
-                                    value={formData.menu}
-                                    onChange={e => setFormData({ ...formData, menu: e.target.value })}
-                                    placeholder="Contoh: Kolak & Gorengan"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>No. HP (Opsional)</label>
-                                <input
-                                    type="text"
-                                    value={formData.phone}
-                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                    placeholder="08xxxxxxxxxx"
-                                />
-                            </div>
-                            <div className="modal-actions">
-                                <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>
-                                    Batal
-                                </button>
-                                <button type="submit" className="submit-btn">
-                                    <Check size={18} />
-                                    Simpan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                                        // Editing mode
+                                        if (isEditing) {
+                                            return (
+                                                <td key={col} className="editing-cell">
+                                                    <input
+                                                        type="text"
+                                                        value={editNama}
+                                                        onChange={e => setEditNama(e.target.value)}
+                                                        placeholder="Nama"
+                                                        autoFocus
+                                                        className="edit-input"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={editBlok}
+                                                        onChange={e => setEditBlok(e.target.value)}
+                                                        placeholder="Blok"
+                                                        className="edit-input blok-input"
+                                                    />
+                                                    <div className="edit-actions">
+                                                        <button className="edit-save" onClick={saveEdit} disabled={saving === `${row.id}-edit`}>
+                                                            {saving === `${row.id}-edit` ? <Loader2 size={12} className="spin" /> : <Save size={12} />}
+                                                        </button>
+                                                        <button className="edit-cancel" onClick={cancelEdit}>
+                                                            <X size={12} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            );
+                                        }
+
+                                        return (
+                                            <td
+                                                key={col}
+                                                className={`clickable-cell ${isDone ? 'cell-done' : 'cell-pending'}`}
+                                                onClick={() => toggleDone(row, col)}
+                                                onDoubleClick={(e) => { e.stopPropagation(); startEdit(row, col); }}
+                                                title="Klik = tandai · Double-klik = edit"
+                                            >
+                                                <div className="cell-content">
+                                                    {isSaving ? (
+                                                        <Loader2 size={14} className="spin" />
+                                                    ) : (
+                                                        <>
+                                                            <span className="cell-status-icon">{isDone ? '✅' : ''}</span>
+                                                            <span className={`donor-name ${isDone ? 'done' : ''}`}>{nama || '-'}</span>
+                                                            {blok && <span className="donor-blok">({blok})</span>}
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    className="edit-cell-btn"
+                                                    onClick={(e) => { e.stopPropagation(); startEdit(row, col); }}
+                                                    title="Edit nama"
+                                                >
+                                                    <Edit2 size={10} />
+                                                </button>
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                            return rows;
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

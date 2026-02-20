@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCommunity } from '../contexts/CommunityContext';
 import {
     Megaphone, Calendar, Shovel, Gift, Heart, ChevronRight,
-    Pin, Clock, Users, ArrowLeft, Moon, Sun
+    Pin, Clock, Users, ArrowLeft, Moon, Sun, Shield
 } from 'lucide-react';
 import './CommunityHub.css';
 
@@ -49,6 +49,15 @@ const CommunityHub = () => {
             color: 'purple',
             link: '/komunitas/takjil',
             stat: `${takjilSchedule.schedule.filter(s => s.status === 'confirmed').length} terkonfirmasi`
+        },
+        {
+            id: 'takjil-admin',
+            title: 'Admin Takjil',
+            description: 'Kelola & tracker donasi takjil',
+            icon: Shield,
+            color: 'teal',
+            link: '/komunitas/takjil/admin',
+            stat: 'Edit & Tracking'
         },
         {
             id: 'kerja-bakti',
