@@ -1,4 +1,4 @@
-/* ========================================
+﻿/* ========================================
    Jadwal Buka Puasa - Musholla As Sakinah
    Ramadhan 1447 H / 2026 M
    ======================================== */
@@ -485,73 +485,401 @@
   }
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive - Polished UI/UX */
 @media (max-width: 768px) {
   .takjil-page {
-    padding: 10px;
+    padding: 10px 8px;
+    background: #f0f4f0;
   }
 
+  /* White container */
   .schedule-content {
-    padding: 12px 10px;
-    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 14px 12px;
+    color: #1a1a1a;
+    border-radius: 16px;
+  }
+
+  /* === COMPACT HEADER === */
+  .schedule-header {
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   .schedule-header h1 {
-    font-size: 16px;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #1e5631;
+    margin-bottom: 2px;
   }
 
   .schedule-header p {
-    font-size: 12px;
+    font-size: 11px;
+    color: #666;
+  }
+
+  /* === COMPACT RULES BOX === */
+  .rules-box {
+    background: #f7fdf7;
+    border: 1.5px solid #1e5631;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+
+  .rules-box h3 {
+    font-size: 11px;
+    color: #1e5631;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
   }
 
   .rules-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .rules-grid div {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 8px;
     font-size: 11px;
+    color: #444;
+    line-height: 1.3;
   }
 
+  .rules-grid em {
+    color: #27ae60;
+    font-size: 10px;
+  }
+
+  /* === INLINE LEGEND === */
+  .legend {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    font-size: 11px;
+    padding: 6px 0;
+    margin-bottom: 8px;
+  }
+
+  .legend-past {
+    color: #27ae60;
+  }
+
+  .legend-today {
+    color: #e67e22;
+  }
+
+  .legend-future {
+    color: #999;
+  }
+
+  /* ===== TABLE → POLISHED CARDS ===== */
+
+  .table-wrapper {
+    overflow: visible;
+  }
+
+  .schedule-table {
+    border: none;
+  }
+
+  .schedule-table thead {
+    display: none;
+  }
+
+  .divider-row {
+    display: none !important;
+  }
+
+  /* --- Card Base --- */
+  .schedule-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border-left: 4px solid transparent;
+  }
+
+  .schedule-table tbody tr:nth-child(even) {
+    background: #fff;
+  }
+
+  /* --- TODAY CARD — POP --- */
+  .row-today {
+    border-left: 4px solid #e67e22 !important;
+    box-shadow: 0 2px 16px rgba(230, 126, 34, 0.15) !important;
+    background: #fffcf5 !important;
+  }
+
+  /* --- PAST CARD — MUTED --- */
+  .row-past {
+    opacity: 0.55;
+    background: #fafafa !important;
+    border-left-color: #ddd !important;
+  }
+
+  .row-past:hover {
+    opacity: 0.8;
+  }
+
+  /* --- FUTURE CARD --- */
+  .row-future {
+    border-left: 4px solid #1e5631;
+  }
+
+  /* === CELLS LAYOUT === */
+  .schedule-table td {
+    display: flex;
+    align-items: center;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 14px;
+    font-size: 14px;
+    min-height: 48px;
+    color: #1a1a1a;
+  }
+
+  .schedule-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Hide CSS ::before labels — using JSX labels now */
+  .schedule-table td::before {
+    display: none;
+  }
+
+  /* Hide 'No' column */
+  .schedule-table td:first-child {
+    display: none;
+  }
+
+  /* === DATE HEADER === */
+  .schedule-table td:nth-child(2) {
+    background: #1e5631;
+    color: #fff;
+    font-weight: 700;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 14px;
+    min-height: 42px;
+    gap: 8px;
+    border-bottom: none;
+  }
+
+  .row-today td:nth-child(2) {
+    background: #d35400;
+  }
+
+  .schedule-table td:nth-child(2) .date-cell {
+    color: #fff;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Status Badges in header */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  /* === CELL CONTENT: STACKED LABEL + VALUE === */
+
+  /* Mobile label group (emoji + text) — left side */
+  .cell-label-mobile {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    min-width: 95px;
+  }
+
+  .cell-emoji {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .cell-label-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: #1e5631;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* Mobile value group (name + blok pill) — right side */
+  .cell-value-mobile {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  /* Donor Name */
   .donor-name {
-    font-size: 9.5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
   }
 
+  .past-name {
+    color: #999;
+    text-decoration: line-through;
+    text-decoration-color: #27ae60;
+    text-decoration-thickness: 1.5px;
+  }
+
+  /* Blok PILL badge */
+  .blok-pill {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #1e5631;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  /* Hide old blok class on mobile if still rendered */
   .blok {
-    font-size: 8.5px;
+    display: none;
   }
 
-  .date-cell {
-    font-size: 9px;
+  .done-icon {
+    font-size: 12px;
+    margin-left: 2px;
   }
 
-  .schedule-table th {
-    font-size: 9px;
-  }
-
-  .schedule-table th small {
-    font-size: 7.5px;
+  /* Donatur highlight */
+  .donatur-cell {
+    background: #fffbeb !important;
   }
 
   .donatur-tag {
-    font-size: 9px;
+    font-size: 13px;
+    color: #d35400;
+    font-weight: 700;
   }
 
+  .cell-done {
+    background: #f5fdf5;
+  }
+
+  /* === INFO BOX === */
+  .info-box {
+    font-size: 12px;
+    padding: 12px;
+    background: #fff5f5;
+    border: 1.5px dashed #e74c3c;
+    border-radius: 10px;
+    color: #c0392b;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .info-box h3 {
+    font-size: 13px;
+    color: #c0392b;
+    margin-bottom: 4px;
+  }
+
+  /* === COMPACT SIGNATURES === */
   .signatures {
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 14px;
+    padding: 12px 8px;
+    background: #fafafa;
+    border-radius: 12px;
   }
 
   .sig-item {
-    width: 80%;
+    width: 30%;
+    min-width: 90px;
+    max-width: 110px;
   }
 
-  .info-box {
-    font-size: 10.5px;
+  .sig-title {
+    color: #666;
+    font-size: 8px;
+    margin-bottom: 2px;
   }
 
-  .legend {
-    gap: 10px;
-    font-size: 10px;
+  .sig-name {
+    color: #1e5631;
+    font-size: 7px;
+  }
+
+  .sig-line {
+    margin: 15px auto 3px;
+  }
+
+  .sig-img {
+    height: 30px;
+    max-width: 70px;
+  }
+
+  /* Nav */
+  .page-nav {
+    margin-bottom: 10px;
+  }
+
+  .page-nav .back-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .print-btn {
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+
+  .offline-banner {
+    font-size: 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+  }
+}
+
+/* Desktop: hide mobile-only elements */
+@media (min-width: 769px) {
+  .cell-label-mobile {
+    display: none;
+  }
+
+  .cell-value-mobile {
+    display: contents;
+  }
+
+  .blok-pill {
+    display: inline-block;
+    background: transparent;
+    color: #1e5631;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .blok-pill::before {
+    content: '(';
+  }
+
+  .blok-pill::after {
+    content: ')';
   }
 }

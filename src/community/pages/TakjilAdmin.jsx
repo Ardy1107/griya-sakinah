@@ -309,8 +309,8 @@ const TakjilAdmin = () => {
                             }
                             rows.push(
                                 <tr key={row.id}>
-                                    <td className="no-cell">{row.no}</td>
-                                    <td className="date-cell">{row.tanggal}</td>
+                                    <td className="no-cell" data-label="No">{row.no}</td>
+                                    <td className="date-cell" data-label="Tanggal">{row.tanggal}</td>
                                     {COLS.map(col => {
                                         const nama = row[`${col}_nama`];
                                         const blok = row[`${col}_blok`];
@@ -321,7 +321,7 @@ const TakjilAdmin = () => {
                                         // Editing mode
                                         if (isEditing) {
                                             return (
-                                                <td key={col} className="editing-cell">
+                                                <td key={col} className="editing-cell" data-label={COL_LABELS[col]}>
                                                     <input
                                                         type="text"
                                                         value={editNama}
@@ -352,6 +352,7 @@ const TakjilAdmin = () => {
                                         return (
                                             <td
                                                 key={col}
+                                                data-label={COL_LABELS[col]}
                                                 className={`clickable-cell ${isDone ? 'cell-done' : 'cell-pending'}`}
                                                 onClick={() => toggleDone(row, col)}
                                                 onDoubleClick={(e) => { e.stopPropagation(); startEdit(row, col); }}

@@ -3,7 +3,7 @@
  * Ramadhan 1447 H / 2026 M
  * Data fetched from Supabase (real-time updates)
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Printer, Loader2, WifiOff } from 'lucide-react';
 import { supabaseMusholla as supabase } from '../../lib/supabaseMusholla';
@@ -64,10 +64,20 @@ const TakjilPage = () => {
     const [schedule, setSchedule] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isOffline, setIsOffline] = useState(false);
+    const todayRef = useRef(null);
 
     useEffect(() => {
         fetchSchedule();
     }, []);
+
+    // Auto-scroll to today's card after data loads
+    useEffect(() => {
+        if (!loading && todayRef.current) {
+            setTimeout(() => {
+                todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    }, [loading]);
 
     async function fetchSchedule() {
         try {
@@ -99,13 +109,23 @@ const TakjilPage = () => {
         const isDone = row[`${col}_done`];
         const status = getDateStatus(row.tanggal_date);
 
-        if (!nama) return <td className="empty-cell">-</td>;
+        const colHeader = COL_HEADERS.find(h => h.key === col);
+        const label = colHeader ? colHeader.label : col;
+        const emoji = colHeader ? colHeader.emoji : '';
+
+        if (!nama || nama === '-') return <td className="empty-cell" data-label={label}>-</td>;
 
         return (
-            <td className={isDone ? 'cell-done' : ''}>
-                <span className={`donor-name ${status === 'past' ? 'past-name' : ''}`}>{nama}</span>
-                <span className="blok">({blok})</span>
-                {status === 'past' && isDone && <span className="done-icon">✅</span>}
+            <td className={isDone ? 'cell-done' : ''} data-label={label}>
+                <span className="cell-label-mobile">
+                    <span className="cell-emoji">{emoji}</span>
+                    <span className="cell-label-text">{label}</span>
+                </span>
+                <span className="cell-value-mobile">
+                    <span className={`donor-name ${status === 'past' ? 'past-name' : ''}`}>{nama}</span>
+                    <span className="blok-pill">{blok}</span>
+                    {status === 'past' && isDone && <span className="done-icon">✅</span>}
+                </span>
             </td>
         );
     };
@@ -132,13 +152,7 @@ const TakjilPage = () => {
 
     return (
         <div className="takjil-page">
-            {/* Navigation */}
-            <nav className="page-nav no-print">
-                <Link to="/komunitas" className="back-btn"><ArrowLeft size={20} /> Kembali</Link>
-                <button className="print-btn" onClick={() => window.print()}>
-                    <Printer size={16} /> Cetak A4
-                </button>
-            </nav>
+            {/* Navigation - hidden, page accessed via direct link */}
 
             {isOffline && (
                 <div className="offline-banner no-print">
@@ -192,9 +206,9 @@ const TakjilPage = () => {
                                 }
                                 const status = getDateStatus(row.tanggal_date);
                                 return (
-                                    <tr key={row.no} className={`row-${status}`}>
-                                        <td className="no-cell">{row.no}</td>
-                                        <td className="date-cell">
+                                    <tr key={row.no} className={`row-${status}`} ref={status === 'today' ? todayRef : null}>
+                                        <td className="no-cell" data-label="NO">{row.no}</td>
+                                        <td className="date-cell" data-label="TANGGAL">
                                             {row.tanggal}
                                             {status === 'past' && <span className="status-badge past-badge">✅ Sudah lewat</span>}
                                             {status === 'today' && <span className="status-badge today-badge">📍 Hari ini</span>}
