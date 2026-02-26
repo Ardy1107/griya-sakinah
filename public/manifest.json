@@ -1,0 +1,72 @@
+{
+    "name": "Portal Griya Sakinah",
+    "short_name": "Griya Sakinah",
+    "description": "Portal resmi warga Perumahan Griya Sakinah Samarinda. Akses layanan Angsuran, Internet, Musholla, dan Komunitas.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#1e3a5f",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "id",
+    "categories": [
+        "utilities",
+        "lifestyle"
+    ],
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-144x144.svg",
+            "sizes": "144x144",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "/logo-griya-sakinah.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Cek Angsuran",
+            "short_name": "Angsuran",
+            "url": "/angsuran",
+            "icons": [
+                {
+                    "src": "/favicon.svg",
+                    "sizes": "any"
+                }
+            ]
+        },
+        {
+            "name": "Internet Dashboard",
+            "short_name": "Internet",
+            "url": "/internet",
+            "icons": [
+                {
+                    "src": "/favicon.svg",
+                    "sizes": "any"
+                }
+            ]
+        },
+        {
+            "name": "Komunitas Hub",
+            "short_name": "Komunitas",
+            "url": "/komunitas",
+            "icons": [
+                {
+                    "src": "/favicon.svg",
+                    "sizes": "any"
+                }
+            ]
+        }
+    ]
+}

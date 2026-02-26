@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" sizes="180x180" href="/logo-griya-sakinah.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Primary SEO Meta Tags -->
@@ -164,6 +165,7 @@
 </head>
 
 <body>
+  <a href="#main-content" class="skip-to-content">Langsung ke konten utama</a>
   <noscript>
     <div style="padding:2rem;text-align:center;font-family:Inter,sans-serif">
       <h1>Portal Griya Sakinah</h1>
@@ -183,7 +185,9 @@
       <p>Aktifkan JavaScript untuk menggunakan portal ini.</p>
     </div>
   </noscript>
-  <div id="root"></div>
+  <div id="root" role="main">
+    <div id="main-content"></div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

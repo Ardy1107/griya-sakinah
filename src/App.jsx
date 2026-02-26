@@ -34,6 +34,8 @@ const LoadingScreen = () => (
     </div>
 );
 
+import ModuleErrorBoundary from './components/ModuleErrorBoundary';
+
 function App() {
     return (
         <SuperadminProvider>
@@ -46,7 +48,11 @@ function App() {
                         <Route path="/" element={<LandingPage />} />
 
                         {/* Warga Portal - Public access */}
-                        <Route path="/warga" element={<WargaPortal />} />
+                        <Route path="/warga" element={
+                            <ModuleErrorBoundary moduleName="Portal Warga">
+                                <WargaPortal />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Superadmin Portal */}
                         <Route path="/superadmin/login" element={<SuperadminLogin />} />
@@ -54,35 +60,83 @@ function App() {
                         <Route path="/superadmin/warga" element={<KelolaWarga />} />
 
                         {/* Spiritual Abundance Module */}
-                        <Route path="/spiritual/*" element={<SpiritualApp />} />
+                        <Route path="/spiritual/*" element={
+                            <ModuleErrorBoundary moduleName="Spiritual Abundance">
+                                <SpiritualApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Module Routes */}
-                        <Route path="/angsuran/*" element={<AngsuranApp />} />
+                        <Route path="/angsuran/*" element={
+                            <ModuleErrorBoundary moduleName="Angsuran">
+                                <AngsuranApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Internet Module - Block-specific routes */}
-                        <Route path="/blok-a/internet/*" element={<InternetApp />} />
-                        <Route path="/blok-b/internet/*" element={<InternetApp />} />
-                        <Route path="/internet/*" element={<InternetApp />} />
+                        <Route path="/blok-a/internet/*" element={
+                            <ModuleErrorBoundary moduleName="Internet">
+                                <InternetApp />
+                            </ModuleErrorBoundary>
+                        } />
+                        <Route path="/blok-b/internet/*" element={
+                            <ModuleErrorBoundary moduleName="Internet">
+                                <InternetApp />
+                            </ModuleErrorBoundary>
+                        } />
+                        <Route path="/internet/*" element={
+                            <ModuleErrorBoundary moduleName="Internet">
+                                <InternetApp />
+                            </ModuleErrorBoundary>
+                        } />
 
-                        <Route path="/musholla/*" element={<MushollaApp />} />
+                        <Route path="/musholla/*" element={
+                            <ModuleErrorBoundary moduleName="Musholla">
+                                <MushollaApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Kalender Komunitas */}
-                        <Route path="/kalender/*" element={<KalenderApp />} />
+                        <Route path="/kalender/*" element={
+                            <ModuleErrorBoundary moduleName="Kalender">
+                                <KalenderApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Voting & Polling */}
-                        <Route path="/voting/*" element={<VotingApp />} />
+                        <Route path="/voting/*" element={
+                            <ModuleErrorBoundary moduleName="Voting">
+                                <VotingApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Keamanan Lingkungan */}
-                        <Route path="/keamanan/*" element={<KeamananApp />} />
+                        <Route path="/keamanan/*" element={
+                            <ModuleErrorBoundary moduleName="Keamanan">
+                                <KeamananApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Chat Warga */}
-                        <Route path="/chat/*" element={<ChatApp />} />
+                        <Route path="/chat/*" element={
+                            <ModuleErrorBoundary moduleName="Chat">
+                                <ChatApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Admin Portal */}
-                        <Route path="/admin/*" element={<AdminApp />} />
+                        <Route path="/admin/*" element={
+                            <ModuleErrorBoundary moduleName="Admin">
+                                <AdminApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Community Hub */}
-                        <Route path="/komunitas/*" element={<CommunityApp />} />
+                        <Route path="/komunitas/*" element={
+                            <ModuleErrorBoundary moduleName="Komunitas">
+                                <CommunityApp />
+                            </ModuleErrorBoundary>
+                        } />
 
                         {/* Catch all - redirect to landing */}
                         <Route path="*" element={<Navigate to="/" replace />} />

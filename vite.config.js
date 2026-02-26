@@ -11,5 +11,19 @@ export default defineConfig({
             '@modules': '/src/modules',
             '@admin': '/src/admin'
         }
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+                    'vendor-charts': ['recharts'],
+                    'vendor-icons': ['lucide-react'],
+                    'vendor-export': ['jspdf', 'jspdf-autotable', 'xlsx', 'file-saver'],
+                    'vendor-supabase': ['@supabase/supabase-js'],
+                }
+            }
+        },
+        chunkSizeWarningLimit: 600,
     }
 })
