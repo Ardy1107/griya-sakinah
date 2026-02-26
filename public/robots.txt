@@ -1,16 +1,52 @@
 # robots.txt for griyasakinah.org
+# Last updated: 2026-02-26
+
 User-agent: *
 Allow: /
+Crawl-delay: 1
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /angsuran/admin/
+Disallow: /internet/admin/
+Disallow: /musholla/admin/
+Disallow: /musholla/login
+Disallow: /superadmin/
+Disallow: /keamanan/admin/
+Disallow: /voting/admin/
+
+# Allow all public content
+Allow: /angsuran
+Allow: /internet
+Allow: /musholla
+Allow: /komunitas
+Allow: /spiritual
+Allow: /kalender
+Allow: /voting
+Allow: /keamanan
+Allow: /chat
+Allow: /warga
 
 # Sitemap
 Sitemap: https://griyasakinah.org/sitemap.xml
 
-# Allow search engine crawlers
+# Google-specific
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 0
 
+# Bing-specific
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
-# Disallow admin and API paths (SPA routes handled client-side)
-Disallow: /api/
+# AI Crawlers (GEO - Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /

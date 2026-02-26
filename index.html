@@ -43,28 +43,118 @@
   <meta name="geo.region" content="ID-KI" />
   <meta name="geo.placename" content="Samarinda" />
 
-  <!-- Structured Data - Local Business -->
+  <!-- Structured Data - ResidentialComplex -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ResidentialComplex",
       "name": "Griya Sakinah",
-      "description": "Perumahan Griya Sakinah - Hunian Nyaman, Komunitas Barokah di Samarinda",
+      "description": "Perumahan Griya Sakinah - Hunian Nyaman, Komunitas Barokah di Samarinda, Kalimantan Timur",
       "url": "https://griyasakinah.org",
       "logo": "https://griyasakinah.org/logo-griya-sakinah.png",
+      "image": "https://griyasakinah.org/logo-griya-sakinah.png",
+      "telephone": "+62-541-000000",
       "address": {
         "@type": "PostalAddress",
+        "streetAddress": "Jl. Griya Sakinah",
         "addressLocality": "Samarinda",
         "addressRegion": "Kalimantan Timur",
+        "postalCode": "75124",
         "addressCountry": "ID"
       },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "-0.5022",
+        "longitude": "117.1536"
+      },
       "amenityFeature": [
-        {"@type": "LocationFeatureSpecification", "name": "Musholla"},
-        {"@type": "LocationFeatureSpecification", "name": "Internet"},
-        {"@type": "LocationFeatureSpecification", "name": "Komunitas Warga"}
+        {"@type": "LocationFeatureSpecification", "name": "Musholla As-Sakinah", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Internet Warga", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Komunitas Warga Aktif", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Keamanan 24 Jam", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Portal Digital Warga", "value": true}
+      ],
+      "sameAs": [
+        "https://griyasakinah.org"
       ]
     }
-    </script>
+  </script>
+
+  <!-- Structured Data - WebSite (enables Google Sitelinks Search Box) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Portal Griya Sakinah",
+      "alternateName": "Griya Sakinah Samarinda",
+      "url": "https://griyasakinah.org",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://griyasakinah.org/angsuran?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+
+  <!-- Structured Data - BreadcrumbList (rich results) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://griyasakinah.org/"},
+        {"@type": "ListItem", "position": 2, "name": "Angsuran Rumah", "item": "https://griyasakinah.org/angsuran"},
+        {"@type": "ListItem", "position": 3, "name": "Internet Sakinah", "item": "https://griyasakinah.org/internet"},
+        {"@type": "ListItem", "position": 4, "name": "Musholla Sakinah", "item": "https://griyasakinah.org/musholla"},
+        {"@type": "ListItem", "position": 5, "name": "Komunitas", "item": "https://griyasakinah.org/komunitas"}
+      ]
+    }
+  </script>
+
+  <!-- Structured Data - FAQPage (Google Featured Snippets) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Apa itu Griya Sakinah?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Griya Sakinah adalah perumahan modern di Samarinda, Kalimantan Timur, yang menawarkan hunian nyaman dengan fasilitas lengkap termasuk musholla, internet komunitas, dan portal digital untuk seluruh warga."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Bagaimana cara cek angsuran rumah di Griya Sakinah?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Warga dapat mengecek status angsuran rumah secara online melalui Portal Griya Sakinah di griyasakinah.org/angsuran. Cukup masukkan nomor blok rumah Anda untuk melihat riwayat dan sisa pembayaran."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Apa saja fasilitas di Griya Sakinah Samarinda?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Griya Sakinah dilengkapi dengan Musholla As-Sakinah, jaringan internet warga, portal angsuran digital, sistem keamanan terintegrasi, kalender kegiatan, voting komunitas, dan ruang chat warga."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Dimana lokasi Griya Sakinah?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Griya Sakinah berlokasi di Kota Samarinda, Provinsi Kalimantan Timur, Indonesia. Perumahan ini mudah diakses dan terletak di lingkungan yang asri dan aman."
+          }
+        }
+      ]
+    }
+  </script>
 
   <!-- Fonts with display swap for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,6 +164,25 @@
 </head>
 
 <body>
+  <noscript>
+    <div style="padding:2rem;text-align:center;font-family:Inter,sans-serif">
+      <h1>Portal Griya Sakinah</h1>
+      <p>Portal resmi warga Perumahan Griya Sakinah, Samarinda, Kalimantan Timur.</p>
+      <h2>Layanan Kami</h2>
+      <ul style="list-style:none;padding:0">
+        <li><strong>Angsuran Rumah</strong> - Cek status pembayaran angsuran rumah Anda secara online</li>
+        <li><strong>Internet Sakinah</strong> - Kelola dan pantau layanan internet warga</li>
+        <li><strong>Musholla As-Sakinah</strong> - Donasi dan laporan keuangan musholla</li>
+        <li><strong>Komunitas</strong> - Arisan, takjil, kerja bakti, dan kegiatan warga</li>
+        <li><strong>Kalender Kegiatan</strong> - Jadwal event dan kegiatan perumahan</li>
+        <li><strong>Voting Warga</strong> - Polling dan keputusan bersama</li>
+        <li><strong>Keamanan</strong> - Sistem keamanan dan panic button</li>
+        <li><strong>Chat Warga</strong> - Komunikasi antar warga</li>
+      </ul>
+      <p>Hunian Nyaman, Komunitas Barokah. Griya Sakinah Samarinda.</p>
+      <p>Aktifkan JavaScript untuk menggunakan portal ini.</p>
+    </div>
+  </noscript>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
