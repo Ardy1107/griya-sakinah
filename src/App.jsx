@@ -21,6 +21,10 @@ const SuperadminLogin = lazy(() => import('./pages/SuperadminPortal/SuperadminLo
 const SuperadminDashboard = lazy(() => import('./pages/SuperadminPortal/SuperadminDashboard'));
 const KelolaWarga = lazy(() => import('./pages/SuperadminPortal/KelolaWarga'));
 const SpiritualApp = lazy(() => import('./modules/spiritual/App'));
+const KalenderApp = lazy(() => import('./modules/kalender/App'));
+const VotingApp = lazy(() => import('./modules/voting/App'));
+const KeamananApp = lazy(() => import('./modules/keamanan/App'));
+const ChatApp = lazy(() => import('./modules/chat/App'));
 
 // Loading Fallback
 const LoadingScreen = () => (
@@ -61,6 +65,18 @@ function App() {
                         <Route path="/internet/*" element={<InternetApp />} />
 
                         <Route path="/musholla/*" element={<MushollaApp />} />
+
+                        {/* Kalender Komunitas */}
+                        <Route path="/kalender/*" element={<KalenderApp />} />
+
+                        {/* Voting & Polling */}
+                        <Route path="/voting/*" element={<VotingApp />} />
+
+                        {/* Keamanan Lingkungan */}
+                        <Route path="/keamanan/*" element={<KeamananApp />} />
+
+                        {/* Chat Warga */}
+                        <Route path="/chat/*" element={<ChatApp />} />
 
                         {/* Admin Portal */}
                         <Route path="/admin/*" element={<AdminApp />} />
