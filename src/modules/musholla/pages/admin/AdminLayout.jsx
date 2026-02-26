@@ -376,6 +376,7 @@ export default function AdminLayout() {
                         <Link
                             to="/musholla"
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="flex items-center gap-md"
                             style={{
                                 padding: '12px 16px',

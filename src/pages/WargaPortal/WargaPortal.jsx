@@ -44,7 +44,7 @@ export default function WargaPortal() {
                 .select('*')
                 .eq('blok', blokInput.toUpperCase().trim())
                 .eq('is_active', true)
-                .single();
+                .maybeSingle();
 
             if (wargaError || !warga) {
                 setError('Blok tidak ditemukan. Pastikan nomor blok benar.');
@@ -65,8 +65,7 @@ export default function WargaPortal() {
                 await fetchMushollaData(warga.blok);
             }
 
-        } catch (err) {
-            console.error('Error:', err);
+        } catch {
             setError('Terjadi kesalahan. Silakan coba lagi.');
         } finally {
             setLoading(false);
@@ -79,7 +78,7 @@ export default function WargaPortal() {
                 .from('warga')
                 .select('*, pembayaran(*)')
                 .eq('blok', blok)
-                .single();
+                .maybeSingle();
 
             if (!error && data) {
                 const totalBayar = data.pembayaran?.reduce((sum, p) => sum + (p.jumlah || 0), 0) || 0;
@@ -91,8 +90,8 @@ export default function WargaPortal() {
                     progress: Math.min(100, (totalBayar / ((data.harga_rumah || 1) - (data.dp || 0))) * 100)
                 });
             }
-        } catch (err) {
-            console.error('Error fetching angsuran:', err);
+        } catch {
+            // Angsuran data not available for this blok
         }
     };
 
@@ -102,7 +101,7 @@ export default function WargaPortal() {
                 .from('internet_warga')
                 .select('*, internet_pembayaran(*)')
                 .eq('blok', blok)
-                .single();
+                .maybeSingle();
 
             if (!error && data) {
                 const currentMonth = new Date().toISOString().slice(0, 7);
@@ -115,8 +114,8 @@ export default function WargaPortal() {
                     lastPayment: data.internet_pembayaran?.[0]
                 });
             }
-        } catch (err) {
-            console.error('Error fetching internet:', err);
+        } catch {
+            // Internet data not available for this blok
         }
     };
 
@@ -136,8 +135,8 @@ export default function WargaPortal() {
                     totalDonasi
                 });
             }
-        } catch (err) {
-            console.error('Error fetching musholla:', err);
+        } catch {
+            // Musholla data not available for this blok
         }
     };
 

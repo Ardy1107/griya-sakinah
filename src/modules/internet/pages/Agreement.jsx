@@ -76,7 +76,7 @@ export default function Agreement() {
                 ctx.fillStyle = '#ffffff'
                 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-                console.log('Canvas initialized:', canvas.width, canvas.height)
+
             }
         }, 100)
 
@@ -99,7 +99,7 @@ export default function Agreement() {
                     .eq('resident_id', selectedResident.id)
                     .order('agreed_at', { ascending: false })
                     .limit(1)
-                    .single()
+                    .maybeSingle()
 
                 if (data && !error) {
                     setExistingAgreement(data)
