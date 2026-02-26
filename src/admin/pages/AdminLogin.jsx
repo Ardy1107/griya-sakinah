@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { Shield, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import './AdminLogin.css';
@@ -118,9 +118,9 @@ const AdminLogin = () => {
                     </form>
 
                     <div className="login-footer">
-                        <a href="/" className="back-link">
+                        <Link to="/" className="back-link">
                             ← Kembali ke Portal
-                        </a>
+                        </Link>
                     </div>
 
 

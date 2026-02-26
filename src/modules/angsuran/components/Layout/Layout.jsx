@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
     Home,
@@ -215,15 +215,15 @@ const Layout = () => {
 
                 <div className="sidebar-footer">
                     {user?.role === 'superadmin' && (
-                        <a href="/admin/dashboard" className="admin-portal-button">
+                        <Link to="/admin/dashboard" className="admin-portal-button">
                             <Home size={20} />
                             {sidebarOpen && <span>Admin Portal</span>}
-                        </a>
+                        </Link>
                     )}
-                    <a href="/" className="portal-back-button">
+                    <Link to="/" className="portal-back-button">
                         <Home size={20} />
                         {sidebarOpen && <span>Kembali ke Portal</span>}
-                    </a>
+                    </Link>
                 </div>
             </aside>
 

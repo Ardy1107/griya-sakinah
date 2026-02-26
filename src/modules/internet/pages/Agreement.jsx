@@ -1,6 +1,7 @@
 // Digital Agreement Page - Internet Sakinah
 // Users select their name and sign digital agreement
 import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { FileText, Check, AlertCircle, Loader2, PenTool, RotateCcw, ChevronDown, Download } from 'lucide-react'
 import Header from '../components/Header'
 import { useResidents } from '../hooks/useSupabase'
@@ -514,9 +515,9 @@ export default function Agreement() {
 
                     {/* Back Link */}
                     <div style={{ textAlign: 'center', marginTop: 'var(--space-xl)' }}>
-                        <a href={urlPrefix} className="text-muted" style={{ fontSize: '0.875rem' }}>
+                        <Link to={urlPrefix} className="text-muted" style={{ fontSize: '0.875rem' }}>
                             ← Kembali ke Dashboard
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </main>

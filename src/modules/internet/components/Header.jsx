@@ -41,9 +41,9 @@ export default function Header() {
                 </Link>
 
                 <nav className="nav-desktop">
-                    <a href="/" className="portal-return-btn">
+                    <Link to="/" className="portal-return-btn">
                         ← Kembali ke Portal Griya Sakinah
-                    </a>
+                    </Link>
 
                     <Link to={urlPrefix} className={`nav-link ${location.pathname === urlPrefix ? 'active' : ''}`}>
                         <Home size={16} />

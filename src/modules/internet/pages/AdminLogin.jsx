@@ -1,6 +1,6 @@
 // Admin Login Page
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Shield, Mail, Lock, Loader2, AlertCircle } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 
@@ -142,9 +142,9 @@ export default function AdminLogin() {
                     paddingTop: 'var(--space-lg)',
                     borderTop: '1px solid var(--border-color)'
                 }}>
-                    <a href="/internet" className="text-muted" style={{ fontSize: '0.875rem' }}>
+                    <Link to="/internet" className="text-muted" style={{ fontSize: '0.875rem' }}>
                         ← Kembali ke Dashboard
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

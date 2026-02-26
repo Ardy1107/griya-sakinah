@@ -93,9 +93,9 @@ const CommunityHub = () => {
             {/* Header */}
             <header className="hub-header">
                 <div className="header-left">
-                    <a href="/" className="portal-return-btn">
+                    <Link to="/" className="portal-return-btn">
                         ← Kembali ke Portal Griya Sakinah
-                    </a>
+                    </Link>
                 </div>
                 <div className="header-center">
                     <h1>Komunitas Griya Sakinah</h1>

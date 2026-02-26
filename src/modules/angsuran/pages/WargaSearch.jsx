@@ -3,7 +3,7 @@
  * Search by blok number, hidden admin access via long-press logo
  */
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Search, Home, CreditCard, Calendar, CheckCircle2, AlertCircle, TrendingUp, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './WargaSearch.css';
@@ -255,9 +255,9 @@ export default function WargaSearch() {
 
             {/* Footer */}
             <footer className="warga-footer">
-                <a href="/" className="portal-return-btn">
+                <Link to="/" className="portal-return-btn">
                     ← Kembali ke Portal Griya Sakinah
-                </a>
+                </Link>
                 <p style={{ marginTop: '16px' }}>© 2026 Portal Griya Sakinah</p>
             </footer>
         </div>

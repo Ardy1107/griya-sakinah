@@ -1,5 +1,6 @@
 // Public Dashboard Page - Enhanced v2.0 with January 2026 default
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import StatusGrid from '../components/StatusGrid'
 import HeroStats from '../components/HeroStats'
@@ -118,15 +119,15 @@ export default function PublicDashboard() {
                     © {new Date().getFullYear()} Griya Sakinah Internet Management {isBlockSpecific && `• ${blockName}`}
                 </p>
                 <p style={{ marginTop: 'var(--space-sm)' }}>
-                    <a href={`${urlPrefix}/peraturan`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+                    <Link to={`${urlPrefix}/peraturan`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
                         📋 Peraturan & Persetujuan
-                    </a>
-                    <a href={`${urlPrefix}/cek-status`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+                    </Link>
+                    <Link to={`${urlPrefix}/cek-status`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
                         🔍 Cek Status
-                    </a>
-                    <a href={`${urlPrefix}/admin/login`} className="footer-link">
+                    </Link>
+                    <Link to={`${urlPrefix}/admin/login`} className="footer-link">
                         🔐 Admin
-                    </a>
+                    </Link>
                 </p>
             </footer>
         </div>
