@@ -15,7 +15,11 @@ import {
     ChevronRight,
     Gift,
     Search,
-    Home
+    Home,
+    Calendar,
+    Vote,
+    ShieldAlert,
+    MessageCircle
 } from 'lucide-react';
 import './LandingPage.css';
 
@@ -147,6 +151,50 @@ const LandingPage = () => {
             gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
             link: '/komunitas',
             features: ['Arisan', 'Takjil', 'Peduli', 'Direktori']
+        },
+        {
+            id: 'kalender',
+            title: 'Kalender Komunitas',
+            subtitle: 'Event & Jadwal',
+            description: 'Kalender kegiatan komunitas, RSVP event, dan reminder otomatis.',
+            icon: Calendar,
+            color: 'teal',
+            gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+            link: '/kalender',
+            features: ['Event', 'RSVP', 'Jadwal']
+        },
+        {
+            id: 'voting',
+            title: 'Voting & Polling',
+            subtitle: 'Suara Warga',
+            description: 'Voting online untuk kepentingan bersama. Transparan dan aman.',
+            icon: Vote,
+            color: 'indigo',
+            gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            link: '/voting',
+            features: ['Polling', 'Hasil', 'Verifikasi']
+        },
+        {
+            id: 'keamanan',
+            title: 'Keamanan Lingkungan',
+            subtitle: 'Ronda & Darurat',
+            description: 'Jadwal ronda, tombol darurat, dan alert keamanan real-time.',
+            icon: ShieldAlert,
+            color: 'red',
+            gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+            link: '/keamanan',
+            features: ['Panic Button', 'Ronda', 'Alert']
+        },
+        {
+            id: 'chat',
+            title: 'Chat Warga',
+            subtitle: 'Komunikasi',
+            description: 'Chat realtime antar warga. Grup diskusi dan pesan pribadi.',
+            icon: MessageCircle,
+            color: 'cyan',
+            gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+            link: '/chat',
+            features: ['Grup', 'Private', 'Realtime']
         }
     ];
 

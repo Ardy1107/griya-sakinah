@@ -13,10 +13,21 @@ export default function PanicButton() {
     const [countdown, setCountdown] = useState(0);
     const [holdTimer, setHoldTimer] = useState(null);
     const [user] = useState(() => {
-        try { return JSON.parse(sessionStorage.getItem('portal_user')); } catch { return null; }
+        try {
+            return JSON.parse(sessionStorage.getItem('portal_user'))
+                || JSON.parse(localStorage.getItem('portal_user'));
+        } catch { return null; }
     });
 
-    const blok = user ? `${user.blok || ''}${user.nomor || ''}`.toUpperCase() : 'UNKNOWN';
+    const blok = (() => {
+        if (user?.blok) return `${user.blok}${user.nomor || ''}`.toUpperCase();
+        // Try warga_users session as fallback
+        try {
+            const warga = JSON.parse(sessionStorage.getItem('warga_user') || localStorage.getItem('warga_user'));
+            if (warga?.blok) return warga.blok.toUpperCase();
+        } catch { }
+        return user?.full_name || 'Warga';
+    })();
 
     function startHold() {
         setCountdown(3);
