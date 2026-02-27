@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, Vote, Save, Plus, X, Calendar, Type, FileText, Shield
+    ArrowLeft, Vote, Save, Plus, X, Calendar, Type, FileText, Shield, Users, Settings
 } from 'lucide-react';
 import { createPoll } from '../services/votingService';
 import '../voting.css';
@@ -20,6 +20,8 @@ export default function VotingForm() {
         ends_at: '',
         require_verification: true,
         is_anonymous: false,
+        max_choices: 1,
+        min_quorum: '',
     });
     const [options, setOptions] = useState(['', '']);
 
@@ -44,10 +46,19 @@ export default function VotingForm() {
         if (!form.ends_at) { alert('Batas waktu wajib diisi'); return; }
         if (validOptions.length < 2) { alert('Minimal 2 opsi'); return; }
 
+        const maxChoices = form.poll_type === 'multiple' ? Math.min(parseInt(form.max_choices) || 2, validOptions.length) : 1;
+
         setSaving(true);
         try {
             await createPoll(
-                { ...form, created_by: user?.id, ends_at: new Date(form.ends_at).toISOString() },
+                {
+                    ...form,
+                    created_by: user?.id,
+                    ends_at: new Date(form.ends_at).toISOString(),
+                    max_choices: maxChoices,
+                    min_quorum: form.min_quorum ? parseInt(form.min_quorum) : null,
+                    poll_type: form.poll_type,
+                },
                 validOptions
             );
             navigate('/voting');
@@ -74,8 +85,7 @@ export default function VotingForm() {
                     <label><Type size={16} /> Judul Voting *</label>
                     <input
                         type="text" name="title" value={form.title} onChange={handleChange}
-                        placeholder='Contoh: "Setuju perbaikan jalan blok A?"'
-                        required
+                        placeholder='Contoh: "Setuju perbaikan jalan blok A?"' required
                     />
                 </div>
 
@@ -83,17 +93,37 @@ export default function VotingForm() {
                     <label><FileText size={16} /> Deskripsi</label>
                     <textarea
                         name="description" value={form.description} onChange={handleChange}
-                        placeholder="Penjelasan detail tentang voting ini..."
-                        rows={3}
+                        placeholder="Penjelasan detail tentang voting ini..." rows={3}
                     />
                 </div>
 
                 <div className="form-group">
                     <label><Calendar size={16} /> Batas Waktu Voting *</label>
                     <input
-                        type="datetime-local" name="ends_at" value={form.ends_at} onChange={handleChange}
-                        required
+                        type="datetime-local" name="ends_at" value={form.ends_at} onChange={handleChange} required
                     />
+                </div>
+
+                {/* Poll Type */}
+                <div className="form-group">
+                    <label><Settings size={16} /> Tipe Voting</label>
+                    <div className="poll-type-selector">
+                        <button type="button" className={`poll-type-btn ${form.poll_type === 'single' ? 'active' : ''}`}
+                            onClick={() => setForm(f => ({ ...f, poll_type: 'single', max_choices: 1 }))}>
+                            ⭕ Pilih Satu
+                        </button>
+                        <button type="button" className={`poll-type-btn ${form.poll_type === 'multiple' ? 'active' : ''}`}
+                            onClick={() => setForm(f => ({ ...f, poll_type: 'multiple', max_choices: 2 }))}>
+                            ☑️ Pilih Banyak
+                        </button>
+                    </div>
+                    {form.poll_type === 'multiple' && (
+                        <div className="max-choices-input">
+                            <label>Maksimal pilihan:</label>
+                            <input type="number" name="max_choices" value={form.max_choices}
+                                onChange={handleChange} min={2} max={options.length} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Options */}
@@ -121,15 +151,21 @@ export default function VotingForm() {
                     </div>
                 </div>
 
+                {/* Quorum */}
+                <div className="form-group">
+                    <label><Users size={16} /> Quorum (opsional)</label>
+                    <input type="number" name="min_quorum" value={form.min_quorum}
+                        onChange={handleChange} placeholder="Minimal berapa blok yang harus ikut voting?" min={1} />
+                    <small className="form-hint">Kosongkan jika tidak ada batas minimal partisipasi</small>
+                </div>
+
                 {/* Settings */}
                 <div className="form-group">
                     <label>⚙️ Pengaturan</label>
                     <div className="settings-toggles">
                         <label className="toggle-row">
-                            <input
-                                type="checkbox" name="require_verification"
-                                checked={form.require_verification} onChange={handleChange}
-                            />
+                            <input type="checkbox" name="require_verification"
+                                checked={form.require_verification} onChange={handleChange} />
                             <Shield size={16} />
                             <div>
                                 <span>Verifikasi NIK/KK</span>
@@ -137,10 +173,8 @@ export default function VotingForm() {
                             </div>
                         </label>
                         <label className="toggle-row">
-                            <input
-                                type="checkbox" name="is_anonymous"
-                                checked={form.is_anonymous} onChange={handleChange}
-                            />
+                            <input type="checkbox" name="is_anonymous"
+                                checked={form.is_anonymous} onChange={handleChange} />
                             <span>🙈</span>
                             <div>
                                 <span>Anonim</span>

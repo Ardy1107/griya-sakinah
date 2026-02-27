@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, Vote, Plus, Clock, CheckCircle2, XCircle,
-    TrendingUp, Users, ChevronRight, BarChart3
+    ArrowLeft, Vote, Plus, Clock, CheckCircle2, Users, Shield,
+    ChevronRight, BarChart3, Eye
 } from 'lucide-react';
 import { fetchPolls, getPollStatus, formatDeadline } from '../services/votingService';
 import '../voting.css';
@@ -11,11 +11,11 @@ export default function VotingList() {
     const navigate = useNavigate();
     const [polls, setPolls] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [tab, setTab] = useState('active');
+    const [filter, setFilter] = useState('all');
     const [user] = useState(() => {
         try { return JSON.parse(sessionStorage.getItem('portal_user')); } catch { return null; }
     });
-    const isAdmin = user?.role === 'superadmin' || user?.role === 'super_admin' || user?.role === 'admin';
+    const isAdmin = user?.role === 'superadmin' || user?.role === 'admin';
 
     useEffect(() => { loadPolls(); }, []);
 
@@ -25,22 +25,17 @@ export default function VotingList() {
             const data = await fetchPolls();
             setPolls(data);
         } catch (err) {
-            console.error('Load polls error:', err);
+            console.error('Load polls:', err);
         }
         setLoading(false);
     }
 
-    const filtered = polls.filter(p => {
-        const status = getPollStatus(p);
-        if (tab === 'active') return status === 'active';
-        return status === 'closed';
-    });
+    const filtered = filter === 'all'
+        ? polls
+        : polls.filter(p => p.computedStatus === filter);
 
-    const statusIcon = (poll) => {
-        const st = getPollStatus(poll);
-        if (st === 'active') return <Clock size={14} className="status-icon active" />;
-        return <CheckCircle2 size={14} className="status-icon closed" />;
-    };
+    const activeCount = polls.filter(p => p.computedStatus === 'active').length;
+    const closedCount = polls.filter(p => p.computedStatus === 'closed').length;
 
     return (
         <div className="voting-container">
@@ -50,63 +45,83 @@ export default function VotingList() {
                 </button>
                 <div className="header-title">
                     <Vote size={24} />
-                    <h1>Voting & Polling</h1>
+                    <h1>Voting Warga</h1>
                 </div>
                 {isAdmin && (
-                    <button className="btn-add" onClick={() => navigate('/voting/buat')}>
+                    <button className="btn-create" onClick={() => navigate('/voting/buat')}>
                         <Plus size={18} />
-                        <span>Buat</span>
                     </button>
                 )}
             </header>
 
-            {/* Tabs */}
-            <div className="voting-tabs">
-                <button className={`tab ${tab === 'active' ? 'active' : ''}`} onClick={() => setTab('active')}>
-                    <Clock size={16} /> Aktif
-                </button>
-                <button className={`tab ${tab === 'closed' ? 'active' : ''}`} onClick={() => setTab('closed')}>
-                    <BarChart3 size={16} /> Selesai
-                </button>
+            {/* Stats */}
+            <div className="voting-stats">
+                <div className="v-stat">
+                    <span className="v-stat-value">{polls.length}</span>
+                    <span className="v-stat-label">Total</span>
+                </div>
+                <div className="v-stat active">
+                    <span className="v-stat-value">{activeCount}</span>
+                    <span className="v-stat-label">Aktif</span>
+                </div>
+                <div className="v-stat closed">
+                    <span className="v-stat-value">{closedCount}</span>
+                    <span className="v-stat-label">Selesai</span>
+                </div>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="voting-filter-tabs">
+                {[
+                    { key: 'all', label: 'Semua' },
+                    { key: 'active', label: '🟢 Aktif' },
+                    { key: 'closed', label: '🔴 Selesai' },
+                ].map(f => (
+                    <button key={f.key}
+                        className={`filter-tab ${filter === f.key ? 'active' : ''}`}
+                        onClick={() => setFilter(f.key)}>
+                        {f.label}
+                    </button>
+                ))}
             </div>
 
             {loading ? (
-                <div className="loading-state">
-                    <div className="loading-spinner"></div>
-                    <p>Memuat polling...</p>
+                <div className="loading-state"><div className="loading-spinner" /><p>Memuat...</p></div>
+            ) : filtered.length === 0 ? (
+                <div className="empty-state">
+                    <Vote size={48} />
+                    <h3>{filter === 'all' ? 'Belum ada voting' : 'Tidak ada voting'}</h3>
+                    <p>{isAdmin ? 'Buat voting pertama!' : 'Voting baru akan muncul di sini.'}</p>
                 </div>
             ) : (
                 <div className="polls-list">
-                    {filtered.length === 0 ? (
-                        <div className="empty-state">
-                            <Vote size={48} />
-                            <h3>{tab === 'active' ? 'Belum ada polling aktif' : 'Belum ada polling selesai'}</h3>
-                            <p>Polling akan muncul di sini.</p>
-                        </div>
-                    ) : filtered.map(poll => (
-                        <div key={poll.id} className="poll-card" onClick={() => navigate(`/voting/${poll.id}`)}>
-                            <div className="poll-card-top">
-                                {statusIcon(poll)}
-                                <span className={`poll-status ${getPollStatus(poll)}`}>
-                                    {getPollStatus(poll) === 'active' ? 'Berlangsung' : 'Selesai'}
-                                </span>
-                                <span className="poll-deadline">
-                                    {getPollStatus(poll) === 'active'
-                                        ? formatDeadline(poll.ends_at)
-                                        : new Date(poll.ends_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
-                                    }
-                                </span>
+                    {filtered.map(poll => {
+                        const status = poll.computedStatus;
+                        return (
+                            <div key={poll.id} className={`poll-card ${status}`}
+                                onClick={() => navigate(`/voting/${poll.id}`)}>
+                                <div className="poll-card-header">
+                                    <span className={`poll-status-dot ${status}`} />
+                                    <span className="poll-status-text">
+                                        {status === 'active' ? formatDeadline(poll.ends_at) : 'Selesai'}
+                                    </span>
+                                </div>
+                                <h3 className="poll-card-title">{poll.title}</h3>
+                                {poll.description && (
+                                    <p className="poll-card-desc">{poll.description.substring(0, 100)}</p>
+                                )}
+                                <div className="poll-card-footer">
+                                    <span className="poll-card-meta">
+                                        {poll.poll_type === 'multiple' && <><Eye size={12} /> Multi</>}
+                                        {poll.require_verification && <><Shield size={12} /> Verifikasi</>}
+                                        {poll.is_anonymous && <>🙈 Anonim</>}
+                                    </span>
+                                    <span className="poll-card-creator">{poll.creator?.full_name}</span>
+                                    <ChevronRight size={16} className="poll-card-arrow" />
+                                </div>
                             </div>
-                            <h3>{poll.title}</h3>
-                            {poll.description && <p className="poll-desc">{poll.description}</p>}
-                            <div className="poll-card-footer">
-                                <span className="poll-creator">
-                                    <Users size={14} /> {poll.creator?.full_name || 'Admin'}
-                                </span>
-                                <ChevronRight size={18} className="poll-arrow" />
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
