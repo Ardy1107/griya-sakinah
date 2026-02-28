@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 // ==================== NOTIFICATIONS ====================
 
@@ -138,3 +138,12 @@ export function timeAgo(dateStr) {
     if (days < 7) return `${days} hari lalu`;
     return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 }
+
+// ==================== INITIALIZATION (for native/PWA) ====================
+
+export function initializeNotifications() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
