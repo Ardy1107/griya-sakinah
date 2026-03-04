@@ -18,7 +18,9 @@ import {
     Sun,
     Moon,
     Info,
-    Map
+    Map,
+    Wrench,
+    Phone
 } from 'lucide-react';
 import './Layout.css';
 
@@ -148,6 +150,20 @@ const Layout = () => {
             label: 'Audit Log',
             tooltip: 'Riwayat aktivitas sistem',
             roles: ['admin', 'superadmin']
+        },
+        {
+            path: '/angsuran/admin/maintenance',
+            icon: Wrench,
+            label: 'Perawatan',
+            tooltip: 'Kelola perawatan dan perbaikan unit perumahan',
+            roles: ['admin', 'developer', 'superadmin']
+        },
+        {
+            path: '/angsuran/admin/contacts',
+            icon: Phone,
+            label: 'Kontak Warga',
+            tooltip: 'Direktori kontak semua penghuni',
+            roles: ['admin', 'developer', 'superadmin']
         },
         {
             path: '/angsuran/admin/settings',

@@ -1,0 +1,238 @@
+.maintenance-page {
+    padding: 0;
+}
+
+.maintenance-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mstat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mstat-card.total svg {
+    color: #60a5fa;
+}
+
+.mstat-card.danger svg {
+    color: #ef4444;
+}
+
+.mstat-card.warning svg {
+    color: #f59e0b;
+}
+
+.mstat-card.success svg {
+    color: #10b981;
+}
+
+.mstat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.mstat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* List */
+.maintenance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.maintenance-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s;
+}
+
+.maintenance-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.maintenance-item.status-dilaporkan {
+    border-left: 3px solid #ef4444;
+}
+
+.maintenance-item.status-diproses {
+    border-left: 3px solid #f59e0b;
+}
+
+.maintenance-item.status-selesai {
+    border-left: 3px solid #10b981;
+}
+
+.mi-category {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.mi-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.mi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.mi-header h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.status-pill.dilaporkan {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.status-pill.diproses {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-pill.selesai {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.mi-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.mi-desc {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin: 6px 0 0;
+    line-height: 1.4;
+}
+
+.mi-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.process:hover {
+    color: #f59e0b;
+    border-color: #f59e0b;
+}
+
+.action-btn.complete:hover {
+    color: #10b981;
+    border-color: #10b981;
+}
+
+.action-btn.delete:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.action-btn.edit:hover {
+    color: #60a5fa;
+    border-color: #60a5fa;
+}
+
+/* Category Chips */
+.category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-chip.active {
+    background: var(--chip-color);
+    color: white;
+    border-color: var(--chip-color);
+}
+
+@media (max-width: 768px) {
+    .maintenance-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .maintenance-item {
+        flex-direction: column;
+    }
+
+    .mi-actions {
+        align-self: flex-end;
+    }
+}

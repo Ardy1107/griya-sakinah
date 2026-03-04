@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUnitById, getPaymentsByUnit } from '../../utils/database';
+import { formatRupiah, formatDateLong as formatDate } from '../../utils/format';
 import { generateWhatsAppLink, getPaymentConfirmationMessage } from '../../utils/pdfGenerator';
 import {
     ArrowLeft,
@@ -43,21 +44,7 @@ const UnitDetail = () => {
         loadData();
     }, [unitId]);
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(num);
-    };
-
-    const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    };
+    // formatRupiah and formatDate imported from utils/format
 
     // Calculate stats
     const getPokokPayments = () => payments.filter(p => p.category === 'pokok');

@@ -9,6 +9,7 @@ import {
     getPaymentsSync as getPayments,
     getMonthlyBalanceSync
 } from '../../utils/database';
+import { formatRupiah, formatDate } from '../../utils/format';
 import {
     AreaChart,
     Area,
@@ -168,23 +169,7 @@ const Dashboard = () => {
         loadData();
     }, []);
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(num);
-    };
-
-    const formatDate = (date) => {
-        if (!date) return '-';
-        return new Date(date).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
+    // formatRupiah and formatDate imported from utils/format
 
     const getMaxMonthly = () => {
         return Math.max(...monthlyData.map(d => d.total), 1);

@@ -6,6 +6,7 @@ import {
     createAuditLog,
     getPaymentsByUnitSync as getPaymentsByUnit
 } from '../../utils/database';
+import { formatRupiah, formatDate } from '../../utils/format';
 import {
     generateKwitansi,
     generateWhatsAppLink,
@@ -260,21 +261,7 @@ const Payments = () => {
         }
     };
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(num);
-    };
-
-    const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
+    // formatRupiah and formatDate imported from utils/format
 
     const getUnitById = (id) => units.find(u => u.id === id);
 

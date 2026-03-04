@@ -5,6 +5,7 @@ import {
     getUnitsSync as getUnits,
     getPaymentStatsSync as getPaymentStats
 } from '../../utils/database';
+import { formatRupiah } from '../../utils/format';
 import MonthPicker, { formatMonthYear, getMonthYearKey } from '../../components/MonthPicker/MonthPicker';
 import {
     FileText,
@@ -92,13 +93,7 @@ const Reports = () => {
         }
     };
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(num);
-    };
+    // formatRupiah imported from utils/format
 
     const handleExportPDF = () => {
         const doc = new jsPDF();

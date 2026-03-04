@@ -462,64 +462,169 @@ export const getMonthlyBalanceSync = async (year) => {
     return await getMonthlyBalance(year);
 };
 
-// ============ SESSION (still uses localStorage for auth state) ============
-const SESSION_KEY = 'angsuran_session';
+// ============ V2: SMART DASHBOARD QUERIES ============
+export const getCollectionRate = async (month, year) => {
+    const sb = ensureSupabase();
+    const { data: units } = await sb.from('units').select('id').eq('status', 'aktif');
+    const { data: payments } = await sb.from('payments').select('unit_id, payment_month_key');
 
-export const getSession = () => {
-    const session = sessionStorage.getItem(SESSION_KEY);
-    return session ? JSON.parse(session) : null;
+    if (!units || !payments) return { rate: 0, paid: 0, total: 0 };
+
+    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const paidUnitIds = new Set(
+        payments.filter(p => p.payment_month_key?.startsWith(monthKey)).map(p => p.unit_id)
+    );
+
+    return {
+        rate: units.length > 0 ? Math.round((paidUnitIds.size / units.length) * 100) : 0,
+        paid: paidUnitIds.size,
+        total: units.length
+    };
 };
 
-export const setSession = (user) => {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+export const getAgingBreakdown = async () => {
+    const sb = ensureSupabase();
+    const { data: units } = await sb.from('units').select('*').eq('status', 'aktif');
+    const { data: payments } = await sb.from('payments').select('unit_id, created_at');
+
+    if (!units || !payments) return { current: 0, days30: 0, days60: 0, days90: 0, over90: 0 };
+
+    const now = new Date();
+    const buckets = { current: 0, days30: 0, days60: 0, days90: 0, over90: 0 };
+
+    units.forEach(unit => {
+        const unitPayments = payments
+            .filter(p => p.unit_id === unit.id)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        const lastPaymentDate = unitPayments[0] ? new Date(unitPayments[0].created_at) : null;
+        const daysSince = lastPaymentDate
+            ? Math.floor((now - lastPaymentDate) / (1000 * 60 * 60 * 24))
+            : 999;
+
+        if (daysSince <= 35) buckets.current++;
+        else if (daysSince <= 65) buckets.days30++;
+        else if (daysSince <= 95) buckets.days60++;
+        else if (daysSince <= 125) buckets.days90++;
+        else buckets.over90++;
+    });
+
+    return buckets;
 };
 
-export const clearSession = () => {
-    sessionStorage.removeItem(SESSION_KEY);
+export const getRevenueByMonth = async (year) => {
+    const sb = ensureSupabase();
+    const { data: payments } = await sb
+        .from('payments')
+        .select('amount, created_at')
+        .gte('created_at', `${year}-01-01`)
+        .lte('created_at', `${year}-12-31`);
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const data = months.map((name, i) => ({ month: name, total: 0 }));
+
+    (payments || []).forEach(p => {
+        const m = new Date(p.created_at).getMonth();
+        data[m].total += Number(p.amount || 0);
+    });
+
+    return data;
+};
+
+// ============ V7: MAINTENANCE LOGS ============
+export const getMaintenanceLogs = async () => {
+    const sb = ensureSupabase();
+    const { data, error } = await sb
+        .from('maintenance_logs')
+        .select('*, units(block_number, resident_name)')
+        .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(m => ({
+        id: m.id,
+        unitId: m.unit_id,
+        blockNumber: m.units?.block_number || '-',
+        residentName: m.units?.resident_name || '-',
+        category: m.category,
+        title: m.title,
+        description: m.description,
+        status: m.status,
+        reportedBy: m.reported_by,
+        resolvedAt: m.resolved_at,
+        photoUrl: m.photo_url,
+        createdAt: m.created_at
+    }));
+};
+
+export const createMaintenanceLog = async (logData) => {
+    const sb = ensureSupabase();
+    const { data, error } = await sb
+        .from('maintenance_logs')
+        .insert({
+            unit_id: logData.unitId,
+            category: logData.category,
+            title: logData.title,
+            description: logData.description,
+            status: logData.status || 'dilaporkan',
+            reported_by: logData.reportedBy,
+            photo_url: logData.photoUrl
+        })
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+};
+
+export const updateMaintenanceLog = async (id, logData) => {
+    const sb = ensureSupabase();
+    const updates = {
+        category: logData.category,
+        title: logData.title,
+        description: logData.description,
+        status: logData.status,
+        reported_by: logData.reportedBy
+    };
+    if (logData.status === 'selesai') {
+        updates.resolved_at = new Date().toISOString();
+    }
+    const { data, error } = await sb
+        .from('maintenance_logs')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+};
+
+export const deleteMaintenanceLog = async (id) => {
+    const sb = ensureSupabase();
+    const { error } = await sb.from('maintenance_logs').delete().eq('id', id);
+    if (error) throw error;
 };
 
 // ============ DEFAULT EXPORT ============
 export default {
     // Units
-    getUnits,
-    getUnitsSync,
-    getUnitById,
-    getUnitByIdSync,
-    createUnit,
-    updateUnit,
-    deleteUnit,
+    getUnits, getUnitsSync, getUnitById, getUnitByIdSync,
+    createUnit, updateUnit, deleteUnit,
     // Payments
-    getPayments,
-    getPaymentsSync,
-    getPaymentsByUnit,
-    getPaymentsByUnitSync,
-    createPayment,
-    updatePayment,
-    deletePayment,
+    getPayments, getPaymentsSync, getPaymentsByUnit, getPaymentsByUnitSync,
+    createPayment, updatePayment, deletePayment,
     // Expenses
-    getExpenses,
-    getExpensesSync,
-    createExpense,
-    updateExpense,
-    deleteExpense,
+    getExpenses, getExpensesSync, createExpense, updateExpense, deleteExpense,
     // Audit
-    createAuditLog,
-    getAuditLogs,
-    getAuditLogsSync,
+    createAuditLog, getAuditLogs, getAuditLogsSync,
     // Users
-    getUsers,
-    getUsersSync,
+    getUsers, getUsersSync,
     // Stats
-    getPaymentStats,
-    getPaymentStatsSync,
-    getAgingReceivable,
-    getAgingReceivableSync,
-    getMonthlyIncome,
-    getMonthlyIncomeSync,
-    getMonthlyBalance,
-    getMonthlyBalanceSync,
+    getPaymentStats, getPaymentStatsSync,
+    getAgingReceivable, getAgingReceivableSync,
+    getMonthlyIncome, getMonthlyIncomeSync,
+    getMonthlyBalance, getMonthlyBalanceSync,
+    // V2 Dashboard
+    getCollectionRate, getAgingBreakdown, getRevenueByMonth,
+    // V7 Maintenance
+    getMaintenanceLogs, createMaintenanceLog, updateMaintenanceLog, deleteMaintenanceLog,
     // Session
-    getSession,
-    setSession,
-    clearSession
+    getSession, setSession, clearSession
 };

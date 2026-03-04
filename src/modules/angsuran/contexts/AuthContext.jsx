@@ -3,6 +3,7 @@
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { hashPassword } from '../utils/format';
 
 const AuthContext = createContext(null);
 
@@ -33,11 +34,8 @@ export const AuthProvider = ({ children }) => {
             // Invalid SSO session, continue to normal auth check
         }
 
-        // Check for existing session (from portal_user or direct angsuran_user)
-        const portalUser = sessionStorage.getItem('portal_user');
-        const angsuranUser = sessionStorage.getItem('angsuran_user') || localStorage.getItem('angsuran_user');
-
-        const storedUser = portalUser || angsuranUser;
+        // Unified session: portal_user only
+        const storedUser = sessionStorage.getItem('portal_user');
         if (storedUser) {
             try {
                 const parsed = JSON.parse(storedUser);
@@ -49,10 +47,11 @@ export const AuthProvider = ({ children }) => {
                 }
             } catch (e) {
                 sessionStorage.removeItem('portal_user');
-                sessionStorage.removeItem('angsuran_user');
-                localStorage.removeItem('angsuran_user');
             }
         }
+        // Cleanup: remove legacy session keys if they exist
+        sessionStorage.removeItem('angsuran_user');
+        localStorage.removeItem('angsuran_user');
         setLoading(false);
     }, []);
 
@@ -62,12 +61,14 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            // Query from Supabase users table
+            // Hash password before comparing with DB
+            const hashedPassword = await hashPassword(password);
+
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
                 .eq('username', username.toLowerCase())
-                .eq('password_hash', password)
+                .eq('password_hash', hashedPassword)
                 .single();
 
             if (error || !data) {
@@ -86,7 +87,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             return { success: true };
         } catch (err) {
-            console.error('Login error:', err);
+            if (import.meta.env.DEV) console.error('Login error:', err);
             return { success: false, error: 'Koneksi bermasalah' };
         }
     };

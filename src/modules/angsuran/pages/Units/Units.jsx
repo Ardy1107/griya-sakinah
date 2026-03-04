@@ -8,6 +8,7 @@ import {
     deleteUnit,
     createAuditLog
 } from '../../utils/database';
+import { formatRupiah } from '../../utils/format';
 import { useAuth } from '../../contexts/AuthContext';
 import {
     Plus,
@@ -369,13 +370,7 @@ const Units = () => {
         }
     };
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(num);
-    };
+    // formatRupiah imported from utils/format
 
     return (
         <div className="units-page">

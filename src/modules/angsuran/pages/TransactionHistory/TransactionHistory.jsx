@@ -4,6 +4,7 @@ import {
     getPaymentsSync as getPayments,
     getUnitsSync as getUnits
 } from '../../utils/database';
+import { formatRupiah, formatDateLong as formatDate } from '../../utils/format';
 import {
     Search,
     Calendar,
@@ -71,23 +72,7 @@ const TransactionHistory = () => {
         setLoading(false);
     };
 
-    const formatRupiah = (num) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(num);
-    };
-
-    const formatDate = (date) => {
-        if (!date) return '-';
-        return new Date(date).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    };
+    // formatRupiah and formatDate imported from utils/format
 
     const filteredPayments = payments.filter(payment => {
         const matchSearch =

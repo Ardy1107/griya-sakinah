@@ -6,27 +6,8 @@ import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, Home, CreditCard, Calendar, CheckCircle2, AlertCircle, TrendingUp, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { formatRupiah, formatDate } from '../utils/format';
 import './WargaSearch.css';
-
-// Format currency
-const formatRupiah = (num) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    }).format(num || 0);
-};
-
-// Format date
-const formatDate = (date) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    });
-};
 
 export default function WargaSearch() {
     const [blokInput, setBlokInput] = useState('');
