@@ -7,7 +7,8 @@ import {
     fetchNotifications, fetchUnreadCount, markAsRead,
     markAllAsRead, deleteNotification, subscribeToNotifications,
     getNotifIcon, timeAgo
-} from '../../services/notificationService';
+} from '../services/notificationService';
+import './NotificationCenter.css';
 
 export default function NotificationCenter({ isOpen, onClose }) {
     const navigate = useNavigate();

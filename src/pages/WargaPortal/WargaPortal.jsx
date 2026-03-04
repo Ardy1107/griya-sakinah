@@ -12,9 +12,14 @@ import {
     Clock,
     TrendingUp,
     AlertCircle,
-    User
+    User,
+    Calendar,
+    Vote,
+    Shield,
+    MessageCircle
 } from 'lucide-react';
 import { supabase } from '../../modules/angsuran/lib/supabase';
+import NotificationCenter, { NotifBell } from '../../components/NotificationCenter';
 import './WargaPortal.css';
 
 export default function WargaPortal() {
@@ -23,6 +28,7 @@ export default function WargaPortal() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [searched, setSearched] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
 
     // Service data states
     const [angsuranData, setAngsuranData] = useState(null);
@@ -167,12 +173,50 @@ export default function WargaPortal() {
                     <span>Portal</span>
                 </Link>
                 <div className="header-title">
-                    <h1>Cek Status Layanan</h1>
-                    <p>Masukkan nomor blok untuk melihat status Anda</p>
+                    <h1>Portal Warga</h1>
+                    <p>Layanan & komunitas perumahan</p>
                 </div>
+                <NotifBell onClick={() => setNotifOpen(true)} />
             </header>
 
-            {/* Search Form */}
+            {/* Notification Panel */}
+            <NotificationCenter isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
+
+            {/* Community Quick Links - Always visible */}
+            <div className="community-section">
+                <h2 className="section-title">🏘️ Fitur Komunitas</h2>
+                <div className="quick-links-grid">
+                    <Link to="/kalender" className="quick-link-card kalender">
+                        <div className="ql-icon">
+                            <Calendar size={24} />
+                        </div>
+                        <span>Kalender</span>
+                    </Link>
+                    <Link to="/voting" className="quick-link-card voting">
+                        <div className="ql-icon">
+                            <Vote size={24} />
+                        </div>
+                        <span>Voting</span>
+                    </Link>
+                    <Link to="/keamanan" className="quick-link-card keamanan">
+                        <div className="ql-icon">
+                            <Shield size={24} />
+                        </div>
+                        <span>Keamanan</span>
+                    </Link>
+                    <Link to="/chat" className="quick-link-card chat">
+                        <div className="ql-icon">
+                            <MessageCircle size={24} />
+                        </div>
+                        <span>Chat</span>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Search Form - Cek Status Layanan */}
+            <div className="community-section">
+                <h2 className="section-title">📋 Cek Status Layanan</h2>
+            </div>
             {!wargaData && (
                 <div className="search-container">
                     <form onSubmit={handleSearch} className="search-form">
