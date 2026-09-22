@@ -18,7 +18,9 @@ export default function AdminLogin() {
     // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/internet/admin')
+            const match = window.location.pathname.match(/\/(blok-[ab])\/internet/i);
+            const prefix = match ? `/${match[1]}/internet` : '/internet';
+            navigate(`${prefix}/admin`)
         }
     }, [isAuthenticated, navigate])
 
@@ -35,7 +37,10 @@ export default function AdminLogin() {
 
         try {
             await signIn(formData.email, formData.password)
-            navigate('/internet/admin')
+            // Get the block prefix from current URL if it exists
+            const match = window.location.pathname.match(/\/(blok-[ab])\/internet/i);
+            const prefix = match ? `/${match[1]}/internet` : '/internet';
+            navigate(`${prefix}/admin`)
         } catch (err) {
             console.error('Login error:', err)
             if (err.message.includes('Invalid')) {
@@ -135,6 +140,27 @@ export default function AdminLogin() {
                         )}
                     </button>
                 </form>
+
+                {import.meta.env.DEV && (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            localStorage.setItem('dev_bypass', 'true');
+                            window.location.href = window.location.pathname.replace('/login', '');
+                        }}
+                        className="btn"
+                        style={{
+                            width: '100%',
+                            marginTop: 'var(--space-md)',
+                            background: 'var(--bg-tertiary)',
+                            border: '1px dashed var(--color-primary)',
+                            color: 'var(--color-primary)'
+                        }}
+                    >
+                        🚀 Bypass Login (Dev Only)
+                    </button>
+                )}
 
                 <div style={{
                     textAlign: 'center',

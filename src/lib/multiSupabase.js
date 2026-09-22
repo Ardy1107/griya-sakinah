@@ -111,41 +111,28 @@ export async function fetchTopLatePayers() {
         const currentMonth = currentDate.getMonth() + 1
         const currentYear = currentDate.getFullYear()
 
-        // Get all residents with their payment status
+        // Single query: fetch all active residents with their payments for current year
         const { data: residents } = await supabaseInternet
             .from('residents')
-            .select('id, nama_warga, blok_rumah')
+            .select('id, nama_warga, blok_rumah, payments(bulan, tahun)')
             .eq('status', 'active')
+            .eq('payments.tahun', currentYear)
 
         if (!residents) return []
 
-        // Check payments for each resident
-        const latePayers = []
-
-        for (const resident of residents) {
-            const { data: payments } = await supabaseInternet
-                .from('payments')
-                .select('bulan, tahun')
-                .eq('resident_id', resident.id)
-                .eq('tahun', currentYear)
-
-            const paidMonths = payments?.map(p => p.bulan) || []
-            const unpaidMonths = []
-
-            for (let m = 1; m <= currentMonth; m++) {
-                if (!paidMonths.includes(m)) {
-                    unpaidMonths.push(m)
+        // Process in-memory instead of N+1 queries
+        const latePayers = residents
+            .map(resident => {
+                const paidMonths = (resident.payments || []).map(p => p.bulan)
+                const unpaidMonths = []
+                for (let m = 1; m <= currentMonth; m++) {
+                    if (!paidMonths.includes(m)) unpaidMonths.push(m)
                 }
-            }
-
-            if (unpaidMonths.length > 0) {
-                latePayers.push({
-                    ...resident,
-                    unpaidCount: unpaidMonths.length,
-                    unpaidMonths
-                })
-            }
-        }
+                return unpaidMonths.length > 0
+                    ? { ...resident, payments: undefined, unpaidCount: unpaidMonths.length, unpaidMonths }
+                    : null
+            })
+            .filter(Boolean)
 
         // Sort by most unpaid months and take top 5
         return latePayers

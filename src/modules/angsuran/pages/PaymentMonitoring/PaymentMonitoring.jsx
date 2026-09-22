@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
-    getUnitsSync,
-    getPaymentsSync
+    getUnits,
+    getPayments
 } from '../../utils/database';
 import {
     CheckCircle,
@@ -30,8 +30,8 @@ const PaymentMonitoring = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const unitsData = await getUnitsSync();
-                const paymentsData = await getPaymentsSync();
+                const unitsData = await getUnits();
+                const paymentsData = await getPayments();
                 setUnits(Array.isArray(unitsData) ? unitsData : []);
                 setPayments(Array.isArray(paymentsData) ? paymentsData : []);
             } catch (err) {

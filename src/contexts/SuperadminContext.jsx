@@ -3,6 +3,7 @@
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { hashPassword } from '../shared/utils/hashUtils';
 
 const SuperadminContext = createContext(null);
 
@@ -34,12 +35,15 @@ export function SuperadminProvider({ children }) {
         }
 
         try {
+            // Hash password before comparing with DB
+            const hashedPassword = await hashPassword(password);
+
             // Query from Supabase portal_users table
             const { data, error } = await supabase
                 .from('portal_users')
                 .select('*')
                 .eq('username', username)
-                .eq('password', password)
+                .eq('password_hash', hashedPassword)
                 .eq('role', 'super_admin')
                 .eq('is_active', true)
                 .single();

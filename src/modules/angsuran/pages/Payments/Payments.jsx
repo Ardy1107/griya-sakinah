@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
-    getUnitsSync as getUnits,
-    getPaymentsSync as getPayments,
+    getUnits,
+    getPayments,
     createPayment,
     createAuditLog,
-    getPaymentsByUnitSync as getPaymentsByUnit
+    getPaymentsByUnit
 } from '../../utils/database';
 import { formatRupiah, formatDate } from '../../utils/format';
 import {

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import {
-    getExpensesSync,
+    getExpenses,
     createExpense,
     deleteExpense,
     createAuditLog,
-    getMonthlyBalanceSync
+    getMonthlyBalance
 } from '../../utils/database';
 import { formatRupiah, formatDate } from '../../utils/format';
 import { useAuth } from '../../contexts/AuthContext';
@@ -47,7 +47,7 @@ const Expenses = () => {
 
     const loadData = async () => {
         try {
-            const data = await getExpensesSync() || [];
+            const data = await getExpenses() || [];
             const expensesArr = Array.isArray(data) ? data : [];
             setExpenses(expensesArr);
 
@@ -59,7 +59,7 @@ const Expenses = () => {
             setFilteredExpenses(filtered);
 
             // Get balance
-            const bal = await getMonthlyBalanceSync(selectedMonth, selectedYear) || { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
+            const bal = await getMonthlyBalance(selectedMonth, selectedYear) || { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
             setBalance(bal);
         } catch (err) {
             console.error('Error loading expenses:', err);

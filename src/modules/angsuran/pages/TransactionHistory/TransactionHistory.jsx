@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-    getPaymentsSync as getPayments,
-    getUnitsSync as getUnits
+    getPayments,
+    getUnits
 } from '../../utils/database';
 import { formatRupiah, formatDateLong as formatDate } from '../../utils/format';
 import {

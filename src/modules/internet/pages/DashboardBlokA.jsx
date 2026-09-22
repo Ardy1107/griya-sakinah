@@ -1,0 +1,130 @@
+// Dashboard Blok A - Dedicated page for Blok A Internet payments
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import Header from '../components/Header'
+import StatusGrid from '../components/StatusGrid'
+import HeroStats from '../components/HeroStats'
+import TrendChart from '../components/TrendChart'
+import ProgressBar from '../components/ProgressBar'
+import PeriodPicker from '../components/PeriodPicker'
+import PaymentInfoCard from '../components/PaymentInfoCard'
+import { useFinancialSummary, usePaymentStatus, useResidents } from '../hooks/useSupabase'
+import { getMonthName } from '../utils/helpers'
+import { useBlock } from '../context/BlockContext'
+
+const DEFAULT_PERIOD = (() => {
+  const now = new Date()
+  return { bulan: now.getMonth() + 1, tahun: now.getFullYear() }
+})()
+
+export default function DashboardBlokA() {
+  const [selectedPeriod, setSelectedPeriod] = useState(DEFAULT_PERIOD)
+  const { blockName, urlPrefix } = useBlock()
+
+  const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
+  const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
+  const { residents } = useResidents()
+
+  const totalWarga = residents.length
+  const paidList = statusList.filter(r => r.isPaid)
+  const unpaidList = statusList.filter(r => !r.isPaid)
+
+  return (
+    <div className="app-container">
+      <Header />
+
+      <main className="main-content">
+        {/* Welcome Banner with Blok A identity */}
+        <div className="dashboard-welcome">
+          <div className="dashboard-welcome-inner">
+            <div className="dashboard-welcome-text">
+              <div className="dashboard-welcome-badge blok-a-badge">
+                <span className="dashboard-welcome-badge-dot" />
+                Blok A
+              </div>
+              <h1 className="dashboard-title">
+                Dashboard Transparansi
+              </h1>
+              <p className="dashboard-subtitle">
+                Pantau status pembayaran iuran internet Blok A secara transparan & real-time
+              </p>
+            </div>
+            <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
+          </div>
+        </div>
+
+        {/* Payment Info Card - Blok A specific */}
+        <PaymentInfoCard blockId="A" />
+
+        {/* Hero Stats */}
+        <HeroStats
+          saldo={saldo}
+          pemasukan={totalPemasukan}
+          pengeluaran={totalPengeluaran}
+          totalWarga={totalWarga}
+          sudahBayar={totalPaid}
+          belumBayar={totalUnpaid}
+          paidList={paidList}
+          unpaidList={unpaidList}
+          expenseList={expenses}
+          paymentList={payments}
+        />
+
+        {/* Progress & Trend */}
+        <div className="dashboard-grid-2">
+          <div className="card">
+            <h3 className="card-title mb-3">
+              Pembayaran {getMonthName(selectedPeriod.bulan)} {selectedPeriod.tahun}
+            </h3>
+            <ProgressBar
+              value={totalPaid}
+              max={totalWarga || 1}
+              label="Progress Pembayaran"
+              variant="auto"
+            />
+            <p className="text-muted mt-2" style={{ fontSize: '0.875rem' }}>
+              {totalPaid} dari {totalWarga} warga Blok A sudah membayar iuran bulan ini
+            </p>
+          </div>
+          <TrendChart payments={payments} />
+        </div>
+
+        {/* Status Grid */}
+        <StatusGrid selectedPeriod={selectedPeriod} />
+
+        {/* Transparansi Info */}
+        <div className="card mt-4 transparansi-card">
+          <h3 className="card-title mb-2" style={{ justifyContent: 'center' }}>
+            📊 Informasi Transparansi
+          </h3>
+          <p className="text-muted transparansi-text">
+            Semua data keuangan Blok A ditampilkan secara transparan.
+            Klik pada setiap kartu statistik untuk melihat detail.
+            Iuran internet Blok A: <strong style={{ color: '#10b981' }}>Rp 150.000/bulan</strong> per rumah.
+          </p>
+          <p className="text-muted transparansi-text" style={{ marginTop: '0.5rem' }}>
+            💳 Transfer ke <strong>BSI 7276140919</strong> (a.n. Ardyanto Pri Utomo)
+          </p>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p className="footer-text">
+          © {new Date().getFullYear()} Internet Sakinah • Blok A
+        </p>
+        <p style={{ marginTop: 'var(--space-sm)' }}>
+          <Link to={`${urlPrefix}/peraturan`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+            📋 Peraturan
+          </Link>
+          <Link to={`${urlPrefix}/cek-status`} className="footer-link" style={{ marginRight: 'var(--space-md)' }}>
+            🔍 Cek Status
+          </Link>
+          <Link to={`${urlPrefix}/admin/login`} className="footer-link">
+            🔐 Admin
+          </Link>
+        </p>
+      </footer>
+    </div>
+  )
+}

@@ -5,7 +5,7 @@ import {
     createMaintenanceLog,
     updateMaintenanceLog,
     deleteMaintenanceLog,
-    getUnitsSync as getUnits,
+    getUnits,
     createAuditLog
 } from '../../utils/database';
 import { formatDate } from '../../utils/format';

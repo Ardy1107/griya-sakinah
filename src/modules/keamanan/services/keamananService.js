@@ -304,12 +304,5 @@ export function getShift(value) {
     return SHIFTS.find(s => s.value === value) || SHIFTS[0];
 }
 
-export function timeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Baru saja';
-    if (mins < 60) return `${mins} menit lalu`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} jam lalu`;
-    return `${Math.floor(hours / 24)} hari lalu`;
-}
+// Re-export from shared utils to avoid breaking existing imports
+export { timeAgo } from '../../../shared/utils/dateUtils';

@@ -4,6 +4,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { hashPassword } from '../utils/format';
+import { getVerifiedSSOSession } from '../../../shared/utils/hashUtils';
 
 const AuthContext = createContext(null);
 
@@ -12,16 +13,15 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // SSO: First check for superadmin session from Admin Portal
-        try {
-            const ssoSession = localStorage.getItem('superadmin_session');
-            if (ssoSession) {
-                const parsed = JSON.parse(ssoSession);
-                if (parsed.expiry > Date.now() && parsed.user) {
+        const initAuth = async () => {
+            // SSO: First check for signed superadmin session
+            try {
+                const ssoUser = await getVerifiedSSOSession();
+                if (ssoUser) {
                     setUser({
-                        id: parsed.user.id,
+                        id: ssoUser.id,
                         username: 'superadmin',
-                        name: parsed.user.name,
+                        name: ssoUser.name,
                         role: 'superadmin',
                         moduleAccess: ['angsuran', 'internet', 'musholla', 'komunitas'],
                         isSuperadminSSO: true
@@ -29,30 +29,30 @@ export const AuthProvider = ({ children }) => {
                     setLoading(false);
                     return;
                 }
-            }
-        } catch (e) {
-            // Invalid SSO session, continue to normal auth check
-        }
-
-        // Unified session: portal_user only
-        const storedUser = sessionStorage.getItem('portal_user');
-        if (storedUser) {
-            try {
-                const parsed = JSON.parse(storedUser);
-                if (parsed.role === 'superadmin' ||
-                    parsed.role === 'admin' ||
-                    parsed.role === 'developer' ||
-                    parsed.moduleAccess?.includes('angsuran')) {
-                    setUser(parsed);
-                }
             } catch (e) {
-                sessionStorage.removeItem('portal_user');
+                // Invalid SSO session, continue to normal auth check
             }
-        }
-        // Cleanup: remove legacy session keys if they exist
-        sessionStorage.removeItem('angsuran_user');
-        localStorage.removeItem('angsuran_user');
-        setLoading(false);
+
+            // Unified session: portal_user only
+            const storedUser = sessionStorage.getItem('portal_user');
+            if (storedUser) {
+                try {
+                    const parsed = JSON.parse(storedUser);
+                    if (parsed.role === 'superadmin' ||
+                        parsed.role === 'admin' ||
+                        parsed.role === 'developer' ||
+                        parsed.moduleAccess?.includes('angsuran')) {
+                        setUser(parsed);
+                    }
+                } catch (e) {
+                    sessionStorage.removeItem('portal_user');
+                }
+            }
+            sessionStorage.removeItem('angsuran_user');
+            localStorage.removeItem('angsuran_user');
+            setLoading(false);
+        };
+        initAuth();
     }, []);
 
     const login = async (username, password) => {

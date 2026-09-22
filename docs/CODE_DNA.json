@@ -1,0 +1,83 @@
+{
+  "_description": "Codebase DNA — Auto-detected conventions. AI MUST follow these when writing code.",
+  "_instructions": "AI: Scan the project's existing code and fill in these values. Update when major changes happen.",
+  "_lastUpdated": "2026-03-17",
+  "_scannedBy": "Not yet scanned — run /orchestrate on a project to auto-populate",
+  
+  "language": {
+    "primary": null,
+    "secondary": null,
+    "strictMode": true,
+    "targetES": null
+  },
+  
+  "framework": {
+    "name": null,
+    "version": null,
+    "router": null,
+    "stateManagement": null,
+    "cssFramework": null,
+    "uiLibrary": null
+  },
+  
+  "naming": {
+    "files": {
+      "components": null,
+      "utils": null,
+      "hooks": null,
+      "types": null,
+      "tests": null,
+      "example": null
+    },
+    "variables": null,
+    "functions": null,
+    "constants": null,
+    "interfaces": null,
+    "enums": null,
+    "cssClasses": null
+  },
+  
+  "structure": {
+    "srcDir": null,
+    "componentDir": null,
+    "pagesDir": null,
+    "apiDir": null,
+    "utilsDir": null,
+    "hooksDir": null,
+    "typesDir": null,
+    "testDir": null,
+    "publicDir": null,
+    "configDir": null
+  },
+  
+  "patterns": {
+    "componentStyle": null,
+    "statePattern": null,
+    "dataFetching": null,
+    "errorHandling": null,
+    "apiPattern": null,
+    "authPattern": null,
+    "testingFramework": null,
+    "importOrder": null
+  },
+  
+  "formatting": {
+    "indent": null,
+    "quotes": null,
+    "semicolons": null,
+    "trailingComma": null,
+    "lineWidth": null,
+    "formatter": null,
+    "linter": null
+  },
+  
+  "preferences": {
+    "preferFunctionalComponents": true,
+    "preferArrowFunctions": null,
+    "preferNamedExports": null,
+    "preferTypeOverInterface": null,
+    "preferAsyncAwait": true,
+    "preferServerComponents": null,
+    "preferServerActions": null
+  }
+}

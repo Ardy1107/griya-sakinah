@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-    getPaymentStatsSync as getPaymentStats,
-    getAgingReceivableSync as getAgingReceivable,
-    getMonthlyIncomeSync as getMonthlyIncome,
-    getUnitsSync as getUnits,
-    getPaymentsSync as getPayments,
-    getMonthlyBalanceSync
+    getPaymentStats,
+    getAgingReceivable,
+    getMonthlyIncome,
+    getUnits,
+    getPayments,
+    getMonthlyBalance
 } from '../../utils/database';
 import { formatRupiah, formatDate } from '../../utils/format';
 import {
@@ -96,7 +96,7 @@ const Dashboard = () => {
 
             // Get expense data for current month
             const now = new Date();
-            const balanceData = await getMonthlyBalanceSync(now.getMonth(), now.getFullYear()) || { totalExpenses: 0, netBalance: 0 };
+            const balanceData = await getMonthlyBalance(now.getMonth(), now.getFullYear()) || { totalExpenses: 0, netBalance: 0 };
             setExpenseStats({
                 totalExpenses: balanceData.totalExpenses || 0,
                 netBalance: balanceData.netBalance || 0

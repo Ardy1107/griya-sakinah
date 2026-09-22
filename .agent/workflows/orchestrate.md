@@ -33,6 +33,9 @@ $ARGUMENTS
 | **Full Stack** | project-planner, frontend-specialist, backend-specialist, devops-engineer |
 | **Debug** | debugger, explorer-agent, test-engineer |
 | **Security** | security-auditor, penetration-tester, devops-engineer |
+| **Code Review** | code-archaeologist, security-auditor, qa-automation-engineer |
+| **Product Strategy** | product-manager, product-owner, project-planner |
+| **Mobile** | mobile-developer, test-engineer, performance-optimizer |
 
 ---
 
@@ -82,22 +85,26 @@ Do you approve? (Y/N)
 
 > ✅ After user approval, invoke multiple agents in PARALLEL.
 
-## Available Agents (17 total)
+## Available Agents (20 total)
 
 | Agent | Domain | Use When |
 |-------|--------|----------|
 | `project-planner` | Planning | Task breakdown, PLAN.md |
 | `explorer-agent` | Discovery | Codebase mapping |
+| `code-archaeologist` | Discovery | Legacy code analysis, code history |
 | `frontend-specialist` | UI/UX | React, Vue, CSS, HTML |
 | `backend-specialist` | Server | API, Node.js, Python |
 | `database-architect` | Data | SQL, NoSQL, Schema |
 | `security-auditor` | Security | Vulnerabilities, Auth |
 | `penetration-tester` | Security | Active testing |
 | `test-engineer` | Testing | Unit, E2E, Coverage |
+| `qa-automation-engineer` | Testing | Test automation, CI integration |
 | `devops-engineer` | Ops | CI/CD, Docker, Deploy |
 | `mobile-developer` | Mobile | React Native, Flutter |
 | `performance-optimizer` | Speed | Lighthouse, Profiling |
 | `seo-specialist` | SEO | Meta, Schema, Rankings |
+| `product-manager` | Strategy | Requirements, roadmap, prioritization |
+| `product-owner` | Strategy | User stories, backlog, acceptance criteria |
 | `documentation-writer` | Docs | README, API docs |
 | `debugger` | Debug | Error analysis |
 | `game-developer` | Games | Unity, Godot |
@@ -110,16 +117,21 @@ Do you approve? (Y/N)
 ### Step 1: Analyze Task Domains
 Identify ALL domains this task touches:
 ```
-□ Security     → security-auditor, penetration-tester
-□ Backend/API  → backend-specialist
-□ Frontend/UI  → frontend-specialist
-□ Database     → database-architect
-□ Testing      → test-engineer
-□ DevOps       → devops-engineer
-□ Mobile       → mobile-developer
-□ Performance  → performance-optimizer
-□ SEO          → seo-specialist
-□ Planning     → project-planner
+□ Security       → security-auditor, penetration-tester
+□ Backend/API    → backend-specialist
+□ Frontend/UI    → frontend-specialist
+□ Database       → database-architect
+□ Testing        → test-engineer, qa-automation-engineer
+□ DevOps         → devops-engineer
+□ Mobile         → mobile-developer
+□ Performance    → performance-optimizer
+□ SEO            → seo-specialist
+□ Planning       → project-planner
+□ Discovery      → explorer-agent, code-archaeologist
+□ Strategy       → product-manager, product-owner
+□ Documentation  → documentation-writer
+□ Games          → game-developer
+□ Debug          → debugger
 ```
 
 ### Step 2: Phase Detection

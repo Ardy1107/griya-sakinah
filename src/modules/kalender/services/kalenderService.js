@@ -204,20 +204,8 @@ export function getEventType(value) {
     return EVENT_TYPES.find(t => t.value === value) || EVENT_TYPES[6];
 }
 
-export function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
-}
-
-export function formatTime(timeStr) {
-    if (!timeStr) return '';
-    return timeStr.slice(0, 5);
-}
-
-export function formatShortDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-}
+// Re-export from shared utils to avoid breaking existing imports
+export { formatDateLong as formatDate, formatTime, formatShortDate, timeAgoShort as timeAgo } from '../../../shared/utils/dateUtils';
 
 export function isEventPast(event) {
     const eventDate = new Date(event.event_date);
@@ -233,14 +221,4 @@ export function getEventStatus(event) {
     const today = new Date().toISOString().split('T')[0];
     if (event.event_date === today) return 'ongoing';
     return 'upcoming';
-}
-
-export function timeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Baru saja';
-    if (mins < 60) return `${mins}m lalu`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}j lalu`;
-    return `${Math.floor(hours / 24)}h lalu`;
 }

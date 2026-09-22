@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAuditLogsSync as getAuditLogs, getUsersSync as getUsers } from '../../utils/database';
+import { getAuditLogs, getUsers } from '../../utils/database';
 import {
     Search,
     FileText,

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { hashPassword, setSignedSSOSession, getVerifiedSSOSession, clearSSOSession } from '../../shared/utils/hashUtils';
 
 const AdminAuthContext = createContext(null);
 
@@ -78,25 +79,16 @@ const setSession = (user) => {
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
 
-    // SSO: If SuperAdmin, also set superadmin_session for other modules
+    // SSO: If SuperAdmin, set signed session for other modules
     if (user.role === ROLES.SUPER_ADMIN) {
-        const ssoSession = {
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: 'superadmin'
-            },
-            expiry: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
-        };
-        localStorage.setItem('superadmin_session', JSON.stringify(ssoSession));
+        setSignedSSOSession(user);
     }
 };
 
 // Clear session
 const clearSession = () => {
     sessionStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem('superadmin_session'); // Also clear SSO session
+    clearSSOSession();
 };
 
 export const useAdminAuth = () => {
@@ -128,12 +120,14 @@ export const AdminAuthProvider = ({ children }) => {
         }
 
         try {
-            // Query from Supabase portal_users table
+            // Hash password before comparing with DB
+            const hashedPassword = await hashPassword(password);
+
             const { data, error } = await supabase
                 .from('portal_users')
                 .select('*')
                 .eq('username', username)
-                .eq('password', password)
+                .eq('password_hash', hashedPassword)
                 .eq('is_active', true)
                 .single();
 
@@ -197,11 +191,14 @@ export const AdminAuthProvider = ({ children }) => {
         }
 
         try {
+            // Hash password before storing
+            const hashedPassword = await hashPassword(userData.password);
+
             const { data, error } = await supabase
                 .from('portal_users')
                 .insert([{
                     username: userData.username,
-                    password: userData.password,
+                    password_hash: hashedPassword,
                     full_name: userData.name,
                     email: userData.email,
                     role: userData.role,
@@ -235,7 +232,7 @@ export const AdminAuthProvider = ({ children }) => {
         try {
             const updateData = {};
             if (updates.username) updateData.username = updates.username;
-            if (updates.password) updateData.password = updates.password;
+            if (updates.password) updateData.password_hash = await hashPassword(updates.password);
             if (updates.name) updateData.full_name = updates.name;
             if (updates.email) updateData.email = updates.email;
             if (updates.role) updateData.role = updates.role;

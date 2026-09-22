@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUnitsSync as getUnits } from '../../utils/database';
+import { getUnits } from '../../utils/database';
 import { formatPhone, formatWhatsAppUrl } from '../../utils/format';
 import { Search, Phone, MessageCircle, MapPin, User, Users } from 'lucide-react';
 import './ContactDirectory.css';

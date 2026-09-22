@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import {
-    getPaymentsSync as getPayments,
-    getUnitsSync as getUnits,
-    getPaymentStatsSync as getPaymentStats
+    getPayments,
+    getUnits,
+    getPaymentStats
 } from '../../utils/database';
 import { formatRupiah } from '../../utils/format';
 import MonthPicker, { formatMonthYear, getMonthYearKey } from '../../components/MonthPicker/MonthPicker';

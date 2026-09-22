@@ -1,21 +1,23 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login/Login';
 import Layout from './components/Layout/Layout';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Units from './pages/Units/Units';
-import UnitDetail from './pages/Units/UnitDetail';
-import Payments from './pages/Payments/Payments';
-import Expenses from './pages/Expenses/Expenses';
-import Reports from './pages/Reports/Reports';
-import AuditLog from './pages/AuditLog/AuditLog';
-import Settings from './pages/Settings/Settings';
-import PaymentMonitoring from './pages/PaymentMonitoring/PaymentMonitoring';
-import TransactionHistory from './pages/TransactionHistory/TransactionHistory';
-import WargaSearch from './pages/WargaSearch';
-import HousingMap from './pages/HousingMap/HousingMap';
-import MaintenanceTracker from './pages/MaintenanceTracker/MaintenanceTracker';
-import ContactDirectory from './pages/ContactDirectory/ContactDirectory';
+
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const Units = lazy(() => import('./pages/Units/Units'));
+const UnitDetail = lazy(() => import('./pages/Units/UnitDetail'));
+const Payments = lazy(() => import('./pages/Payments/Payments'));
+const Expenses = lazy(() => import('./pages/Expenses/Expenses'));
+const Reports = lazy(() => import('./pages/Reports/Reports'));
+const AuditLog = lazy(() => import('./pages/AuditLog/AuditLog'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
+const PaymentMonitoring = lazy(() => import('./pages/PaymentMonitoring/PaymentMonitoring'));
+const TransactionHistory = lazy(() => import('./pages/TransactionHistory/TransactionHistory'));
+const WargaSearch = lazy(() => import('./pages/WargaSearch'));
+const HousingMap = lazy(() => import('./pages/HousingMap/HousingMap'));
+const MaintenanceTracker = lazy(() => import('./pages/MaintenanceTracker/MaintenanceTracker'));
+const ContactDirectory = lazy(() => import('./pages/ContactDirectory/ContactDirectory'));
 import './angsuran.css';
 
 // Protected Route Component - Only for admin access
@@ -64,169 +66,171 @@ const AdminLoginRoute = ({ children }) => {
 
 function AngsuranRoutes() {
     return (
-        <Routes>
-            {/* Default route - Warga Search (public, no login) */}
-            <Route index element={<WargaSearch />} />
-            <Route path="search" element={<WargaSearch />} />
+        <Suspense fallback={<div className="loading-screen"><div className="loading-spinner"></div><p>Memuat...</p></div>}>
+            <Routes>
+                {/* Default route - Warga Search (public, no login) */}
+                <Route index element={<WargaSearch />} />
+                <Route path="search" element={<WargaSearch />} />
 
-            {/* Hidden Admin Routes */}
-            <Route path="admin">
-                {/* Admin Login (hidden access) */}
-                <Route
-                    path="login"
-                    element={
-                        <AdminLoginRoute>
-                            <Login />
-                        </AdminLoginRoute>
-                    }
-                />
-
-                {/* Protected Admin Routes with Layout */}
-                <Route
-                    element={
-                        <ProtectedRoute>
-                            <Layout />
-                        </ProtectedRoute>
-                    }
-                >
+                {/* Hidden Admin Routes */}
+                <Route path="admin">
+                    {/* Admin Login (hidden access) */}
                     <Route
-                        path="dashboard"
+                        path="login"
                         element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <Dashboard />
-                            </ProtectedRoute>
+                            <AdminLoginRoute>
+                                <Login />
+                            </AdminLoginRoute>
                         }
                     />
 
+                    {/* Protected Admin Routes with Layout */}
                     <Route
-                        path="units"
                         element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <Units />
+                            <ProtectedRoute>
+                                <Layout />
                             </ProtectedRoute>
                         }
-                    />
+                    >
+                        <Route
+                            path="dashboard"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="units/:unitId"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <UnitDetail />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="units"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <Units />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="payments"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
-                                <Payments />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="units/:unitId"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <UnitDetail />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="expenses"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <Expenses />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="payments"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+                                    <Payments />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="history"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <TransactionHistory />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="expenses"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <Expenses />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="audit"
-                        element={
-                            <ProtectedRoute allowedRoles={['developer', 'superadmin']}>
-                                <AuditLog />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="history"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <TransactionHistory />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="monitoring"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <PaymentMonitoring />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="audit"
+                            element={
+                                <ProtectedRoute allowedRoles={['developer', 'superadmin']}>
+                                    <AuditLog />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="map"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <HousingMap />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="monitoring"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <PaymentMonitoring />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="reports"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <Reports />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="map"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <HousingMap />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="maintenance"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <MaintenanceTracker />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="reports"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <Reports />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="contacts"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <ContactDirectory />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="maintenance"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <MaintenanceTracker />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    <Route
-                        path="settings"
-                        element={
-                            <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
-                                <Settings />
-                            </ProtectedRoute>
-                        }
-                    />
+                        <Route
+                            path="contacts"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <ContactDirectory />
+                                </ProtectedRoute>
+                            }
+                        />
 
-                    {/* Admin index redirect */}
-                    <Route index element={<Navigate to="dashboard" replace />} />
+                        <Route
+                            path="settings"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
+                                    <Settings />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Admin index redirect */}
+                        <Route index element={<Navigate to="dashboard" replace />} />
+                    </Route>
                 </Route>
-            </Route>
 
-            {/* Legacy routes - redirect to new paths */}
-            <Route path="login" element={<Navigate to="/angsuran/admin/login" replace />} />
-            <Route path="dashboard" element={<Navigate to="/angsuran/admin/dashboard" replace />} />
-            <Route path="units" element={<Navigate to="/angsuran/admin/units" replace />} />
-            <Route path="units/:unitId" element={<Navigate to="/angsuran/admin/units/:unitId" replace />} />
-            <Route path="payments" element={<Navigate to="/angsuran/admin/payments" replace />} />
-            <Route path="expenses" element={<Navigate to="/angsuran/admin/expenses" replace />} />
-            <Route path="history" element={<Navigate to="/angsuran/admin/history" replace />} />
-            <Route path="audit" element={<Navigate to="/angsuran/admin/audit" replace />} />
-            <Route path="monitoring" element={<Navigate to="/angsuran/admin/monitoring" replace />} />
-            <Route path="reports" element={<Navigate to="/angsuran/admin/reports" replace />} />
-            <Route path="settings" element={<Navigate to="/angsuran/admin/settings" replace />} />
+                {/* Legacy routes - redirect to new paths */}
+                <Route path="login" element={<Navigate to="/angsuran/admin/login" replace />} />
+                <Route path="dashboard" element={<Navigate to="/angsuran/admin/dashboard" replace />} />
+                <Route path="units" element={<Navigate to="/angsuran/admin/units" replace />} />
+                <Route path="units/:unitId" element={<Navigate to="/angsuran/admin/units/:unitId" replace />} />
+                <Route path="payments" element={<Navigate to="/angsuran/admin/payments" replace />} />
+                <Route path="expenses" element={<Navigate to="/angsuran/admin/expenses" replace />} />
+                <Route path="history" element={<Navigate to="/angsuran/admin/history" replace />} />
+                <Route path="audit" element={<Navigate to="/angsuran/admin/audit" replace />} />
+                <Route path="monitoring" element={<Navigate to="/angsuran/admin/monitoring" replace />} />
+                <Route path="reports" element={<Navigate to="/angsuran/admin/reports" replace />} />
+                <Route path="settings" element={<Navigate to="/angsuran/admin/settings" replace />} />
 
-            {/* Catch all - redirect to search */}
-            <Route path="*" element={<Navigate to="/angsuran" replace />} />
-        </Routes>
+                {/* Catch all - redirect to search */}
+                <Route path="*" element={<Navigate to="/angsuran" replace />} />
+            </Routes>
+        </Suspense>
     );
 }
 

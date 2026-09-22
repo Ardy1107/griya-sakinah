@@ -5,8 +5,10 @@ import { usePaymentStatus } from '../hooks/useSupabase'
 import { debounce } from '../utils/helpers'
 import ResidentModal from './ResidentModal'
 
-export default function StatusGrid() {
-    const { statusList, totalPaid, totalUnpaid, bulan, tahun } = usePaymentStatus()
+export default function StatusGrid({ selectedPeriod }) {
+    const { statusList, totalPaid, totalUnpaid, bulan, tahun } = usePaymentStatus(
+        selectedPeriod?.bulan, selectedPeriod?.tahun
+    )
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedResident, setSelectedResident] = useState(null)
 

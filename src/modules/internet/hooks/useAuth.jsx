@@ -1,6 +1,7 @@
 // Auth Hook - Manages authentication state
 import { useState, useEffect, createContext, useContext } from 'react'
 import { supabase } from '../config/supabase'
+import { getVerifiedSSOSession } from '../../../shared/utils/hashUtils'
 
 const AuthContext = createContext(null)
 
@@ -26,40 +27,54 @@ export function AuthProvider({ children }) {
     const [isSuperadmin, setIsSuperadmin] = useState(false)
 
     useEffect(() => {
-        // First check for superadmin SSO
-        const superadminUser = checkSuperadminSession()
-        if (superadminUser) {
-            // Auto-login as superadmin
-            setUser({
-                id: 'superadmin',
-                email: 'superadmin@griyasakinah.local',
-                role: 'superadmin'
+        const initAuth = async () => {
+            // Dev Bypass check
+            if (import.meta.env.DEV && localStorage.getItem('dev_bypass') === 'true') {
+                setUser({
+                    id: 'dev-bypass',
+                    email: 'admin@griyasakinah.local',
+                    role: 'superadmin'
+                });
+                setIsSuperadmin(true);
+                setLoading(false);
+                return;
+            }
+
+            // First check for signed superadmin SSO
+            const superadminUser = await getVerifiedSSOSession();
+            if (superadminUser) {
+                setUser({
+                    id: 'superadmin',
+                    email: 'superadmin@griyasakinah.local',
+                    role: 'superadmin'
+                });
+                setIsSuperadmin(true);
+                setLoading(false);
+                return;
+            }
+
+            // If supabase is not configured, just set loading to false
+            if (!supabase) {
+                setLoading(false)
+                return
+            }
+
+            // Check active sessions
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                setUser(session?.user ?? null)
+                setLoading(false)
+            }).catch(() => {
+                setLoading(false)
             })
-            setIsSuperadmin(true)
-            setLoading(false)
-            return
-        }
 
-        // If supabase is not configured, just set loading to false
-        if (!supabase) {
-            setLoading(false)
-            return
-        }
+            // Listen for auth changes
+            const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                setUser(session?.user ?? null)
+            })
 
-        // Check active sessions
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null)
-            setLoading(false)
-        }).catch(() => {
-            setLoading(false)
-        })
-
-        // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null)
-        })
-
-        return () => subscription.unsubscribe()
+            return () => subscription.unsubscribe();
+        };
+        initAuth();
     }, [])
 
     const signIn = async (email, password) => {
@@ -71,14 +86,20 @@ export function AuthProvider({ children }) {
             password
         })
         if (error) throw error
+        // Immediately set user to avoid race condition with React Router navigate
+        if (data?.session?.user) {
+            setUser(data.session.user)
+        }
         return data
     }
 
     const signOut = async () => {
+        localStorage.removeItem('dev_bypass')
         if (supabase) {
             await supabase.auth.signOut()
         }
         setUser(null)
+        setIsSuperadmin(false)
     }
 
     const value = {
