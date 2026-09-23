@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { BlockProvider } from './context/BlockContext'
 import DashboardBlokA from './pages/DashboardBlokA'
 import DashboardBlokB from './pages/DashboardBlokB'
+import BlockSelector from './pages/BlockSelector'
 import PublicDashboard from './pages/PublicDashboard'
 import AdminLogin from './pages/AdminLogin'
 import AdminPanel from './pages/AdminPanel'
@@ -34,8 +35,8 @@ function SmartDashboard() {
     if (block === 'B') return <DashboardBlokB />
   }
 
-  // Fallback to generic dashboard (superadmin view)
-  return <PublicDashboard />
+  // No block specified → show block selector
+  return <BlockSelector />
 }
 
 function InternetApp() {

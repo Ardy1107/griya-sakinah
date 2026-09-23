@@ -96,33 +96,31 @@ function App() {
                             </ModuleErrorBoundary>
                         } />
 
-                        {/* Kalender Komunitas */}
+                        {/* === DISABLED MODULES (Coming Soon) ===
                         <Route path="/kalender/*" element={
                             <ModuleErrorBoundary moduleName="Kalender">
                                 <KalenderApp />
                             </ModuleErrorBoundary>
                         } />
 
-                        {/* Voting & Polling */}
                         <Route path="/voting/*" element={
                             <ModuleErrorBoundary moduleName="Voting">
                                 <VotingApp />
                             </ModuleErrorBoundary>
                         } />
 
-                        {/* Keamanan Lingkungan */}
                         <Route path="/keamanan/*" element={
                             <ModuleErrorBoundary moduleName="Keamanan">
                                 <KeamananApp />
                             </ModuleErrorBoundary>
                         } />
 
-                        {/* Chat Warga */}
                         <Route path="/chat/*" element={
                             <ModuleErrorBoundary moduleName="Chat">
                                 <ChatApp />
                             </ModuleErrorBoundary>
                         } />
+                        === END DISABLED MODULES === */}
 
                         {/* Admin Portal */}
                         <Route path="/admin/*" element={

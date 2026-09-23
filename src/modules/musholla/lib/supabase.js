@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Supabase configuration (shared with Sakinah Net)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL_MUSHOLLA || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY_MUSHOLLA || '';
 
 // Create Supabase client with session persistence
 export const supabase = supabaseUrl && supabaseAnonKey
