@@ -91,17 +91,30 @@ export default function BlockSelector() {
         setTimeout(() => inputRefs.current[0]?.focus(), 100)
     }
 
-    const verifyPin = async (blockId, pinCode) => {
-        if (!supabase) return false
-        const key = `pin_blok_${blockId.toLowerCase()}`
-        const { data, error } = await supabase
-            .from('internet_settings')
-            .select('value')
-            .eq('key', key)
-            .single()
+    // Default PINs (fallback if DB table not yet created)
+    const DEFAULT_PINS = { A: '1234', B: '5678' }
 
-        if (error || !data) return false
-        return data.value === pinCode
+    const verifyPin = async (blockId, pinCode) => {
+        // Try Supabase first
+        if (supabase) {
+            try {
+                const key = `pin_blok_${blockId.toLowerCase()}`
+                const { data, error } = await supabase
+                    .from('internet_settings')
+                    .select('value')
+                    .eq('key', key)
+                    .single()
+
+                if (!error && data) {
+                    return data.value === pinCode
+                }
+            } catch (err) {
+                console.warn('PIN table not found, using default PINs')
+            }
+        }
+
+        // Fallback to hardcoded defaults
+        return DEFAULT_PINS[blockId] === pinCode
     }
 
     const handlePinSubmit = async () => {
