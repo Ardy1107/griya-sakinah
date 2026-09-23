@@ -59,7 +59,7 @@ async function deploy() {
     client.ftp.verbose = false; // Less verbose for speed
 
     try {
-        const localDir = join(__dirname, "dist");
+        const localDir = join(__dirname, "..", "dist");
 
         // Get current and previous file hashes
         console.log("🔍 Scanning for changes...");

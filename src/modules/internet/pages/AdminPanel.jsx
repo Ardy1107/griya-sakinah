@@ -1,12 +1,13 @@
 // Admin Panel Page - Ultra Premium with Block Filter & Complete Bookkeeping
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Navigate, Link } from 'react-router-dom'
+import { supabase } from '../config/supabase'
 import {
     Home, CreditCard, Receipt, Users, BarChart3,
     LogOut, Menu, X, Eye, Download, FileText, BookOpen,
     Filter, ChevronDown, Shield, Settings, Moon, Sun,
     TrendingUp, TrendingDown, Wallet, Search, Trash2, Edit3,
-    CheckCircle, XCircle, AlertTriangle, RefreshCw
+    CheckCircle, XCircle, AlertTriangle, RefreshCw, Key, EyeOff
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useAdminOperations } from '../hooks/useSupabase'
@@ -37,7 +38,8 @@ const TABS = [
     { id: 'residents', label: 'Data Warga', icon: Users, group: 'kelola' },
     { id: 'import', label: 'Import Data', icon: FileText, group: 'tools' },
     { id: 'reports', label: 'Laporan', icon: BarChart3, group: 'tools' },
-    { id: 'export', label: 'Export Data', icon: Download, group: 'tools' }
+    { id: 'export', label: 'Export Data', icon: Download, group: 'tools' },
+    { id: 'settings', label: 'Pengaturan PIN', icon: Key, group: 'tools' }
 ]
 
 const TAB_GROUPS = [
@@ -348,6 +350,9 @@ export default function AdminPanel() {
                         </div>
                     </div>
                 )
+
+            case 'settings':
+                return <PinSettings />
 
             default:
                 return null
@@ -788,6 +793,255 @@ function ResidentListAdmin({ residents }) {
         </div>
     )
 }
+
+// ─── PIN Settings Component ──────────────────────
+function PinSettings() {
+    const [pinA, setPinA] = useState('')
+    const [pinB, setPinB] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [showPinA, setShowPinA] = useState(false)
+    const [showPinB, setShowPinB] = useState(false)
+    const [message, setMessage] = useState(null)
+
+    useEffect(() => {
+        loadPins()
+    }, [])
+
+    async function loadPins() {
+        if (!supabase) return
+        setLoading(true)
+        try {
+            const { data: dataA } = await supabase
+                .from('internet_settings')
+                .select('value')
+                .eq('key', 'pin_blok_a')
+                .single()
+            const { data: dataB } = await supabase
+                .from('internet_settings')
+                .select('value')
+                .eq('key', 'pin_blok_b')
+                .single()
+            if (dataA) setPinA(dataA.value)
+            if (dataB) setPinB(dataB.value)
+        } catch (err) {
+            console.error('Error loading PINs:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function handleSave() {
+        if (!supabase) return
+        if (pinA.length < 4 || pinB.length < 4) {
+            setMessage({ type: 'error', text: 'PIN harus minimal 4 digit' })
+            return
+        }
+        setSaving(true)
+        setMessage(null)
+        try {
+            await supabase
+                .from('internet_settings')
+                .upsert({ key: 'pin_blok_a', value: pinA, updated_at: new Date().toISOString() })
+            await supabase
+                .from('internet_settings')
+                .upsert({ key: 'pin_blok_b', value: pinB, updated_at: new Date().toISOString() })
+            setMessage({ type: 'success', text: '✅ PIN berhasil disimpan!' })
+        } catch (err) {
+            setMessage({ type: 'error', text: '❌ Gagal menyimpan: ' + err.message })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    return (
+        <div>
+            <div className="admin-section-header">
+                <div>
+                    <h2 className="admin-section-title">Pengaturan Kode Akses</h2>
+                    <p className="admin-section-subtitle">
+                        Atur kode PIN yang digunakan warga untuk mengakses dashboard blok masing-masing
+                    </p>
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="admin-loading">
+                    <div className="admin-loading-spinner" />
+                    <p>Memuat pengaturan...</p>
+                </div>
+            ) : (
+                <div className="card" style={{ padding: 'var(--space-xl)' }}>
+                    <div style={{ display: 'grid', gap: '24px', maxWidth: '400px' }}>
+                        {/* PIN Blok A */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                color: 'var(--text-secondary)',
+                                marginBottom: '8px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                🔵 Kode Akses Blok A
+                            </label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPinA ? 'text' : 'password'}
+                                    value={pinA}
+                                    onChange={e => setPinA(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="Masukkan PIN (4-6 digit)"
+                                    style={{
+                                        width: '100%',
+                                        padding: '14px 48px 14px 16px',
+                                        borderRadius: '12px',
+                                        border: '2px solid var(--border-color)',
+                                        background: 'var(--bg-tertiary)',
+                                        color: 'var(--text-primary)',
+                                        fontSize: '1.1rem',
+                                        fontFamily: 'var(--font-mono)',
+                                        letterSpacing: '4px',
+                                        outline: 'none',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPinA(!showPinA)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--text-muted)',
+                                        cursor: 'pointer',
+                                        padding: '4px'
+                                    }}
+                                >
+                                    {showPinA ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* PIN Blok B */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                color: 'var(--text-secondary)',
+                                marginBottom: '8px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                🟢 Kode Akses Blok B
+                            </label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPinB ? 'text' : 'password'}
+                                    value={pinB}
+                                    onChange={e => setPinB(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="Masukkan PIN (4-6 digit)"
+                                    style={{
+                                        width: '100%',
+                                        padding: '14px 48px 14px 16px',
+                                        borderRadius: '12px',
+                                        border: '2px solid var(--border-color)',
+                                        background: 'var(--bg-tertiary)',
+                                        color: 'var(--text-primary)',
+                                        fontSize: '1.1rem',
+                                        fontFamily: 'var(--font-mono)',
+                                        letterSpacing: '4px',
+                                        outline: 'none',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPinB(!showPinB)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--text-muted)',
+                                        cursor: 'pointer',
+                                        padding: '4px'
+                                    }}
+                                >
+                                    {showPinB ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Message */}
+                        {message && (
+                            <div style={{
+                                padding: '12px 16px',
+                                borderRadius: '10px',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                background: message.type === 'success'
+                                    ? 'rgba(16, 185, 129, 0.1)'
+                                    : 'rgba(239, 68, 68, 0.1)',
+                                color: message.type === 'success' ? '#10b981' : '#ef4444'
+                            }}>
+                                {message.text}
+                            </div>
+                        )}
+
+                        {/* Save Button */}
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            style={{
+                                padding: '14px 24px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                                color: 'white',
+                                fontSize: '0.9rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                fontFamily: 'var(--font-sans)',
+                                opacity: saving ? 0.6 : 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <Key size={16} />
+                            {saving ? 'Menyimpan...' : 'Simpan Kode Akses'}
+                        </button>
+
+                        {/* Info */}
+                        <div style={{
+                            padding: '14px 16px',
+                            borderRadius: '10px',
+                            background: 'var(--bg-tertiary)',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-muted)',
+                            lineHeight: 1.6
+                        }}>
+                            <strong>ℹ️ Informasi:</strong><br />
+                            • Kode akses digunakan warga untuk masuk ke dashboard blok mereka<br />
+                            • Bagikan kode hanya ke warga blok terkait melalui grup WhatsApp<br />
+                            • Setelah warga memasukkan kode 1 kali, kode akan tersimpan di HP mereka<br />
+                            • Jika Anda mengubah kode, warga harus memasukkan kode baru saat berikutnya
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
 
 // ─── Export Card ──────────────────────────────────
 function ExportCard({ icon, title, desc, onClick, color, highlight }) {
