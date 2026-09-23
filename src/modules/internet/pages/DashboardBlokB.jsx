@@ -92,21 +92,6 @@ export default function DashboardBlokB() {
 
         {/* Payment Info Card - Blok B specific (rekening info) */}
         <PaymentInfoCard blockId="B" />
-
-        {/* Transparansi Info */}
-        <div className="card mt-4 transparansi-card">
-          <h3 className="card-title mb-2" style={{ justifyContent: 'center' }}>
-            📊 Informasi Transparansi
-          </h3>
-          <p className="text-muted transparansi-text">
-            Semua data keuangan Blok B ditampilkan secara transparan.
-            Klik pada setiap kartu statistik untuk melihat detail.
-            Iuran internet Blok B: <strong style={{ color: '#3b82f6' }}>Rp 150.000/bulan</strong> per rumah.
-          </p>
-          <p className="text-muted transparansi-text" style={{ marginTop: '0.5rem' }}>
-            💳 Transfer ke <strong>Bank Mandiri 1480023234738</strong> (a.n. Ardyanto Pri Utomo)
-          </p>
-        </div>
       </main>
 
       {/* Footer */}

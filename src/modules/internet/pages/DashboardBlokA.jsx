@@ -92,21 +92,6 @@ export default function DashboardBlokA() {
 
         {/* Payment Info Card - Blok A specific (rekening info) */}
         <PaymentInfoCard blockId="A" />
-
-        {/* Transparansi Info */}
-        <div className="card mt-4 transparansi-card">
-          <h3 className="card-title mb-2" style={{ justifyContent: 'center' }}>
-            📊 Informasi Transparansi
-          </h3>
-          <p className="text-muted transparansi-text">
-            Semua data keuangan Blok A ditampilkan secara transparan.
-            Klik pada setiap kartu statistik untuk melihat detail.
-            Iuran internet Blok A: <strong style={{ color: '#10b981' }}>Rp 150.000/bulan</strong> per rumah.
-          </p>
-          <p className="text-muted transparansi-text" style={{ marginTop: '0.5rem' }}>
-            💳 Transfer ke <strong>BSI 7276140919</strong> (a.n. Ardyanto Pri Utomo)
-          </p>
-        </div>
       </main>
 
       {/* Footer */}
