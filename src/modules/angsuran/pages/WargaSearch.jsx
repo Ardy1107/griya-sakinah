@@ -21,25 +21,13 @@ export default function WargaSearch() {
     const longPressTimer = useRef(null);
     const [isSecretLoading, setIsSecretLoading] = useState(false);
 
-    // Long press handler for hidden admin access - auto login as developer
+    // Long press handler for hidden admin access - navigate to login selector
     const handleLogoMouseDown = (e) => {
-        e.preventDefault(); // Prevent any default behavior
+        e.preventDefault();
         longPressTimer.current = setTimeout(() => {
             setIsSecretLoading(true);
-            // Clear welcome shown flag so popup shows
-            sessionStorage.removeItem('welcomeShownThisLogin');
-            // Set developer session directly — use portal_user key (matches AuthContext)
-            const deviSession = {
-                id: 'dev-devi',
-                username: 'devi',
-                name: 'Devi Indah Suhartatik',
-                role: 'developer',
-                moduleAccess: ['angsuran']
-            };
-            sessionStorage.setItem('portal_user', JSON.stringify(deviSession));
-            // Use full page reload to ensure AuthContext reads the new session
-            window.location.href = '/angsuran/admin/dashboard';
-        }, 3000); // 3 seconds
+            navigate('/angsuran/admin/login');
+        }, 5000); // 5 seconds
     };
 
     const handleLogoMouseUp = (e) => {

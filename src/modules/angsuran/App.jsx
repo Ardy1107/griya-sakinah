@@ -68,8 +68,8 @@ function AngsuranRoutes() {
     return (
         <Suspense fallback={<div className="loading-screen"><div className="loading-spinner"></div><p>Memuat...</p></div>}>
             <Routes>
-                {/* Default route - redirect to admin login (mode selector) */}
-                <Route index element={<Navigate to="/angsuran/admin/login" replace />} />
+                {/* Default route - Warga Search (public, no login) */}
+                <Route index element={<WargaSearch />} />
                 <Route path="search" element={<WargaSearch />} />
 
                 {/* Hidden Admin Routes */}
