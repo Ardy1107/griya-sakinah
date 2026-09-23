@@ -105,6 +105,20 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const hashedPin = await hashPassword(pin);
+            console.log('[PIN Login] PIN:', pin, 'Hash:', hashedPin);
+
+            // First, check if any admin users exist at all
+            const { data: admins, error: adminErr } = await supabase
+                .from('users')
+                .select('id, nama, role, pin_hash')
+                .eq('role', 'admin');
+            
+            console.log('[PIN Login] Admin users found:', admins, 'Error:', adminErr);
+
+            if (admins && admins.length > 0) {
+                console.log('[PIN Login] DB pin_hash:', admins[0].pin_hash);
+                console.log('[PIN Login] Match:', admins[0].pin_hash === hashedPin);
+            }
 
             // Look for admin user with matching PIN hash
             const { data, error } = await supabase
@@ -113,6 +127,8 @@ export const AuthProvider = ({ children }) => {
                 .eq('role', 'admin')
                 .eq('pin_hash', hashedPin)
                 .single();
+
+            console.log('[PIN Login] Final query result:', data, 'Error:', error);
 
             if (error || !data) {
                 return { success: false, error: 'PIN salah' };
@@ -123,7 +139,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
             return { success: true };
         } catch (err) {
-            if (import.meta.env.DEV) console.error('PIN login error:', err);
+            console.error('PIN login error:', err);
             return { success: false, error: 'Koneksi bermasalah' };
         }
     };
