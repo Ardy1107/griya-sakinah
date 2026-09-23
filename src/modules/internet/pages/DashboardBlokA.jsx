@@ -53,8 +53,6 @@ export default function DashboardBlokA() {
           </div>
         </div>
 
-        {/* Payment Info Card - Blok A specific */}
-        <PaymentInfoCard blockId="A" />
 
         {/* Hero Stats */}
         <HeroStats
@@ -91,6 +89,9 @@ export default function DashboardBlokA() {
 
         {/* Status Grid */}
         <StatusGrid selectedPeriod={selectedPeriod} />
+
+        {/* Payment Info Card - Blok A specific (rekening info) */}
+        <PaymentInfoCard blockId="A" />
 
         {/* Transparansi Info */}
         <div className="card mt-4 transparansi-card">
