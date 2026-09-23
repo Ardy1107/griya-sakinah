@@ -6,8 +6,7 @@
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { hashPassword } from '../utils/format';
-import { getVerifiedSSOSession } from '../../../shared/utils/hashUtils';
+import { hashPassword, getVerifiedSSOSession } from '../../../shared/utils/hashUtils';
 
 const AuthContext = createContext(null);
 
