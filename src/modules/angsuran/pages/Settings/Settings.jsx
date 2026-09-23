@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { createAuditLog } from '../../utils/database';
+import { hashPassword } from '../../../shared/utils/hashUtils';
+import { supabase } from '../../lib/supabase';
 import {
     backupDatabaseToDrive,
     getBackupInfo,
@@ -41,11 +43,41 @@ const Settings = () => {
     const [driveLoading, setDriveLoading] = useState(false);
     const [backupInfo, setBackupInfo] = useState(null);
     const [autoBackup, setAutoBackup] = useState(false);
+    const [newPin, setNewPin] = useState('');
+    const [confirmPin, setConfirmPin] = useState('');
 
     useEffect(() => {
         setBackupInfo(getBackupInfo());
         setAutoBackup(isAutoBackupEnabled());
     }, []);
+
+    const handleChangePin = async () => {
+        if (newPin !== confirmPin) {
+            showMessage('error', 'PIN tidak cocok!');
+            return;
+        }
+        if (newPin.length !== 4) {
+            showMessage('error', 'PIN harus 4 digit!');
+            return;
+        }
+        setLoading(true);
+        try {
+            const hashedPin = await hashPassword(newPin);
+            const { error } = await supabase
+                .from('users')
+                .update({ pin_hash: hashedPin })
+                .eq('role', 'admin');
+            if (error) throw error;
+            showMessage('success', 'PIN berhasil diubah!');
+            setNewPin('');
+            setConfirmPin('');
+            await createAuditLog(user?.name || 'Admin', 'PIN admin diubah');
+        } catch (err) {
+            console.error('Change PIN error:', err);
+            showMessage('error', 'Gagal mengubah PIN: ' + err.message);
+        }
+        setLoading(false);
+    };
 
     const showMessage = (type, text) => {
         setMessage({ type, text });
@@ -345,6 +377,57 @@ const Settings = () => {
                         onChange={handleRestore}
                         style={{ display: 'none' }}
                     />
+                </div>
+            </div>
+
+            {/* PIN Management Section */}
+            <div className="settings-card">
+                <div className="card-header">
+                    <Shield size={20} />
+                    <h3>Ubah PIN Admin</h3>
+                </div>
+                <p className="card-description">
+                    Ubah PIN 4 digit untuk login admin angsuran.
+                </p>
+
+                <div className="pin-change-form">
+                    <div className="pin-input-group">
+                        <label>PIN Baru (4 digit)</label>
+                        <input
+                            type="tel"
+                            maxLength={4}
+                            pattern="[0-9]*"
+                            inputMode="numeric"
+                            placeholder="Masukkan 4 digit PIN"
+                            value={newPin}
+                            onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                            className="pin-input"
+                        />
+                    </div>
+                    <div className="pin-input-group">
+                        <label>Konfirmasi PIN</label>
+                        <input
+                            type="tel"
+                            maxLength={4}
+                            pattern="[0-9]*"
+                            inputMode="numeric"
+                            placeholder="Ulangi 4 digit PIN"
+                            value={confirmPin}
+                            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                            className="pin-input"
+                        />
+                    </div>
+                    <button
+                        className="action-button backup"
+                        onClick={handleChangePin}
+                        disabled={loading || newPin.length !== 4 || confirmPin.length !== 4}
+                    >
+                        <CheckCircle size={20} />
+                        <div>
+                            <span className="button-title">Simpan PIN Baru</span>
+                            <span className="button-desc">Update PIN login admin</span>
+                        </div>
+                    </button>
                 </div>
             </div>
 
