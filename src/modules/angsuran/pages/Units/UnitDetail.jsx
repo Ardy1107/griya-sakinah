@@ -68,7 +68,7 @@ const UnitDetail = () => {
             <div className="unit-detail">
                 <div className="not-found">
                     <h2>Unit tidak ditemukan</h2>
-                    <button onClick={() => navigate('/angsuran/units')} className="secondary-button">
+                    <button onClick={() => navigate('/angsuran/admin/units')} className="secondary-button">
                         <ArrowLeft size={18} />
                         Kembali ke Data Unit
                     </button>
@@ -80,7 +80,7 @@ const UnitDetail = () => {
     return (
         <div className="unit-detail">
             <div className="page-header">
-                <button onClick={() => navigate('/angsuran/units')} className="back-button">
+                <button onClick={() => navigate('/angsuran/admin/units')} className="back-button">
                     <ArrowLeft size={20} />
                 </button>
                 <div>

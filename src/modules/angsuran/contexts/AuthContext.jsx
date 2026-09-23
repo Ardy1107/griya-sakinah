@@ -105,36 +105,26 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const hashedPin = await hashPassword(pin);
-            console.log('[PIN Login] PIN:', pin, 'Hash:', hashedPin);
 
-            // First, check if any admin users exist at all
+            // Fetch all admin users (don't filter by pin_hash in query)
             const { data: admins, error: adminErr } = await supabase
                 .from('users')
-                .select('id, nama, role, pin_hash')
+                .select('*')
                 .eq('role', 'admin');
-            
-            console.log('[PIN Login] Admin users found:', admins, 'Error:', adminErr);
 
-            if (admins && admins.length > 0) {
-                console.log('[PIN Login] DB pin_hash:', admins[0].pin_hash);
-                console.log('[PIN Login] Match:', admins[0].pin_hash === hashedPin);
+            if (adminErr || !admins || admins.length === 0) {
+                console.error('[PIN Login] No admin users found:', adminErr);
+                return { success: false, error: 'Akun admin tidak ditemukan' };
             }
 
-            // Look for admin user with matching PIN hash
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('role', 'admin')
-                .eq('pin_hash', hashedPin)
-                .single();
-
-            console.log('[PIN Login] Final query result:', data, 'Error:', error);
-
-            if (error || !data) {
+            // Compare PIN hash in JavaScript
+            const matchedAdmin = admins.find(a => a.pin_hash === hashedPin);
+            
+            if (!matchedAdmin) {
                 return { success: false, error: 'PIN salah' };
             }
 
-            const userData = mapDbUser(data);
+            const userData = mapDbUser(matchedAdmin);
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };

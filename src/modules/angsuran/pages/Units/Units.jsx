@@ -578,7 +578,7 @@ const Units = () => {
 
                                         <button
                                             className="view-detail-button"
-                                            onClick={() => navigate(`/units/${unit.id}`)}
+                                            onClick={() => navigate(`/angsuran/admin/units/${unit.id}`)}
                                         >
                                             <Eye size={16} />
                                             <span>Lihat Detail</span>

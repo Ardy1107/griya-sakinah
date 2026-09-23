@@ -107,7 +107,7 @@ const Layout = () => {
             icon: Map,
             label: 'Peta Blok',
             tooltip: 'Visualisasi status pembayaran per blok rumah',
-            roles: ['admin', 'developer', 'superadmin']
+            roles: ['admin', 'superadmin']
         },
         {
             path: '/angsuran/admin/history',
@@ -149,21 +149,21 @@ const Layout = () => {
             icon: FileText,
             label: 'Audit Log',
             tooltip: 'Riwayat aktivitas sistem',
-            roles: ['admin', 'developer', 'superadmin']
+            roles: ['admin', 'superadmin']
         },
         {
             path: '/angsuran/admin/maintenance',
             icon: Wrench,
             label: 'Perawatan',
             tooltip: 'Kelola perawatan dan perbaikan unit perumahan',
-            roles: ['admin', 'developer', 'superadmin']
+            roles: ['admin', 'superadmin']
         },
         {
             path: '/angsuran/admin/contacts',
             icon: Phone,
             label: 'Kontak Warga',
             tooltip: 'Direktori kontak semua penghuni',
-            roles: ['admin', 'developer', 'superadmin']
+            roles: ['admin', 'superadmin']
         },
         {
             path: '/angsuran/admin/settings',
