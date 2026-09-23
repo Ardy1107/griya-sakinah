@@ -1,59 +1,77 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Home, LogIn, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Home, LogIn, ArrowLeft, Shield, User, Lock, Delete } from 'lucide-react';
 import './Login.css';
 
 const Login = () => {
-    const { login, isAuthenticated } = useAuth();
+    const { login, loginWithPin, loginAsDeveloper, isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [pin, setPin] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [selectedMode, setSelectedMode] = useState(null); // 'admin' | 'developer'
+    const pinInputRef = useRef(null);
 
-    // Secret long-press login
-    const pressTimerRef = useRef(null);
-    const [isSecretLoading, setIsSecretLoading] = useState(false);
+    const PIN_LENGTH = 4;
 
-    // Redirect if already authenticated (including superadmin SSO)
+    // Redirect if already authenticated
     useEffect(() => {
         if (isAuthenticated) {
             navigate('/angsuran/admin/dashboard');
         }
     }, [isAuthenticated, navigate]);
 
-    // Secret login - hold logo for 3 seconds
-    const handleLogoPress = () => {
-        pressTimerRef.current = setTimeout(async () => {
-            setIsSecretLoading(true);
-            // Auto-login as devi
-            const result = await login('devi', 'sakinah2026');
-            if (result.success) {
-                navigate('/angsuran/admin/dashboard');
-            }
-            setIsSecretLoading(false);
-        }, 3000);
-    };
+    // Focus pin input when admin mode selected
+    useEffect(() => {
+        if (selectedMode === 'admin' && pinInputRef.current) {
+            pinInputRef.current.focus();
+        }
+    }, [selectedMode]);
 
-    const handleLogoRelease = () => {
-        if (pressTimerRef.current) {
-            clearTimeout(pressTimerRef.current);
-            pressTimerRef.current = null;
+    // Auto-submit when PIN is complete
+    useEffect(() => {
+        if (pin.length === PIN_LENGTH && selectedMode === 'admin') {
+            handlePinSubmit();
+        }
+    }, [pin]);
+
+    const handlePinDigit = (digit) => {
+        if (pin.length < PIN_LENGTH) {
+            setPin(prev => prev + digit);
+            setError('');
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handlePinDelete = () => {
+        setPin(prev => prev.slice(0, -1));
         setError('');
+    };
+
+    const handlePinSubmit = async () => {
+        if (pin.length !== PIN_LENGTH) return;
+
         setLoading(true);
+        setError('');
 
-        // Simulate slight delay for UX
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-        const result = await login(username, password);
+        const result = await loginWithPin(pin);
+        if (!result.success) {
+            setError(result.error);
+            setPin('');
+        }
 
+        setLoading(false);
+    };
+
+    const handleDeveloperLogin = async () => {
+        setLoading(true);
+        setError('');
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const result = await loginAsDeveloper();
         if (!result.success) {
             setError(result.error);
         }
@@ -61,8 +79,92 @@ const Login = () => {
         setLoading(false);
     };
 
+    // Hidden PIN input for keyboard support
+    const handleKeyDown = (e) => {
+        if (selectedMode !== 'admin') return;
+
+        if (e.key >= '0' && e.key <= '9') {
+            handlePinDigit(e.key);
+        } else if (e.key === 'Backspace') {
+            handlePinDelete();
+        }
+    };
+
+    // Mode selection screen
+    if (!selectedMode) {
+        return (
+            <div className="login-container" onKeyDown={handleKeyDown}>
+                <div className="login-background">
+                    <div className="login-gradient"></div>
+                    <div className="login-pattern"></div>
+                </div>
+
+                <div className="login-card">
+                    <div className="login-header">
+                        <div className="login-logo">
+                            <Home size={32} />
+                        </div>
+                        <h1>Griya Sakinah</h1>
+                        <p>Sistem Pembayaran Angsuran</p>
+                    </div>
+
+                    <div className="mode-selector">
+                        <p className="mode-label">Masuk sebagai:</p>
+
+                        <button
+                            className="mode-card admin"
+                            onClick={() => setSelectedMode('admin')}
+                        >
+                            <div className="mode-icon admin">
+                                <Shield size={28} />
+                            </div>
+                            <div className="mode-info">
+                                <span className="mode-title">Admin</span>
+                                <span className="mode-desc">Masuk dengan PIN</span>
+                            </div>
+                            <LogIn size={20} className="mode-arrow" />
+                        </button>
+
+                        <button
+                            className="mode-card developer"
+                            onClick={handleDeveloperLogin}
+                            disabled={loading}
+                        >
+                            <div className="mode-icon developer">
+                                <User size={28} />
+                            </div>
+                            <div className="mode-info">
+                                <span className="mode-title">Developer</span>
+                                <span className="mode-desc">Masuk langsung</span>
+                            </div>
+                            {loading ? (
+                                <span className="loading-spinner"></span>
+                            ) : (
+                                <LogIn size={20} className="mode-arrow" />
+                            )}
+                        </button>
+                    </div>
+
+                    {error && (
+                        <div className="login-error">
+                            <span>{error}</span>
+                        </div>
+                    )}
+
+                    <div className="login-footer">
+                        <Link to="/" className="portal-link">
+                            <ArrowLeft size={16} />
+                            Kembali ke Portal Griya Sakinah
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Admin PIN entry screen
     return (
-        <div className="login-container">
+        <div className="login-container" tabIndex={0} onKeyDown={handleKeyDown}>
             <div className="login-background">
                 <div className="login-gradient"></div>
                 <div className="login-pattern"></div>
@@ -70,83 +172,88 @@ const Login = () => {
 
             <div className="login-card">
                 <div className="login-header">
-                    <div
-                        className={`login-logo ${isSecretLoading ? 'secret-loading' : ''}`}
-                        onMouseDown={handleLogoPress}
-                        onMouseUp={handleLogoRelease}
-                        onMouseLeave={handleLogoRelease}
-                        onTouchStart={handleLogoPress}
-                        onTouchEnd={handleLogoRelease}
-                        style={{ cursor: 'pointer', userSelect: 'none' }}
-                    >
-                        <Home size={32} />
+                    <div className="login-logo">
+                        <Lock size={28} />
                     </div>
-                    <h1>Griya Sakinah</h1>
-                    <p>Sistem Pembayaran Angsuran</p>
+                    <h1>Masukkan PIN</h1>
+                    <p>Masukkan 4 digit PIN admin</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="login-form">
-                    {error && (
-                        <div className="login-error">
-                            <span>{error}</span>
-                        </div>
-                    )}
+                {error && (
+                    <div className="login-error">
+                        <span>{error}</span>
+                    </div>
+                )}
 
-                    <div className="form-group">
-                        <label htmlFor="username">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Masukkan username"
-                            required
-                            autoComplete="username"
+                {/* PIN Dots */}
+                <div className="pin-dots">
+                    {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+                        <div
+                            key={i}
+                            className={`pin-dot ${i < pin.length ? 'filled' : ''} ${loading ? 'loading' : ''}`}
                         />
-                    </div>
+                    ))}
+                </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <div className="password-input">
-                            <input
-                                type={showPassword ? 'text' : 'password'}
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Masukkan password"
-                                required
-                                autoComplete="current-password"
-                            />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
-                        </div>
-                    </div>
+                {/* Hidden input for mobile keyboard */}
+                <input
+                    ref={pinInputRef}
+                    type="tel"
+                    className="pin-hidden-input"
+                    value={pin}
+                    onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, PIN_LENGTH);
+                        setPin(val);
+                        setError('');
+                    }}
+                    maxLength={PIN_LENGTH}
+                    autoFocus
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                />
 
-                    <button type="submit" className="login-button" disabled={loading}>
-                        {loading ? (
-                            <span className="loading-spinner"></span>
-                        ) : (
-                            <>
-                                <LogIn size={20} />
-                                <span>Masuk</span>
-                            </>
-                        )}
+                {/* Numpad */}
+                <div className="pin-numpad">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(digit => (
+                        <button
+                            key={digit}
+                            className="numpad-btn"
+                            onClick={() => handlePinDigit(String(digit))}
+                            disabled={loading || pin.length >= PIN_LENGTH}
+                            type="button"
+                        >
+                            {digit}
+                        </button>
+                    ))}
+                    <button
+                        className="numpad-btn back-btn"
+                        onClick={() => setSelectedMode(null)}
+                        type="button"
+                    >
+                        <ArrowLeft size={20} />
                     </button>
-                </form>
+                    <button
+                        className="numpad-btn"
+                        onClick={() => handlePinDigit('0')}
+                        disabled={loading || pin.length >= PIN_LENGTH}
+                        type="button"
+                    >
+                        0
+                    </button>
+                    <button
+                        className="numpad-btn delete-btn"
+                        onClick={handlePinDelete}
+                        disabled={loading || pin.length === 0}
+                        type="button"
+                    >
+                        <Delete size={20} />
+                    </button>
+                </div>
 
                 <div className="login-footer">
-                    <div className="credentials-list">
-                        <span><strong>User:</strong> devi</span>
-                        <span><strong>Pass:</strong> sakinah2026</span>
-                    </div>
                     <Link to="/" className="portal-link">
                         <ArrowLeft size={16} />
-                        Kembali ke Portal Griya Sakinah
+                        Kembali ke Portal
                     </Link>
                 </div>
             </div>
