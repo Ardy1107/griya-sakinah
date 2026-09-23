@@ -182,36 +182,17 @@ export default function WargaPortal() {
             {/* Notification Panel */}
             <NotificationCenter isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
 
-            {/* Community Quick Links - Always visible */}
+            {/* Community Quick Links - DISABLED (Coming Soon)
             <div className="community-section">
                 <h2 className="section-title">🏘️ Fitur Komunitas</h2>
                 <div className="quick-links-grid">
-                    <Link to="/kalender" className="quick-link-card kalender">
-                        <div className="ql-icon">
-                            <Calendar size={24} />
-                        </div>
-                        <span>Kalender</span>
-                    </Link>
-                    <Link to="/voting" className="quick-link-card voting">
-                        <div className="ql-icon">
-                            <Vote size={24} />
-                        </div>
-                        <span>Voting</span>
-                    </Link>
-                    <Link to="/keamanan" className="quick-link-card keamanan">
-                        <div className="ql-icon">
-                            <Shield size={24} />
-                        </div>
-                        <span>Keamanan</span>
-                    </Link>
-                    <Link to="/chat" className="quick-link-card chat">
-                        <div className="ql-icon">
-                            <MessageCircle size={24} />
-                        </div>
-                        <span>Chat</span>
-                    </Link>
+                    <Link to="/kalender" className="quick-link-card kalender">...</Link>
+                    <Link to="/voting" className="quick-link-card voting">...</Link>
+                    <Link to="/keamanan" className="quick-link-card keamanan">...</Link>
+                    <Link to="/chat" className="quick-link-card chat">...</Link>
                 </div>
             </div>
+            */}
 
             {/* Search Form - Cek Status Layanan */}
             <div className="community-section">
