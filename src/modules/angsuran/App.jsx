@@ -149,7 +149,7 @@ function AngsuranRoutes() {
                         <Route
                             path="audit"
                             element={
-                                <ProtectedRoute allowedRoles={['developer', 'superadmin']}>
+                                <ProtectedRoute allowedRoles={['admin', 'developer', 'superadmin']}>
                                     <AuditLog />
                                 </ProtectedRoute>
                             }

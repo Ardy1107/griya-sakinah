@@ -142,14 +142,14 @@ const Layout = () => {
             icon: FileText,
             label: 'Laporan',
             tooltip: 'Buat dan unduh laporan keuangan',
-            roles: ['admin', 'superadmin']
+            roles: ['admin', 'developer', 'superadmin']
         },
         {
             path: '/angsuran/admin/audit',
             icon: FileText,
             label: 'Audit Log',
             tooltip: 'Riwayat aktivitas sistem',
-            roles: ['admin', 'superadmin']
+            roles: ['admin', 'developer', 'superadmin']
         },
         {
             path: '/angsuran/admin/maintenance',
