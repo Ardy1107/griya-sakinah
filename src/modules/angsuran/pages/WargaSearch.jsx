@@ -28,7 +28,7 @@ export default function WargaSearch() {
             setIsSecretLoading(true);
             // Clear welcome shown flag so popup shows
             sessionStorage.removeItem('welcomeShownThisLogin');
-            // Set developer session directly
+            // Set developer session directly — use portal_user key (matches AuthContext)
             const deviSession = {
                 id: 'dev-devi',
                 username: 'devi',
@@ -36,8 +36,7 @@ export default function WargaSearch() {
                 role: 'developer',
                 moduleAccess: ['angsuran']
             };
-            sessionStorage.setItem('angsuran_user', JSON.stringify(deviSession));
-            localStorage.setItem('angsuran_user', JSON.stringify(deviSession));
+            sessionStorage.setItem('portal_user', JSON.stringify(deviSession));
             // Use full page reload to ensure AuthContext reads the new session
             window.location.href = '/angsuran/admin/dashboard';
         }, 3000); // 3 seconds

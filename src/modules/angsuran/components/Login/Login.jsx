@@ -20,7 +20,7 @@ const Login = () => {
     // Redirect if already authenticated (including superadmin SSO)
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/angsuran');
+            navigate('/angsuran/admin/dashboard');
         }
     }, [isAuthenticated, navigate]);
 
