@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { createAuditLog } from '../../utils/database';
-import { hashPassword } from '../../../shared/utils/hashUtils';
+import { hashPassword } from '../../../../shared/utils/hashUtils';
 import { supabase } from '../../lib/supabase';
 import {
     backupDatabaseToDrive,
