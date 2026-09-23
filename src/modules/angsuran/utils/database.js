@@ -352,16 +352,45 @@ export const getUsersSync = async () => {
 // ============ STATS & REPORTS ============
 export const getPaymentStats = async () => {
     const sb = ensureSupabase();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     const { data: payments, error } = await sb
         .from('payments')
         .select('*');
     if (error) throw error;
 
-    const totalPayments = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
-    const completedPayments = payments.filter(p => p.status === 'completed');
-    const pendingPayments = payments.filter(p => p.status === 'pending');
+    const { data: units, error: unitsError } = await sb
+        .from('units')
+        .select('id')
+        .eq('status', 'aktif');
+    if (unitsError) throw unitsError;
+
+    // Total income this month
+    const thisMonthPayments = (payments || []).filter(p => {
+        const d = new Date(p.created_at);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+    const totalThisMonth = thisMonthPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+    // Units that have NOT paid pokok this month
+    const paidUnitIds = new Set(
+        thisMonthPayments
+            .filter(p => p.category === 'pokok')
+            .map(p => p.unit_id)
+    );
+    const totalUnits = (units || []).length;
+    const overdueUnits = totalUnits - paidUnitIds.size;
+
+    const totalPayments = (payments || []).reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    const completedPayments = (payments || []).filter(p => p.status === 'completed');
+    const pendingPayments = (payments || []).filter(p => p.status === 'pending');
 
     return {
+        totalThisMonth,
+        totalUnits,
+        overdueUnits,
         totalPayments,
         totalAmount: totalPayments,
         completedCount: completedPayments.length,
@@ -382,43 +411,40 @@ export const getAgingReceivable = async () => {
     const { data: payments, error: paymentsError } = await sb.from('payments').select('*');
     if (paymentsError) throw paymentsError;
 
-    // Calculate aging based on payment status
-    const aging = {
-        current: [],
-        days30: [],
-        days60: [],
-        days90: [],
-        over90: []
-    };
-
+    // Return a flat array of overdue units for the Dashboard table
     const now = new Date();
-    units.forEach(unit => {
-        const unitPayments = payments.filter(p => p.unit_id === unit.id);
+    const overdueList = [];
+
+    (units || []).forEach(unit => {
+        const unitPayments = (payments || []).filter(p => p.unit_id === unit.id);
         const lastPayment = unitPayments.sort((a, b) =>
             new Date(b.created_at) - new Date(a.created_at)
         )[0];
 
-        if (!lastPayment) {
-            aging.over90.push({ unit, daysPastDue: 999 });
-        } else {
-            const lastPaymentDate = new Date(lastPayment.created_at);
-            const daysSincePayment = Math.floor((now - lastPaymentDate) / (1000 * 60 * 60 * 24));
+        const lastPaymentDate = lastPayment ? new Date(lastPayment.created_at) : null;
+        const daysSincePayment = lastPaymentDate
+            ? Math.floor((now - lastPaymentDate) / (1000 * 60 * 60 * 24))
+            : 999;
 
-            if (daysSincePayment <= 30) {
-                aging.current.push({ unit, daysPastDue: 0 });
-            } else if (daysSincePayment <= 60) {
-                aging.days30.push({ unit, daysPastDue: daysSincePayment - 30 });
-            } else if (daysSincePayment <= 90) {
-                aging.days60.push({ unit, daysPastDue: daysSincePayment - 30 });
-            } else if (daysSincePayment <= 120) {
-                aging.days90.push({ unit, daysPastDue: daysSincePayment - 30 });
-            } else {
-                aging.over90.push({ unit, daysPastDue: daysSincePayment - 30 });
-            }
+        // Only include units overdue (>30 days since last payment)
+        if (daysSincePayment > 30) {
+            const totalPaid = unitPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+            overdueList.push({
+                id: unit.id,
+                blockNumber: unit.block_number,
+                residentName: unit.resident_name,
+                phone: unit.phone,
+                lastPaymentDate: lastPaymentDate ? lastPaymentDate.toISOString() : null,
+                daysSincePayment,
+                totalPaid
+            });
         }
     });
 
-    return aging;
+    // Sort by days since payment descending (worst first)
+    overdueList.sort((a, b) => b.daysSincePayment - a.daysSincePayment);
+
+    return overdueList;
 };
 
 export const getAgingReceivableSync = async () => {
@@ -434,28 +460,59 @@ export const getMonthlyIncome = async (year = new Date().getFullYear()) => {
         .lte('created_at', `${year}-12-31`);
     if (error) throw error;
 
-    const monthlyData = Array(12).fill(0);
-    payments.forEach(p => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const monthlyData = monthNames.map(name => ({ month: name, total: 0 }));
+
+    (payments || []).forEach(p => {
         const month = new Date(p.created_at).getMonth();
-        monthlyData[month] += Number(p.amount || 0);
+        monthlyData[month].total += Number(p.amount || 0);
     });
 
-    return monthlyData;
+    // Return only the last 6 months up to current month
+    const currentMonth = new Date().getMonth();
+    const start = Math.max(0, currentMonth - 5);
+    return monthlyData.slice(start, currentMonth + 1);
 };
 
 export const getMonthlyIncomeSync = async (year) => {
     return await getMonthlyIncome(year);
 };
 
-export const getMonthlyBalance = async (year = new Date().getFullYear()) => {
-    const income = await getMonthlyIncome(year);
-    // For now, return income as balance (no expenses in angsuran module)
-    return income.map((amount, index) => ({
-        month: index + 1,
-        income: amount,
-        expense: 0,
-        balance: amount
-    }));
+export const getMonthlyBalance = async (month, year) => {
+    // Accept (month, year) as Dashboard calls it: getMonthlyBalance(now.getMonth(), now.getFullYear())
+    // If called with only year (legacy), treat first arg as year
+    const targetMonth = (year !== undefined) ? month : new Date().getMonth();
+    const targetYear = (year !== undefined) ? year : (month || new Date().getFullYear());
+
+    const sb = ensureSupabase();
+    const monthStart = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`;
+    const nextMonth = targetMonth === 11 ? 0 : targetMonth + 1;
+    const nextYear = targetMonth === 11 ? targetYear + 1 : targetYear;
+    const monthEnd = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-01`;
+
+    // Get payments for the month
+    const { data: payments } = await sb
+        .from('payments')
+        .select('amount')
+        .gte('created_at', monthStart)
+        .lt('created_at', monthEnd);
+
+    const totalIncome = (payments || []).reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+    // Get expenses for the month
+    const { data: expenses } = await sb
+        .from('expenses')
+        .select('amount')
+        .gte('date', monthStart)
+        .lt('date', monthEnd);
+
+    const totalExpenses = (expenses || []).reduce((sum, e) => sum + Number(e.amount || 0), 0);
+
+    return {
+        totalIncome,
+        totalExpenses,
+        netBalance: totalIncome - totalExpenses
+    };
 };
 
 export const getMonthlyBalanceSync = async (year) => {
@@ -624,7 +681,5 @@ export default {
     // V2 Dashboard
     getCollectionRate, getAgingBreakdown, getRevenueByMonth,
     // V7 Maintenance
-    getMaintenanceLogs, createMaintenanceLog, updateMaintenanceLog, deleteMaintenanceLog,
-    // Session
-    getSession, setSession, clearSession
+    getMaintenanceLogs, createMaintenanceLog, updateMaintenanceLog, deleteMaintenanceLog
 };
