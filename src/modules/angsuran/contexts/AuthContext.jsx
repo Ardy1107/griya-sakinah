@@ -1,6 +1,8 @@
 /**
  * Angsuran Auth Context - Uses Supabase users table
  * Supports: PIN-based admin login & one-click developer login
+ * 
+ * users table columns: id, nama, email, role, created_at, pin_hash
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -56,6 +58,15 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
+    // Helper: map DB row to user object
+    const mapDbUser = (data) => ({
+        id: data.id,
+        username: data.email || data.nama,
+        name: data.nama,
+        role: data.role,
+        moduleAccess: ['angsuran']
+    });
+
     // Legacy username+password login (kept for backward compatibility)
     const login = async (username, password) => {
         if (!isSupabaseConfigured()) {
@@ -65,10 +76,11 @@ export const AuthProvider = ({ children }) => {
         try {
             const hashedPassword = await hashPassword(password);
 
+            // Try matching email or nama
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
-                .eq('username', username.toLowerCase())
+                .or(`email.eq.${username.toLowerCase()},nama.ilike.${username}`)
                 .eq('password_hash', hashedPassword)
                 .single();
 
@@ -76,14 +88,7 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, error: 'Username atau password salah' };
             }
 
-            const userData = {
-                id: data.id,
-                username: data.username,
-                name: data.name,
-                role: data.role,
-                moduleAccess: ['angsuran']
-            };
-
+            const userData = mapDbUser(data);
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };
@@ -111,40 +116,10 @@ export const AuthProvider = ({ children }) => {
                 .single();
 
             if (error || !data) {
-                // Fallback: try matching against password_hash for backward compatibility
-                const hashedAlt = await hashPassword(pin);
-                const { data: altData, error: altError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('role', 'admin')
-                    .eq('password_hash', hashedAlt)
-                    .single();
-
-                if (altError || !altData) {
-                    return { success: false, error: 'PIN salah' };
-                }
-
-                const userData = {
-                    id: altData.id,
-                    username: altData.username,
-                    name: altData.name,
-                    role: altData.role,
-                    moduleAccess: ['angsuran']
-                };
-
-                sessionStorage.setItem('portal_user', JSON.stringify(userData));
-                setUser(userData);
-                return { success: true };
+                return { success: false, error: 'PIN salah' };
             }
 
-            const userData = {
-                id: data.id,
-                username: data.username,
-                name: data.name,
-                role: data.role,
-                moduleAccess: ['angsuran']
-            };
-
+            const userData = mapDbUser(data);
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };
@@ -172,14 +147,7 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, error: 'Akun developer tidak ditemukan' };
             }
 
-            const userData = {
-                id: data.id,
-                username: data.username,
-                name: data.name,
-                role: data.role,
-                moduleAccess: ['angsuran']
-            };
-
+            const userData = mapDbUser(data);
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };
