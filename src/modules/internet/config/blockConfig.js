@@ -1,4 +1,4 @@
-// Block Configuration - Bank details & pricing per block
+// Block Configuration - Bank details, pricing & operational costs per block
 export const BLOCK_CONFIG = {
   A: {
     id: 'A',
@@ -16,6 +16,11 @@ export const BLOCK_CONFIG = {
     admin: {
       name: 'Ardyanto Pri Utomo',
       role: 'Pengurus Internet Blok A'
+    },
+    // Monthly operational costs for Blok A
+    expenses: {
+      Bandwidth: { label: '🌐 Internet Starlink', nominal: 750000 },
+      Listrik: { label: '⚡ Listrik Starlink & Perangkat Jaringan', nominal: 75000 }
     }
   },
   B: {
@@ -34,6 +39,12 @@ export const BLOCK_CONFIG = {
     admin: {
       name: 'Ardyanto Pri Utomo',
       role: 'Pengurus Internet Blok B'
+    },
+    // Monthly operational costs for Blok B
+    expenses: {
+      Bandwidth: { label: '🌐 Internet Starlink', nominal: 800000 },
+      Support: { label: '🔧 Support & Maintenance', nominal: 500000 },
+      Listrik: { label: '⚡ Listrik Starlink & Perangkat Jaringan', nominal: 75000 }
     }
   }
 }
@@ -45,4 +56,16 @@ export function getBlockConfig(blockId) {
 export function getBlockBankInfo(blockId) {
   const config = getBlockConfig(blockId)
   return config?.bank || null
+}
+
+// Get the fixed expense amount for a category in a specific block
+export function getBlockExpenseAmount(blockId, category) {
+  const config = getBlockConfig(blockId)
+  return config?.expenses?.[category]?.nominal || null
+}
+
+// Get all expense categories for a block (returns config-aware categories)
+export function getBlockExpenseCategories(blockId) {
+  const config = getBlockConfig(blockId)
+  return config?.expenses || {}
 }

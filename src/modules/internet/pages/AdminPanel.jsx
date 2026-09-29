@@ -7,7 +7,8 @@ import {
     LogOut, Menu, X, Eye, Download, FileText, BookOpen,
     Filter, ChevronDown, Shield, Settings, Moon, Sun,
     TrendingUp, TrendingDown, Wallet, Search, Trash2, Edit3,
-    CheckCircle, XCircle, AlertTriangle, RefreshCw, Key, EyeOff
+    CheckCircle, XCircle, AlertTriangle, RefreshCw, Key, EyeOff,
+    Phone, Save, Printer, User
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useAdminOperations } from '../hooks/useSupabase'
@@ -25,10 +26,12 @@ import PeriodPicker from '../components/PeriodPicker'
 import StarlinkReminder from '../components/StarlinkReminder'
 import ImportData from '../components/ImportData'
 import ConfirmModal from '../components/ConfirmModal'
+import DigitalReceipt from '../components/DigitalReceipt'
 import { useToast } from '../components/Toast'
 import { getMonthName, formatCurrency, formatDate } from '../utils/helpers'
 import { exportToExcel, exportBackup } from '../utils/export'
 import { getBlockConfig } from '../config/blockConfig'
+import { validatePhoneNumber } from '../utils/helpers'
 
 const TABS = [
     { id: 'transparansi', label: 'Transparansi', icon: Eye, group: 'main' },
@@ -65,7 +68,7 @@ export default function AdminPanel() {
     const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
     const { residents, refetch: refetchResidents } = useResidents()
     const { expenses: allExpenses } = useExpenses()
-    const { deletePayment, deleteExpense } = useAdminOperations()
+    const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
     const toast = useToast()
 
     // Filter data by admin block filter (for admin view only — beyond BlockContext)
@@ -278,7 +281,28 @@ export default function AdminPanel() {
                             </div>
                         </div>
                         <ResidentForm onSuccess={handleRefresh} />
-                        <ResidentListAdmin residents={filteredResidents} />
+                        <ResidentListAdmin
+                            residents={filteredResidents}
+                            onUpdateResident={async (id, data) => {
+                                try {
+                                    await updateResident(id, data)
+                                    toast.success('Data warga berhasil diperbarui')
+                                    handleRefresh()
+                                } catch (e) {
+                                    toast.error('Gagal memperbarui: ' + e.message)
+                                }
+                            }}
+                            onDeleteResident={async (id) => {
+                                try {
+                                    await deleteResident(id)
+                                    toast.success('Warga berhasil dihapus')
+                                    handleRefresh()
+                                } catch (e) {
+                                    toast.error('Gagal menghapus: ' + e.message)
+                                }
+                            }}
+                            payments={payments}
+                        />
                     </div>
                 )
 
@@ -510,6 +534,7 @@ export default function AdminPanel() {
 function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, onDeletePayment, onDeleteExpense }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(null)
+    const [showReceipt, setShowReceipt] = useState(null)
 
     // Combine payments and expenses into one ledger
     const ledgerEntries = useMemo(() => {
@@ -672,13 +697,40 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                                             {formatCurrency(entry.saldo)}
                                         </td>
                                         <td>
-                                            <button
-                                                className="bukukas-delete-btn"
-                                                onClick={() => setConfirmDelete(entry)}
-                                                title="Hapus"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                {entry.source === 'payment' && (
+                                                    <button
+                                                        className="bukukas-receipt-btn"
+                                                        onClick={() => {
+                                                            const payment = payments.find(p => p.id === entry.id)
+                                                            const resident = payment?.resident || residents.find(r => r.id === payment?.resident_id)
+                                                            if (resident && payment) {
+                                                                setShowReceipt({ resident, payment })
+                                                            }
+                                                        }}
+                                                        title="Cetak Kwitansi"
+                                                        style={{
+                                                            background: 'none',
+                                                            border: '1px solid var(--color-primary)',
+                                                            color: 'var(--color-primary)',
+                                                            borderRadius: 'var(--radius-sm)',
+                                                            padding: '4px 6px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                        }}
+                                                    >
+                                                        <Printer size={14} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    className="bukukas-delete-btn"
+                                                    onClick={() => setConfirmDelete(entry)}
+                                                    title="Hapus"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -712,12 +764,39 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                                     <span className={`bukukas-mobile-amount ${entry.type}`}>
                                         {entry.type === 'masuk' ? '+' : '-'}{formatCurrency(entry.type === 'masuk' ? entry.debit : entry.kredit)}
                                     </span>
-                                    <button
-                                        className="bukukas-delete-btn"
-                                        onClick={() => setConfirmDelete(entry)}
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '6px' }}>
+                                        {entry.source === 'payment' && (
+                                            <button
+                                                className="bukukas-receipt-btn"
+                                                onClick={() => {
+                                                    const payment = payments.find(p => p.id === entry.id)
+                                                    const resident = payment?.resident || residents.find(r => r.id === payment?.resident_id)
+                                                    if (resident && payment) {
+                                                        setShowReceipt({ resident, payment })
+                                                    }
+                                                }}
+                                                title="Cetak Kwitansi"
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid var(--color-primary)',
+                                                    color: 'var(--color-primary)',
+                                                    borderRadius: 'var(--radius-sm)',
+                                                    padding: '4px 6px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <Printer size={14} />
+                                            </button>
+                                        )}
+                                        <button
+                                            className="bukukas-delete-btn"
+                                            onClick={() => setConfirmDelete(entry)}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -734,13 +813,26 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                     onCancel={() => setConfirmDelete(null)}
                 />
             )}
+
+            {/* Receipt Modal from Buku Kas */}
+            {showReceipt && (
+                <DigitalReceipt
+                    resident={showReceipt.resident}
+                    payment={showReceipt.payment}
+                    onClose={() => setShowReceipt(null)}
+                />
+            )}
         </div>
     )
 }
 
-// ─── Resident List for Admin ────────────────────────
-function ResidentListAdmin({ residents }) {
+// ─── Resident List for Admin (Full CRUD) ────────────────────────
+function ResidentListAdmin({ residents, onUpdateResident, onDeleteResident, payments = [] }) {
     const [searchTerm, setSearchTerm] = useState('')
+    const [editingId, setEditingId] = useState(null)
+    const [editData, setEditData] = useState({})
+    const [confirmDelete, setConfirmDelete] = useState(null)
+    const [saving, setSaving] = useState(false)
 
     const filtered = useMemo(() => {
         if (!searchTerm) return residents
@@ -751,6 +843,49 @@ function ResidentListAdmin({ residents }) {
             r.no_whatsapp?.includes(term)
         )
     }, [residents, searchTerm])
+
+    // Check if a resident has payments
+    const hasPayments = (residentId) => {
+        return payments.some(p => p.resident_id === residentId)
+    }
+
+    const startEdit = (resident) => {
+        setEditingId(resident.id)
+        setEditData({
+            blok_rumah: resident.blok_rumah || '',
+            nama_warga: resident.nama_warga || '',
+            no_whatsapp: resident.no_whatsapp || ''
+        })
+    }
+
+    const cancelEdit = () => {
+        setEditingId(null)
+        setEditData({})
+    }
+
+    const handleSave = async (id) => {
+        if (!editData.blok_rumah?.trim() || !editData.nama_warga?.trim()) return
+        if (editData.no_whatsapp && !validatePhoneNumber(editData.no_whatsapp)) return
+
+        setSaving(true)
+        try {
+            await onUpdateResident(id, {
+                blok_rumah: editData.blok_rumah.trim().toUpperCase(),
+                nama_warga: editData.nama_warga.trim(),
+                no_whatsapp: editData.no_whatsapp?.trim() || null
+            })
+            setEditingId(null)
+            setEditData({})
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!confirmDelete) return
+        await onDeleteResident(confirmDelete.id)
+        setConfirmDelete(null)
+    }
 
     return (
         <div className="card mt-3">
@@ -775,21 +910,162 @@ function ResidentListAdmin({ residents }) {
                 {filtered.map(r => {
                     const blockChar = r.blok_rumah?.charAt(0)?.toUpperCase()
                     const blockColor = blockChar === 'A' ? '#10b981' : blockChar === 'B' ? '#3b82f6' : 'var(--text-muted)'
+                    const isEditing = editingId === r.id
 
                     return (
-                        <div key={r.id} className="admin-resident-item">
-                            <div className="admin-resident-avatar" style={{ background: `${blockColor}20`, color: blockColor }}>
-                                {blockChar || '?'}
-                            </div>
-                            <div className="admin-resident-info">
-                                <span className="admin-resident-blok" style={{ color: blockColor }}>{r.blok_rumah}</span>
-                                <span className="admin-resident-name">{r.nama_warga}</span>
-                            </div>
-                            <span className="admin-resident-phone">{r.no_whatsapp || '-'}</span>
+                        <div key={r.id} className="admin-resident-item" style={{
+                            ...(isEditing && {
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--color-primary)',
+                                borderRadius: 'var(--radius-md)',
+                                padding: 'var(--space-md)'
+                            })
+                        }}>
+                            {isEditing ? (
+                                /* Edit Mode */
+                                <div style={{ width: '100%' }}>
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '100px 1fr 140px',
+                                        gap: 'var(--space-sm)',
+                                        marginBottom: 'var(--space-sm)'
+                                    }}>
+                                        <input
+                                            type="text"
+                                            value={editData.blok_rumah}
+                                            onChange={(e) => setEditData(prev => ({ ...prev, blok_rumah: e.target.value }))}
+                                            className="form-input"
+                                            placeholder="Blok"
+                                            style={{ fontSize: '0.8rem' }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={editData.nama_warga}
+                                            onChange={(e) => setEditData(prev => ({ ...prev, nama_warga: e.target.value }))}
+                                            className="form-input"
+                                            placeholder="Nama warga"
+                                            style={{ fontSize: '0.8rem' }}
+                                        />
+                                        <input
+                                            type="tel"
+                                            value={editData.no_whatsapp}
+                                            onChange={(e) => setEditData(prev => ({ ...prev, no_whatsapp: e.target.value }))}
+                                            className="form-input"
+                                            placeholder="WhatsApp"
+                                            style={{ fontSize: '0.8rem' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'flex-end' }}>
+                                        <button
+                                            className="btn btn-sm"
+                                            onClick={cancelEdit}
+                                            style={{
+                                                background: 'var(--bg-secondary)',
+                                                border: '1px solid var(--color-border)',
+                                                color: 'var(--text-secondary)',
+                                                fontSize: '0.75rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            <X size={14} />
+                                            Batal
+                                        </button>
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => handleSave(r.id)}
+                                            disabled={saving}
+                                            style={{
+                                                fontSize: '0.75rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
+                                        >
+                                            <Save size={14} />
+                                            {saving ? 'Menyimpan...' : 'Simpan'}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* View Mode */
+                                <>
+                                    <div className="admin-resident-avatar" style={{ background: `${blockColor}20`, color: blockColor }}>
+                                        {blockChar || '?'}
+                                    </div>
+                                    <div className="admin-resident-info">
+                                        <span className="admin-resident-blok" style={{ color: blockColor }}>{r.blok_rumah}</span>
+                                        <span className="admin-resident-name">{r.nama_warga}</span>
+                                    </div>
+                                    <span className="admin-resident-phone">
+                                        {r.no_whatsapp ? (
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <Phone size={12} />
+                                                {r.no_whatsapp}
+                                            </span>
+                                        ) : '-'}
+                                    </span>
+                                    <div className="admin-resident-actions" style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
+                                        <button
+                                            className="btn btn-sm"
+                                            onClick={() => startEdit(r)}
+                                            title="Edit"
+                                            style={{
+                                                background: 'none',
+                                                border: '1px solid var(--color-primary)',
+                                                color: 'var(--color-primary)',
+                                                padding: '4px 8px',
+                                                borderRadius: 'var(--radius-sm)',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            <Edit3 size={13} />
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="btn btn-sm"
+                                            onClick={() => setConfirmDelete(r)}
+                                            title="Hapus"
+                                            style={{
+                                                background: 'none',
+                                                border: '1px solid var(--color-danger)',
+                                                color: 'var(--color-danger)',
+                                                padding: '4px 8px',
+                                                borderRadius: 'var(--radius-sm)',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                fontSize: '0.75rem'
+                                            }}
+                                        >
+                                            <Trash2 size={13} />
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )
                 })}
             </div>
+
+            {/* Delete Confirmation with Warning */}
+            {confirmDelete && (
+                <ConfirmModal
+                    title="Hapus Warga?"
+                    message={
+                        hasPayments(confirmDelete.id)
+                            ? `⚠️ PERHATIAN: "${confirmDelete.nama_warga}" (${confirmDelete.blok_rumah}) memiliki data pembayaran. Menghapus warga ini bisa menyebabkan data pembayaran menjadi orphan. Yakin ingin menghapus?`
+                            : `Yakin ingin menghapus "${confirmDelete.nama_warga}" (${confirmDelete.blok_rumah})? Aksi ini tidak bisa dibatalkan.`
+                    }
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={() => setConfirmDelete(null)}
+                />
+            )}
         </div>
     )
 }

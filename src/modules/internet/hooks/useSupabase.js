@@ -289,6 +289,47 @@ export function useAdminOperations() {
         if (error) throw error
     }
 
+    // Update resident
+    const updateResident = async (residentId, updates) => {
+        setLoading(true)
+        setError(null)
+        try {
+            const { data, error } = await supabaseAdmin
+                .from('residents')
+                .update(updates)
+                .eq('id', residentId)
+                .select()
+                .single()
+
+            if (error) throw error
+            return data
+        } catch (err) {
+            setError(err.message)
+            throw err
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Delete resident
+    const deleteResident = async (residentId) => {
+        setLoading(true)
+        setError(null)
+        try {
+            const { error } = await supabaseAdmin
+                .from('residents')
+                .delete()
+                .eq('id', residentId)
+
+            if (error) throw error
+        } catch (err) {
+            setError(err.message)
+            throw err
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return {
         loading,
         error,
@@ -296,6 +337,8 @@ export function useAdminOperations() {
         updatePaymentReceipt,
         createExpense,
         createResident,
+        updateResident,
+        deleteResident,
         deletePayment,
         deleteExpense
     }

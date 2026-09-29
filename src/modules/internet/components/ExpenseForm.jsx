@@ -1,17 +1,41 @@
-// Expense Form Component with Multi-Item Support & Starlink Month Picker
+// Expense Form Component with Multi-Item Support & Block-Aware Pricing
 import { useState, useMemo } from 'react'
-import { Receipt, FileText, DollarSign, Tag, Calendar, Loader2, Check, Plus, Trash2, List, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Receipt, FileText, DollarSign, Tag, Calendar, Loader2, Check, Plus, Trash2, List, ChevronRight, Filter } from 'lucide-react'
 import { useAdminOperations } from '../hooks/useSupabase'
 import { formatCurrency, getMonthName } from '../utils/helpers'
 import { useBlock } from '../context/BlockContext'
+import { getBlockConfig, BLOCK_CONFIG } from '../config/blockConfig'
 
-// NOTE: Categories must match database constraint
-// Run supabase_update_v4.sql to enable new categories
-const EXPENSE_CATEGORIES = [
-    { value: 'Bandwidth', label: '🌐 Bandwidth / ISP', fixed: 750000 },
-    { value: 'Maintenance', label: '🔧 Maintenance / Perawatan' },
-    { value: 'Lainnya', label: '💡 Lainnya' }
-]
+// Build expense categories dynamically based on block
+function getExpenseCategories(blockId) {
+    const config = getBlockConfig(blockId)
+    const categories = []
+
+    if (config?.expenses) {
+        Object.entries(config.expenses).forEach(([value, data]) => {
+            categories.push({ value, label: data.label, fixed: data.nominal })
+        })
+    } else {
+        // Fallback when no block is selected — show all unique categories
+        const seen = new Set()
+        Object.values(BLOCK_CONFIG).forEach(block => {
+            if (block.expenses) {
+                Object.entries(block.expenses).forEach(([value, data]) => {
+                    if (!seen.has(value)) {
+                        seen.add(value)
+                        categories.push({ value, label: data.label })
+                    }
+                })
+            }
+        })
+    }
+
+    // Always add generic categories
+    categories.push({ value: 'Maintenance', label: '🔧 Maintenance / Perawatan' })
+    categories.push({ value: 'Lainnya', label: '💡 Lainnya' })
+
+    return categories
+}
 
 const EMPTY_ITEM = { nama: '', qty: 1, harga: 0 }
 
@@ -21,6 +45,15 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     const currentYear = now.getFullYear()
+
+    // If not in block-specific mode, admin can choose which block
+    const [selectedBlock, setSelectedBlock] = useState(blockId || 'B')
+    const effectiveBlockId = isBlockSpecific ? blockId : selectedBlock
+
+    // Dynamic categories based on effective block
+    const EXPENSE_CATEGORIES = useMemo(() => {
+        return getExpenseCategories(effectiveBlockId)
+    }, [effectiveBlockId])
 
     // Get list of months already paid for Bandwidth/ISP
     const paidStarlinkMonths = useMemo(() => {
@@ -41,6 +74,12 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                 return `${date.getMonth() + 1}-${date.getFullYear()}`
             })
     }, [expenses])
+
+    // Get default fixed amount for the initial category
+    const getFixedAmount = (category, blk) => {
+        const config = getBlockConfig(blk)
+        return config?.expenses?.[category]?.nominal || 0
+    }
 
     // Check if CURRENT month Starlink is already paid (to lock category)
     const isCurrentMonthStarlinkPaid = useMemo(() => {
@@ -69,10 +108,21 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
     // Starlink month picker state - start from next unpaid month
     const [starlinkPeriod, setStarlinkPeriod] = useState(() => getNextUnpaidMonth())
 
+    // Determine initial category and amount
+    const getInitialCategory = () => {
+        if (isCurrentMonthStarlinkPaid) return 'Maintenance'
+        return 'Bandwidth'
+    }
+
+    const getInitialAmount = () => {
+        if (isCurrentMonthStarlinkPaid) return 0
+        return getFixedAmount('Bandwidth', effectiveBlockId)
+    }
+
     const [formData, setFormData] = useState({
         keterangan: isCurrentMonthStarlinkPaid ? '' : 'Pembayaran ISP Starlink',
-        nominal: isCurrentMonthStarlinkPaid ? 0 : 750000,
-        kategori: isCurrentMonthStarlinkPaid ? 'Maintenance' : 'Bandwidth',
+        nominal: getInitialAmount(),
+        kategori: getInitialCategory(),
         tanggal: now.toISOString().split('T')[0]
     })
 
@@ -85,6 +135,11 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
     const isStarlinkPeriodPaid = useMemo(() => {
         return paidStarlinkMonths.includes(`${starlinkPeriod.month}-${starlinkPeriod.year}`)
     }, [paidStarlinkMonths, starlinkPeriod])
+
+    // Check if selected category has a fixed price
+    const currentCategoryFixed = useMemo(() => {
+        return EXPENSE_CATEGORIES.find(c => c.value === formData.kategori)?.fixed
+    }, [formData.kategori, EXPENSE_CATEGORIES])
 
     // Calculate total from items
     const calculateItemsTotal = () => {
@@ -111,20 +166,33 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
         })
     }
 
-
+    // Handle block change (when not in block-specific mode)
+    const handleBlockChange = (newBlock) => {
+        setSelectedBlock(newBlock)
+        // Re-calculate amount if current category has a fixed price in the new block
+        const config = getBlockConfig(newBlock)
+        const fixedAmount = config?.expenses?.[formData.kategori]?.nominal
+        if (fixedAmount) {
+            setFormData(prev => ({ ...prev, nominal: fixedAmount }))
+        }
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target
 
-        // Auto-fill for Starlink category
+        // Auto-fill for fixed-price categories
         if (name === 'kategori') {
             const category = EXPENSE_CATEGORIES.find(c => c.value === value)
             if (category?.fixed) {
+                const autoKeterangan = value === 'Bandwidth' ? 'Pembayaran ISP Starlink'
+                    : value === 'Support' ? 'Biaya Support & Maintenance'
+                    : value === 'Listrik' ? 'Biaya Listrik Starlink & Perangkat Jaringan'
+                    : ''
                 setFormData(prev => ({
                     ...prev,
                     [name]: value,
                     nominal: category.fixed,
-                    keterangan: 'Pembayaran ISP Starlink'
+                    keterangan: autoKeterangan
                 }))
                 return
             } else {
@@ -179,8 +247,8 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
             return
         }
 
-        // For non-ISP, require keterangan
-        if (formData.kategori !== 'Bandwidth' && !formData.keterangan.trim()) {
+        // For non-fixed categories, require keterangan
+        if (!currentCategoryFixed && !formData.keterangan.trim()) {
             setError('Keterangan wajib diisi')
             return
         }
@@ -202,19 +270,22 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
         }
 
         try {
-            // For Starlink, auto-generate keterangan from period
-            const finalKeterangan = formData.kategori === 'Bandwidth'
-                ? 'Pembayaran ISP Starlink'
-                : formData.keterangan
+            // For fixed categories, auto-generate keterangan
+            let finalKeterangan = formData.keterangan
+            if (formData.kategori === 'Bandwidth') {
+                finalKeterangan = 'Pembayaran ISP Starlink'
+            } else if (formData.kategori === 'Support' && !formData.keterangan.trim()) {
+                finalKeterangan = 'Biaya Support & Maintenance'
+            } else if (formData.kategori === 'Listrik' && !formData.keterangan.trim()) {
+                finalKeterangan = 'Biaya Listrik Starlink & Perangkat Jaringan'
+            }
 
             const expenseData = {
                 ...formData,
                 keterangan: finalKeterangan,
                 nominal: finalNominal,
-                // Auto-assign block_id if in block-specific mode
-                ...(blockId && { block_id: blockId })
-                // Note: items field disabled until database is updated
-                // items: useDetailItems ? items.filter(item => item.nama.trim()) : []
+                // Auto-assign block_id
+                block_id: effectiveBlockId || null
             }
 
             await createExpense(expenseData)
@@ -227,7 +298,7 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
 
             setFormData({
                 keterangan: formData.kategori === 'Bandwidth' ? 'Pembayaran ISP Starlink' : '',
-                nominal: formData.kategori === 'Bandwidth' ? 750000 : 0,
+                nominal: currentCategoryFixed || 0,
                 kategori: formData.kategori,
                 tanggal: new Date().toISOString().split('T')[0]
             })
@@ -242,6 +313,9 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
             setError(err.message)
         }
     }
+
+    // Get effective block name for display
+    const effectiveBlockName = getBlockConfig(effectiveBlockId)?.name || 'Semua Blok'
 
     return (
         <div className="card">
@@ -285,6 +359,52 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                     </div>
                 )}
 
+                {/* Block Selector (only when not in block-specific mode) */}
+                {!isBlockSpecific && (
+                    <div className="form-group">
+                        <label className="form-label">
+                            <Filter size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                            Blok Pengeluaran
+                        </label>
+                        <div style={{
+                            display: 'flex',
+                            gap: 'var(--space-sm)'
+                        }}>
+                            {Object.values(BLOCK_CONFIG).map(block => (
+                                <button
+                                    key={block.id}
+                                    type="button"
+                                    onClick={() => handleBlockChange(block.id)}
+                                    style={{
+                                        flex: 1,
+                                        padding: 'var(--space-sm) var(--space-md)',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: effectiveBlockId === block.id
+                                            ? `2px solid ${block.color}`
+                                            : '2px solid var(--color-border)',
+                                        background: effectiveBlockId === block.id
+                                            ? `${block.color}15`
+                                            : 'transparent',
+                                        color: effectiveBlockId === block.id
+                                            ? block.color
+                                            : 'var(--text-secondary)',
+                                        fontWeight: effectiveBlockId === block.id ? 700 : 500,
+                                        cursor: 'pointer',
+                                        fontSize: '0.875rem',
+                                        fontFamily: 'var(--font-sans)',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    {block.name}
+                                </button>
+                            ))}
+                        </div>
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>
+                            Harga Starlink {effectiveBlockName}: {formatCurrency(getFixedAmount('Bandwidth', effectiveBlockId))} /bln
+                        </small>
+                    </div>
+                )}
+
                 {/* Category */}
                 <div className="form-group">
                     <label className="form-label">
@@ -302,7 +422,7 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                                 key={cat.value}
                                 value={cat.value}
                             >
-                                {cat.label}
+                                {cat.label}{cat.fixed ? ` — ${formatCurrency(cat.fixed)}` : ''}
                             </option>
                         ))}
                     </select>
@@ -395,8 +515,8 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                     </div>
                 )}
 
-                {/* Description - only for non-Bandwidth */}
-                {formData.kategori !== 'Bandwidth' && (
+                {/* Description - only for non-fixed categories */}
+                {!currentCategoryFixed && (
                     <div className="form-group">
                         <label className="form-label">
                             <FileText size={14} style={{ display: 'inline', marginRight: '4px' }} />
@@ -415,7 +535,7 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                 )}
 
                 {/* Toggle Detail Items - only for non-fixed categories */}
-                {!EXPENSE_CATEGORIES.find(c => c.value === formData.kategori)?.fixed && (
+                {!currentCategoryFixed && (
                     <div className="form-group">
                         <label className="form-checkbox-label" style={{
                             display: 'flex',
@@ -541,8 +661,8 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                     </div>
                 )}
 
-                {/* Amount - hide for Starlink (fixed) and when using detail items */}
-                {!useDetailItems && formData.kategori !== 'Bandwidth' && (
+                {/* Amount - hide for fixed categories and when using detail items */}
+                {!useDetailItems && !currentCategoryFixed && (
                     <div className="form-group">
                         <label className="form-label">
                             <DollarSign size={14} style={{ display: 'inline', marginRight: '4px' }} />
@@ -557,13 +677,39 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                             min="0"
                             step="1000"
                             placeholder="0"
-                            required={!useDetailItems && formData.kategori !== 'Bandwidth'}
+                            required={!useDetailItems && !currentCategoryFixed}
                         />
                         {formData.nominal > 0 && (
                             <small className="text-muted" style={{ fontSize: '0.75rem' }}>
                                 Nominal: {formatCurrency(formData.nominal)}
                             </small>
                         )}
+                    </div>
+                )}
+
+                {/* Fixed amount display */}
+                {currentCategoryFixed && (
+                    <div className="form-group">
+                        <div style={{
+                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.04))',
+                            borderRadius: 'var(--radius-md)',
+                            padding: 'var(--space-md)',
+                            border: '1px solid rgba(16, 185, 129, 0.15)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                Nominal ({effectiveBlockName})
+                            </span>
+                            <span style={{
+                                fontSize: '1.25rem',
+                                fontWeight: 700,
+                                color: 'var(--color-primary)'
+                            }}>
+                                {formatCurrency(formData.nominal)}
+                            </span>
+                        </div>
                     </div>
                 )}
 
