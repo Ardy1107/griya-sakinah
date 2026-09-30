@@ -284,6 +284,18 @@ const Layout = () => {
                                 </div>
                                 <ChevronDown size={16} className={userMenuOpen ? 'rotated' : ''} />
                             </button>
+
+                            {userMenuOpen && (
+                                <div className="user-dropdown">
+                                    <div 
+                                        className="dropdown-item" 
+                                        onClick={handleLogout}
+                                    >
+                                        <LogOut size={16} />
+                                        <span>Keluar</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </header>
