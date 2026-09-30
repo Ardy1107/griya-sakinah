@@ -5,7 +5,7 @@ import { Home, LogIn, ArrowLeft, Shield, User, Lock, Delete } from 'lucide-react
 import './Login.css';
 
 const Login = () => {
-    const { login, loginWithPin, loginAsDeveloper, isAuthenticated } = useAuth();
+    const { loginWithPin, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [pin, setPin] = useState('');
     const [error, setError] = useState('');
@@ -13,7 +13,7 @@ const Login = () => {
     const [selectedMode, setSelectedMode] = useState(null); // 'admin' | 'developer'
     const pinInputRef = useRef(null);
 
-    const PIN_LENGTH = 4;
+    const PIN_LENGTH = 6;
 
     // Redirect if already authenticated
     useEffect(() => {
@@ -22,16 +22,16 @@ const Login = () => {
         }
     }, [isAuthenticated, navigate]);
 
-    // Focus pin input when admin mode selected
+    // Focus pin input when mode is selected
     useEffect(() => {
-        if (selectedMode === 'admin' && pinInputRef.current) {
+        if (selectedMode && pinInputRef.current) {
             pinInputRef.current.focus();
         }
     }, [selectedMode]);
 
     // Auto-submit when PIN is complete
     useEffect(() => {
-        if (pin.length === PIN_LENGTH && selectedMode === 'admin') {
+        if (pin.length === PIN_LENGTH && selectedMode) {
             handlePinSubmit();
         }
     }, [pin]);
@@ -56,7 +56,7 @@ const Login = () => {
 
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        const result = await loginWithPin(pin);
+        const result = await loginWithPin(pin, selectedMode);
         if (!result.success) {
             setError(result.error);
             setPin('');
@@ -65,29 +65,28 @@ const Login = () => {
         setLoading(false);
     };
 
-    const handleDeveloperLogin = async () => {
-        setLoading(true);
-        setError('');
-
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        const result = await loginAsDeveloper();
-        if (!result.success) {
-            setError(result.error);
-        }
-
-        setLoading(false);
-    };
-
     // Hidden PIN input for keyboard support
     const handleKeyDown = (e) => {
-        if (selectedMode !== 'admin') return;
+        if (!selectedMode) return;
 
         if (e.key >= '0' && e.key <= '9') {
             handlePinDigit(e.key);
         } else if (e.key === 'Backspace') {
             handlePinDelete();
         }
+    };
+
+    // Mode labels
+    const getModeLabel = () => {
+        if (selectedMode === 'admin') return 'Admin';
+        if (selectedMode === 'developer') return 'Developer';
+        return '';
+    };
+
+    const getModeColor = () => {
+        if (selectedMode === 'admin') return '#10b981';
+        if (selectedMode === 'developer') return '#3b82f6';
+        return '#64748b';
     };
 
     // Mode selection screen
@@ -120,28 +119,23 @@ const Login = () => {
                             </div>
                             <div className="mode-info">
                                 <span className="mode-title">Admin</span>
-                                <span className="mode-desc">Masuk dengan PIN</span>
+                                <span className="mode-desc">Masuk dengan PIN 6 digit</span>
                             </div>
                             <LogIn size={20} className="mode-arrow" />
                         </button>
 
                         <button
                             className="mode-card developer"
-                            onClick={handleDeveloperLogin}
-                            disabled={loading}
+                            onClick={() => setSelectedMode('developer')}
                         >
                             <div className="mode-icon developer">
                                 <User size={28} />
                             </div>
                             <div className="mode-info">
                                 <span className="mode-title">Developer</span>
-                                <span className="mode-desc">Masuk langsung</span>
+                                <span className="mode-desc">Masuk dengan PIN 6 digit</span>
                             </div>
-                            {loading ? (
-                                <span className="loading-spinner"></span>
-                            ) : (
-                                <LogIn size={20} className="mode-arrow" />
-                            )}
+                            <LogIn size={20} className="mode-arrow" />
                         </button>
                     </div>
 
@@ -162,7 +156,7 @@ const Login = () => {
         );
     }
 
-    // Admin PIN entry screen
+    // PIN entry screen (shared for both admin & developer)
     return (
         <div className="login-container" tabIndex={0} onKeyDown={handleKeyDown}>
             <div className="login-background">
@@ -172,11 +166,11 @@ const Login = () => {
 
             <div className="login-card">
                 <div className="login-header">
-                    <div className="login-logo">
-                        <Lock size={28} />
+                    <div className="login-logo" style={{ background: getModeColor() }}>
+                        {selectedMode === 'admin' ? <Shield size={28} /> : <User size={28} />}
                     </div>
-                    <h1>Masukkan PIN</h1>
-                    <p>Masukkan 4 digit PIN admin</p>
+                    <h1>Masukkan PIN {getModeLabel()}</h1>
+                    <p>Masukkan 6 digit PIN {getModeLabel().toLowerCase()}</p>
                 </div>
 
                 {error && (
@@ -227,7 +221,11 @@ const Login = () => {
                     ))}
                     <button
                         className="numpad-btn back-btn"
-                        onClick={() => setSelectedMode(null)}
+                        onClick={() => {
+                            setSelectedMode(null);
+                            setPin('');
+                            setError('');
+                        }}
                         type="button"
                     >
                         <ArrowLeft size={20} />

@@ -55,8 +55,12 @@ export default function AdminPanel() {
     const { user, loading, signOut, isAuthenticated, isSuperadmin } = useAuth()
     const { blockId, blockName, urlPrefix, isBlockSpecific } = useBlock()
     const { theme, toggleTheme } = useTheme()
-    const [activeTab, setActiveTab] = useState('transparansi')
+    const [activeTab, setActiveTab] = useState(() => sessionStorage.getItem('adminActiveTab') || 'transparansi')
     const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    useEffect(() => {
+        sessionStorage.setItem('adminActiveTab', activeTab)
+    }, [activeTab])
     const [adminBlockFilter, setAdminBlockFilter] = useState('all') // 'all', 'A', 'B'
     const [showBlockDropdown, setShowBlockDropdown] = useState(false)
     const [selectedPeriod, setSelectedPeriod] = useState(() => {
@@ -807,10 +811,11 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
             {/* Delete Confirmation */}
             {confirmDelete && (
                 <ConfirmModal
+                    isOpen={true}
                     title="Hapus Transaksi?"
                     message={`Yakin ingin menghapus "${confirmDelete.keterangan}"? Aksi ini tidak bisa dibatalkan.`}
                     onConfirm={handleDeleteConfirm}
-                    onCancel={() => setConfirmDelete(null)}
+                    onClose={() => setConfirmDelete(null)}
                 />
             )}
 
@@ -1056,6 +1061,7 @@ function ResidentListAdmin({ residents, onUpdateResident, onDeleteResident, paym
             {/* Delete Confirmation with Warning */}
             {confirmDelete && (
                 <ConfirmModal
+                    isOpen={true}
                     title="Hapus Warga?"
                     message={
                         hasPayments(confirmDelete.id)
@@ -1063,7 +1069,7 @@ function ResidentListAdmin({ residents, onUpdateResident, onDeleteResident, paym
                             : `Yakin ingin menghapus "${confirmDelete.nama_warga}" (${confirmDelete.blok_rumah})? Aksi ini tidak bisa dibatalkan.`
                     }
                     onConfirm={handleDeleteConfirm}
-                    onCancel={() => setConfirmDelete(null)}
+                    onClose={() => setConfirmDelete(null)}
                 />
             )}
         </div>

@@ -1,8 +1,8 @@
 /**
  * Angsuran Auth Context - Uses Supabase users table
- * Supports: PIN-based admin login & one-click developer login
+ * Supports: PIN-based login for both admin & developer
  * 
- * users table columns: id, nama, email, role, created_at, pin_hash
+ * users table columns: id, username, name, role, password_hash, pin_hash, created_at, updated_at
  */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -57,11 +57,11 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
-    // Helper: map DB row to user object
+    // Helper: map DB row to user object (matches actual DB column names)
     const mapDbUser = (data) => ({
         id: data.id,
-        username: data.email || data.nama,
-        name: data.nama,
+        username: data.username || data.name,
+        name: data.name,
         role: data.role,
         moduleAccess: ['angsuran']
     });
@@ -75,11 +75,11 @@ export const AuthProvider = ({ children }) => {
         try {
             const hashedPassword = await hashPassword(password);
 
-            // Try matching email or nama
+            // Try matching username or name
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
-                .or(`email.eq.${username.toLowerCase()},nama.ilike.${username}`)
+                .or(`username.eq.${username.toLowerCase()},name.ilike.${username}`)
                 .eq('password_hash', hashedPassword)
                 .single();
 
@@ -97,8 +97,8 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // PIN-based login for admin
-    const loginWithPin = async (pin) => {
+    // Unified PIN-based login for both admin & developer
+    const loginWithPin = async (pin, role = null) => {
         if (!isSupabaseConfigured()) {
             return { success: false, error: 'Database tidak tersedia' };
         }
@@ -106,58 +106,34 @@ export const AuthProvider = ({ children }) => {
         try {
             const hashedPin = await hashPassword(pin);
 
-            // Fetch all admin users (don't filter by pin_hash in query)
-            const { data: admins, error: adminErr } = await supabase
+            // Build query: fetch users with matching role (or all if no role specified)
+            let query = supabase
                 .from('users')
-                .select('*')
-                .eq('role', 'admin');
+                .select('*');
 
-            if (adminErr || !admins || admins.length === 0) {
-                console.error('[PIN Login] No admin users found:', adminErr);
-                return { success: false, error: 'Akun admin tidak ditemukan' };
+            if (role) {
+                query = query.eq('role', role);
             }
 
-            // Compare PIN hash in JavaScript
-            const matchedAdmin = admins.find(a => a.pin_hash === hashedPin);
-            
-            if (!matchedAdmin) {
+            const { data: users, error: fetchErr } = await query;
+
+            if (fetchErr || !users || users.length === 0) {
+                return { success: false, error: 'Akun tidak ditemukan' };
+            }
+
+            // Compare PIN hash securely in JavaScript (not exposed in query)
+            const matchedUser = users.find(u => u.pin_hash === hashedPin);
+
+            if (!matchedUser) {
                 return { success: false, error: 'PIN salah' };
             }
 
-            const userData = mapDbUser(matchedAdmin);
+            const userData = mapDbUser(matchedUser);
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };
         } catch (err) {
-            console.error('PIN login error:', err);
-            return { success: false, error: 'Koneksi bermasalah' };
-        }
-    };
-
-    // One-click developer login
-    const loginAsDeveloper = async () => {
-        if (!isSupabaseConfigured()) {
-            return { success: false, error: 'Database tidak tersedia' };
-        }
-
-        try {
-            // Fetch the developer user directly
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('role', 'developer')
-                .single();
-
-            if (error || !data) {
-                return { success: false, error: 'Akun developer tidak ditemukan' };
-            }
-
-            const userData = mapDbUser(data);
-            sessionStorage.setItem('portal_user', JSON.stringify(userData));
-            setUser(userData);
-            return { success: true };
-        } catch (err) {
-            if (import.meta.env.DEV) console.error('Developer login error:', err);
+            if (import.meta.env.DEV) console.error('PIN login error:', err);
             return { success: false, error: 'Koneksi bermasalah' };
         }
     };
@@ -182,7 +158,6 @@ export const AuthProvider = ({ children }) => {
             isSuperadmin,
             login,
             loginWithPin,
-            loginAsDeveloper,
             logout
         }}>
             {children}
