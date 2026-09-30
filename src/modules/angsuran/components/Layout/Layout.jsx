@@ -24,6 +24,52 @@ import {
 } from 'lucide-react';
 import './Layout.css';
 
+import { createPortal } from 'react-dom';
+
+// NavTooltip component with Portal for fixing fixed positioning inside transformed sidebars
+const NavTooltip = ({ text }) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef(null);
+
+    const handleMouseEnter = () => {
+        if (triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setPosition({
+                top: rect.top + rect.height / 2,
+                left: rect.right + 12
+            });
+        }
+        setIsVisible(true);
+    };
+
+    return (
+        <span
+            ref={triggerRef}
+            className="nav-tooltip-trigger"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={() => setIsVisible(false)}
+        >
+            <Info size={14} />
+            {isVisible && createPortal(
+                <div
+                    className="nav-tooltip-popup"
+                    style={{
+                        position: 'fixed',
+                        top: `${position.top}px`,
+                        left: `${position.left}px`,
+                        transform: 'translateY(-50%)',
+                        zIndex: 99999
+                    }}
+                >
+                    {text}
+                </div>,
+                document.body
+            )}
+        </span>
+    );
+};
+
 const Layout = () => {
     const { user, logout, isAdmin } = useAuth();
     const navigate = useNavigate();
@@ -42,49 +88,6 @@ const Layout = () => {
     const handleLogout = () => {
         logout();
         navigate('/angsuran/admin/login');
-    };
-
-    // NavTooltip component with fixed positioning
-    const NavTooltip = ({ text }) => {
-        const [isVisible, setIsVisible] = useState(false);
-        const [position, setPosition] = useState({ top: 0, left: 0 });
-        const triggerRef = useRef(null);
-
-        const handleMouseEnter = () => {
-            if (triggerRef.current) {
-                const rect = triggerRef.current.getBoundingClientRect();
-                setPosition({
-                    top: rect.top + rect.height / 2,
-                    left: rect.right + 12
-                });
-            }
-            setIsVisible(true);
-        };
-
-        return (
-            <span
-                ref={triggerRef}
-                className="nav-tooltip-trigger"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={() => setIsVisible(false)}
-            >
-                <Info size={14} />
-                {isVisible && (
-                    <div
-                        className="nav-tooltip-popup"
-                        style={{
-                            position: 'fixed',
-                            top: `${position.top}px`,
-                            left: `${position.left}px`,
-                            transform: 'translateY(-50%)',
-                            zIndex: 99999
-                        }}
-                    >
-                        {text}
-                    </div>
-                )}
-            </span>
-        );
     };
 
     const menuItems = [
