@@ -97,38 +97,34 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Unified PIN-based login for both admin & developer
+    // Secure PIN-based login via server-side RPC (no hash exposure)
     const loginWithPin = async (pin, role = null) => {
         if (!isSupabaseConfigured()) {
             return { success: false, error: 'Database tidak tersedia' };
         }
 
         try {
-            const hashedPin = await hashPassword(pin);
+            const params = { input_pin: pin };
+            if (role) params.input_role = role;
 
-            // Build query: fetch users with matching role (or all if no role specified)
-            let query = supabase
-                .from('users')
-                .select('*');
+            const { data, error: rpcError } = await supabase.rpc('verify_pin', params);
 
-            if (role) {
-                query = query.eq('role', role);
+            if (rpcError) {
+                if (import.meta.env.DEV) console.error('RPC error:', rpcError);
+                return { success: false, error: 'Koneksi bermasalah' };
             }
 
-            const { data: users, error: fetchErr } = await query;
-
-            if (fetchErr || !users || users.length === 0) {
-                return { success: false, error: 'Akun tidak ditemukan' };
+            if (!data?.success) {
+                return { success: false, error: data?.error || 'PIN salah' };
             }
 
-            // Compare PIN hash securely in JavaScript (not exposed in query)
-            const matchedUser = users.find(u => u.pin_hash === hashedPin);
-
-            if (!matchedUser) {
-                return { success: false, error: 'PIN salah' };
-            }
-
-            const userData = mapDbUser(matchedUser);
+            const userData = {
+                id: data.user.id,
+                username: data.user.username || data.user.name,
+                name: data.user.name,
+                role: data.user.role,
+                moduleAccess: ['angsuran']
+            };
             sessionStorage.setItem('portal_user', JSON.stringify(userData));
             setUser(userData);
             return { success: true };
