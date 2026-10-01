@@ -1,5 +1,6 @@
 // Image Receipt Generator with Logo - v2.0
 import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { formatCurrency, getMonthName, generateReceiptNumber } from './helpers'
 
 // Create receipt HTML element for capture
@@ -234,23 +235,23 @@ export async function generateReceiptImage(resident, payment) {
   }
 }
 
-// Download receipt as image
+// Download receipt as PDF
 export async function downloadReceiptImage(resident, payment) {
   const canvas = await generateReceiptImage(resident, payment)
-
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-      resolve(link.download)
-    }, 'image/png')
+  
+  // Calculate dimensions for PDF (A5 portrait size might be good, or fit to image)
+  // PDF format 'a5' is 148 x 210 mm. Let's just create a PDF that fits the canvas.
+  const imgData = canvas.toDataURL('image/png')
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'px',
+    format: [canvas.width, canvas.height]
   })
+  
+  pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+  pdf.save(`Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.pdf`)
+  
+  return `Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.pdf`
 }
 
 // Get receipt as blob

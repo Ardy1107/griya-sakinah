@@ -156,7 +156,7 @@ export default function DigitalReceipt({ resident, payment, onClose }) {
             disabled={downloading}
           >
             <Download size={18} />
-            {downloading ? 'Menyimpan...' : 'Simpan Gambar'}
+            {downloading ? 'Menyimpan PDF...' : 'Simpan PDF'}
           </button>
           <button className="receipt-action-btn receipt-share-btn" onClick={handleShare}>
             {copied ? <Check size={18} /> : <Share2 size={18} />}
