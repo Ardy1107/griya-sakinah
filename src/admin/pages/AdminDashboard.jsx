@@ -7,6 +7,7 @@ import {
     Moon, Sun, UserPlus, LayoutDashboard, Gift, Sparkles
 } from 'lucide-react';
 import CommunityAdmin from './CommunityAdmin';
+import KelolaWarga from '../../pages/SuperadminPortal/KelolaWarga';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -249,13 +250,22 @@ const AdminDashboard = () => {
                     )}
 
                     {isSuperAdmin && (
-                        <button
-                            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('settings')}
-                        >
-                            <Settings size={20} />
-                            <span>Pengaturan</span>
-                        </button>
+                        <>
+                            <button
+                                className={`nav-item ${activeTab === 'warga' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('warga')}
+                            >
+                                <Users size={20} />
+                                <span>Manajemen Warga</span>
+                            </button>
+                            <button
+                                className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('settings')}
+                            >
+                                <Settings size={20} />
+                                <span>Pengaturan</span>
+                            </button>
+                        </>
                     )}
                 </nav>
 
@@ -281,8 +291,9 @@ const AdminDashboard = () => {
                     <div>
                         <h1>
                             {activeTab === 'overview' && 'Dashboard Overview'}
-                            {activeTab === 'users' && 'Management User'}
+                            {activeTab === 'users' && 'Management User Admin'}
                             {activeTab === 'komunitas' && 'Kelola Komunitas'}
+                            {activeTab === 'warga' && 'Manajemen Warga (KK)'}
                             {activeTab === 'settings' && 'Pengaturan'}
                         </h1>
                         <p>Selamat datang kembali, {admin?.name}</p>
@@ -434,6 +445,13 @@ const AdminDashboard = () => {
                     {activeTab === 'komunitas' && hasModuleAccess('komunitas') && (
                         <div className="komunitas-content">
                             <CommunityAdmin />
+                        </div>
+                    )}
+
+                    {/* Warga Tab */}
+                    {activeTab === 'warga' && isSuperAdmin && (
+                        <div className="warga-content">
+                            <KelolaWarga />
                         </div>
                     )}
 

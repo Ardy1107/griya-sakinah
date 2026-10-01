@@ -54,10 +54,10 @@ function App() {
                             </ModuleErrorBoundary>
                         } />
 
-                        {/* Superadmin Portal */}
-                        <Route path="/superadmin/login" element={<SuperadminLogin />} />
-                        <Route path="/superadmin" element={<SuperadminDashboard />} />
-                        <Route path="/superadmin/warga" element={<KelolaWarga />} />
+                        {/* Superadmin Portal - Redirects to Unified Admin Portal */}
+                        <Route path="/superadmin/login" element={<Navigate to="/admin" replace />} />
+                        <Route path="/superadmin" element={<Navigate to="/admin/dashboard" replace />} />
+                        <Route path="/superadmin/warga" element={<Navigate to="/admin/dashboard" replace />} />
 
                         {/* Spiritual Abundance Module */}
                         <Route path="/spiritual/*" element={

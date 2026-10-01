@@ -13,13 +13,13 @@ import {
     X,
     Save
 } from 'lucide-react';
-import { useSuperadmin } from '../../contexts/SuperadminContext';
+import { useAdminAuth } from '../../admin/contexts/AdminAuthContext';
 import { supabase } from '../../modules/angsuran/lib/supabase';
 import { createFuzzySearch } from '../../lib/smartSearch';
 import './SuperadminPortal.css';
 
 export default function KelolaWarga() {
-    const { isAuthenticated, loading: authLoading } = useSuperadmin();
+    const { isAuthenticated, loading: authLoading, isSuperAdmin } = useAdminAuth();
     const navigate = useNavigate();
 
     const [wargaList, setWargaList] = useState([]);
@@ -40,7 +40,9 @@ export default function KelolaWarga() {
 
     useEffect(() => {
         if (!authLoading && !isAuthenticated) {
-            navigate('/superadmin/login');
+            navigate('/admin');
+        } else if (!authLoading && !isSuperAdmin) {
+            navigate('/admin/dashboard');
         }
     }, [isAuthenticated, authLoading, navigate]);
 
