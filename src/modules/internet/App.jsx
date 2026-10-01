@@ -52,8 +52,8 @@ function InternetApp() {
               <Route path="peraturan" element={<Agreement />} />
 
               {/* Admin Routes */}
-              <Route path="admin/login" element={<AdminLogin />} />
-              <Route path="login" element={<AdminLogin />} />
+              <Route path="admin/login" element={<Navigate to="/admin" replace />} />
+              <Route path="login" element={<Navigate to="/admin" replace />} />
               <Route path="admin" element={<AdminPanel />} />
               <Route path="admin/*" element={<AdminPanel />} />
 

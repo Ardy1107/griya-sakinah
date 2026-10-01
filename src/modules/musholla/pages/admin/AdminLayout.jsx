@@ -75,7 +75,7 @@ export default function AdminLayout() {
         }
 
         // 2. Check Global Admin Portal Session
-        const adminSession = localStorage.getItem('griya_admin_session');
+        const adminSession = sessionStorage.getItem('griya_admin_session');
         if (adminSession) {
             try {
                 const admin = JSON.parse(adminSession);
@@ -98,14 +98,7 @@ export default function AdminLayout() {
         const { data } = await getCurrentUser();
         if (!data) {
             // Redirect to appropriate login based on context
-            if (location.pathname.includes('/musholla/admin')) {
-                // If trying to access via direct link without auth, go to module login
-                // But if we want unified experience, maybe redirect to main admin login?
-                // For now, keep module login as fallback
-                navigate('/musholla/login');
-            } else {
-                navigate('/musholla/login');
-            }
+            navigate('/admin');
         } else {
             setUser(data);
         }
@@ -114,7 +107,7 @@ export default function AdminLayout() {
 
     async function handleLogout() {
         // Clear global session if exists
-        localStorage.removeItem('griya_admin_session');
+        sessionStorage.removeItem('griya_admin_session');
 
         // Clear Supabase session
         await signOut();

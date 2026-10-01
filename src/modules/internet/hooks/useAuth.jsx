@@ -40,7 +40,29 @@ export function AuthProvider({ children }) {
                 return;
             }
 
-            // First check for signed superadmin SSO
+            // First check for global admin session (Unified Portal)
+            try {
+                const adminSession = sessionStorage.getItem('griya_admin_session');
+                if (adminSession) {
+                    const admin = JSON.parse(adminSession);
+                    // Allow if role is super_admin or admin_internet
+                    if (admin.role === 'super_admin' || admin.role === 'admin_internet' || admin.role === 'superadmin') {
+                        setUser({
+                            id: admin.id || 'admin',
+                            email: admin.email || 'admin@griyasakinah.local',
+                            role: admin.role,
+                            ...admin
+                        });
+                        setIsSuperadmin(admin.role === 'super_admin' || admin.role === 'superadmin');
+                        setLoading(false);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error('Invalid admin session', e);
+            }
+
+            // Fallback for signed superadmin SSO (legacy support if needed)
             const superadminUser = await getVerifiedSSOSession();
             if (superadminUser) {
                 setUser({
@@ -95,11 +117,13 @@ export function AuthProvider({ children }) {
 
     const signOut = async () => {
         localStorage.removeItem('dev_bypass')
+        sessionStorage.removeItem('griya_admin_session')
         if (supabase) {
             await supabase.auth.signOut()
         }
         setUser(null)
         setIsSuperadmin(false)
+        window.location.href = '/admin'
     }
 
     const value = {

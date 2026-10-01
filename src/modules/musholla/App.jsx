@@ -14,7 +14,7 @@ function MushollaApp() {
         <Routes>
             {/* Public Routes */}
             <Route index element={<PublicDashboard />} />
-            <Route path="login" element={<LoginPage />} />
+            <Route path="login" element={<Navigate to="/admin" replace />} />
 
             {/* Admin Routes */}
             <Route path="admin" element={<AdminLayout />}>

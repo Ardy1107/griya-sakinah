@@ -35,21 +35,32 @@ export const AuthProvider = ({ children }) => {
                 // Invalid SSO session, continue to normal auth check
             }
 
-            // Unified session: portal_user only
-            const storedUser = sessionStorage.getItem('portal_user');
-            if (storedUser) {
+            // Unified session: griya_admin_session (Unified Admin Portal)
+            const storedAdmin = sessionStorage.getItem('griya_admin_session');
+            if (storedAdmin) {
                 try {
-                    const parsed = JSON.parse(storedUser);
-                    if (parsed.role === 'superadmin' ||
-                        parsed.role === 'admin' ||
+                    const parsed = JSON.parse(storedAdmin);
+                    if (parsed.role === 'super_admin' ||
+                        parsed.role === 'superadmin' ||
+                        parsed.role === 'admin_angsuran' ||
                         parsed.role === 'developer' ||
-                        parsed.moduleAccess?.includes('angsuran')) {
-                        setUser(parsed);
+                        parsed.role === 'admin') {
+                        setUser({
+                            id: parsed.id || 'admin',
+                            username: parsed.username || parsed.name || 'admin',
+                            name: parsed.name,
+                            role: parsed.role === 'super_admin' ? 'superadmin' : (parsed.role === 'admin_angsuran' ? 'admin' : parsed.role),
+                            moduleAccess: ['angsuran'],
+                            isSuperadminSSO: parsed.role === 'super_admin' || parsed.role === 'superadmin'
+                        });
+                        setLoading(false);
+                        return;
                     }
                 } catch (e) {
-                    sessionStorage.removeItem('portal_user');
+                    // Invalid session
                 }
             }
+            sessionStorage.removeItem('portal_user');
             sessionStorage.removeItem('angsuran_user');
             localStorage.removeItem('angsuran_user');
             setLoading(false);
@@ -135,8 +146,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        sessionStorage.removeItem('griya_admin_session');
         sessionStorage.removeItem('portal_user');
         setUser(null);
+        window.location.href = '/admin';
     };
 
     const isAuthenticated = !!user;
