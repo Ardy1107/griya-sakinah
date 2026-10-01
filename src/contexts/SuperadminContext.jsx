@@ -35,16 +35,13 @@ export function SuperadminProvider({ children }) {
         }
 
         try {
-            // Hash password before comparing with DB
-            const hashedPassword = await hashPassword(password);
-
-            // Query from Supabase portal_users table
+            // Note: Currently passwords are in plaintext in the database
             const { data, error } = await supabase
                 .from('portal_users')
                 .select('*')
                 .eq('username', username)
-                .eq('password_hash', hashedPassword)
-                .eq('role', 'super_admin')
+                .eq('password', password)
+                .in('role', ['super_admin', 'superadmin'])
                 .eq('is_active', true)
                 .single();
 
