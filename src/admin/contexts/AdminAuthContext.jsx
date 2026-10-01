@@ -120,14 +120,12 @@ export const AdminAuthProvider = ({ children }) => {
         }
 
         try {
-            // Hash password before comparing with DB
-            const hashedPassword = await hashPassword(password);
-
+            // Note: Currently passwords are in plaintext in the database
             const { data, error } = await supabase
                 .from('portal_users')
                 .select('*')
                 .eq('username', username)
-                .eq('password_hash', hashedPassword)
+                .eq('password', password)
                 .eq('is_active', true)
                 .single();
 
@@ -191,14 +189,12 @@ export const AdminAuthProvider = ({ children }) => {
         }
 
         try {
-            // Hash password before storing
-            const hashedPassword = await hashPassword(userData.password);
-
+            // Note: Passwords are in plaintext in DB
             const { data, error } = await supabase
                 .from('portal_users')
                 .insert([{
                     username: userData.username,
-                    password_hash: hashedPassword,
+                    password: userData.password,
                     full_name: userData.name,
                     email: userData.email,
                     role: userData.role,
@@ -232,7 +228,7 @@ export const AdminAuthProvider = ({ children }) => {
         try {
             const updateData = {};
             if (updates.username) updateData.username = updates.username;
-            if (updates.password) updateData.password_hash = await hashPassword(updates.password);
+            if (updates.password) updateData.password = updates.password;
             if (updates.name) updateData.full_name = updates.name;
             if (updates.email) updateData.email = updates.email;
             if (updates.role) updateData.role = updates.role;
