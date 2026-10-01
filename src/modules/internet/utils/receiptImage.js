@@ -1,6 +1,6 @@
 // Image Receipt Generator with Logo - v2.0
 import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+import { jsPDF } from 'jspdf'
 import { formatCurrency, getMonthName, generateReceiptNumber } from './helpers'
 
 // Create receipt HTML element for capture
@@ -18,191 +18,173 @@ export function createReceiptElement(resident, payment) {
   container.id = 'receipt-capture'
   container.innerHTML = `
     <div style="
-      width: 400px;
-      background: white;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      border-radius: 12px;
+      width: 480px;
+      background: #ffffff;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      position: relative;
     ">
-      <!-- Header with Logo -->
+      <!-- Background Watermark Pattern -->
       <div style="
-        background: linear-gradient(135deg, #10b981, #059669);
-        padding: 24px;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: radial-gradient(#10b981 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.03;
+        pointer-events: none;
+      "></div>
+
+      <!-- Header with Logo and Gradient -->
+      <div style="
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        padding: 32px 24px;
         text-align: center;
+        position: relative;
+        overflow: hidden;
       ">
-        <img 
-          src="/logo.png" 
-          alt="Griya Sakinah" 
-          style="
-            height: 60px;
-            width: auto;
-            margin-bottom: 12px;
-            filter: brightness(0) invert(1);
-          "
-          crossorigin="anonymous"
-        />
         <div style="
-          font-size: 10px;
-          color: rgba(255,255,255,0.8);
-          text-transform: uppercase;
-          letter-spacing: 2px;
-        ">Internet Management System</div>
+          position: absolute;
+          top: -50%; left: -50%; width: 200%; height: 200%;
+          background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 50%);
+        "></div>
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          position: relative;
+          z-index: 1;
+        ">
+          <div style="
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 20px;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+          ">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+          </div>
+          <div style="text-align: left;">
+            <div style="font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;">INTERNET SAKINAH</div>
+            <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Kwitansi Resmi</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Receipt Number -->
+      <!-- Receipt Number Ribbon -->
       <div style="
-        text-align: center;
-        padding: 16px;
         background: #f8fafc;
-        border-bottom: 1px dashed #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       ">
-        <div style="
-          font-size: 11px;
-          color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        ">Nomor Kwitansi</div>
-        <div style="
-          font-size: 14px;
-          font-weight: 600;
-          color: #1e293b;
-          margin-top: 4px;
-          font-family: monospace;
-        ">${receiptNumber}</div>
+        <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">No. Referensi</span>
+        <span style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 4px 10px; border-radius: 6px;">${receiptNumber}</span>
       </div>
 
-      <!-- Title -->
-      <div style="
-        text-align: center;
-        padding: 20px;
-      ">
+      <!-- Details Section -->
+      <div style="padding: 28px 24px; position: relative;">
+        <!-- Large Background LUNAS Watermark -->
         <div style="
-          font-size: 16px;
-          font-weight: 600;
-          color: #1e293b;
-        ">KWITANSI PEMBAYARAN</div>
-        <div style="
-          font-size: 12px;
-          color: #64748b;
-          margin-top: 4px;
-        ">Iuran Internet Sakinah</div>
-      </div>
-
-      <!-- Details -->
-      <div style="padding: 0 24px;">
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #f1f5f9;
-        ">
-          <span style="color: #64748b; font-size: 13px;">Blok Rumah</span>
-          <span style="color: #1e293b; font-weight: 600; font-size: 14px;">${resident.blok_rumah}</span>
-        </div>
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #f1f5f9;
-        ">
-          <span style="color: #64748b; font-size: 13px;">Nama Warga</span>
-          <span style="color: #1e293b; font-weight: 600; font-size: 14px;">${resident.nama_warga}</span>
-        </div>
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #f1f5f9;
-        ">
-          <span style="color: #64748b; font-size: 13px;">Periode</span>
-          <span style="color: #1e293b; font-weight: 600; font-size: 14px;">${period}</span>
-        </div>
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #f1f5f9;
-        ">
-          <span style="color: #64748b; font-size: 13px;">Tanggal Bayar</span>
-          <span style="color: #1e293b; font-weight: 600; font-size: 14px;">${tanggalBayar}</span>
-        </div>
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 0;
-          border-bottom: 1px solid #f1f5f9;
-        ">
-          <span style="color: #64748b; font-size: 13px;">Metode Bayar</span>
-          <span style="color: #1e293b; font-weight: 600; font-size: 14px;">${metodeBayar}</span>
+          position: absolute;
+          top: 50%; left: 50%;
+          transform: translate(-50%, -50%) rotate(-15deg);
+          font-size: 80px;
+          font-weight: 900;
+          color: rgba(34, 197, 94, 0.05);
+          pointer-events: none;
+          white-space: nowrap;
+          letter-spacing: 10px;
+          z-index: 0;
+        ">LUNAS</div>
+        
+        <div style="position: relative; z-index: 1;">
+          <div style="
+            display: flex; flex-direction: column; gap: 16px;
+          ">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 14px;">Nama Warga</span>
+              <span style="color: #0f172a; font-weight: 600; font-size: 15px;">${resident.nama_warga}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 14px;">Blok Rumah</span>
+              <span style="color: #0f172a; font-weight: 700; font-size: 15px; background: #f1f5f9; padding: 4px 12px; border-radius: 20px;">${resident.blok_rumah}</span>
+            </div>
+            <div style="height: 1px; background: #e2e8f0; margin: 4px 0;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 14px;">Periode Iuran</span>
+              <span style="color: #0f172a; font-weight: 600; font-size: 15px;">${period}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 14px;">Tanggal Bayar</span>
+              <span style="color: #0f172a; font-weight: 500; font-size: 15px;">${tanggalBayar}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #64748b; font-size: 14px;">Metode Pembayaran</span>
+              <span style="color: #0f172a; font-weight: 500; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                ${metodeBayar}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Total -->
-      <div style="
-        margin: 20px 24px;
-        padding: 16px;
-        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-        border-radius: 12px;
-        border: 1px solid #86efac;
-      ">
+      <!-- Total & LUNAS Stamp -->
+      <div style="padding: 0 24px 28px;">
         <div style="
+          background: linear-gradient(to right, #ecfdf5, #dcfce7);
+          border: 1px solid #a7f3d0;
+          border-radius: 12px;
+          padding: 20px;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          position: relative;
+          overflow: hidden;
         ">
-          <span style="color: #166534; font-size: 13px;">Total Pembayaran</span>
-          <span style="
-            color: #15803d;
-            font-weight: 700;
-            font-size: 20px;
-          ">${formatCurrency(payment.nominal)}</span>
-        </div>
-      </div>
-
-      <!-- LUNAS Stamp -->
-      <div style="
-        text-align: center;
-        padding: 24px;
-      ">
-        <div style="
-          display: inline-block;
-          padding: 12px 40px;
-          background: #dcfce7;
-          border: 3px solid #22c55e;
-          border-radius: 8px;
-          transform: rotate(-2deg);
-        ">
+          <div>
+            <div style="color: #047857; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Total Dibayarkan</div>
+            <div style="color: #065f46; font-size: 24px; font-weight: 800;">${formatCurrency(payment.nominal)}</div>
+          </div>
+          
+          <!-- Stamp Graphic -->
           <div style="
-            font-size: 28px;
-            font-weight: 700;
-            color: #22c55e;
-            letter-spacing: 4px;
-          ">LUNAS</div>
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 2px solid #059669;
+            border-radius: 8px;
+            color: #059669;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 2px;
+            transform: rotate(-3deg);
+            background: rgba(16, 185, 129, 0.1);
+          ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            LUNAS
+          </div>
         </div>
       </div>
 
       <!-- Footer -->
       <div style="
-        padding: 20px;
         background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        padding: 20px 24px;
         text-align: center;
-        border-top: 1px dashed #e2e8f0;
       ">
-        <div style="
-          font-size: 12px;
-          color: #64748b;
-        ">Terima kasih atas pembayarannya!</div>
-        <div style="
-          font-size: 10px;
-          color: #94a3b8;
-          margin-top: 8px;
-        ">Simpan kwitansi ini sebagai bukti pembayaran sah.</div>
-        <div style="
-          font-size: 10px;
-          color: #cbd5e1;
-          margin-top: 16px;
-        ">© ${new Date().getFullYear()} Griya Sakinah Internet Management</div>
+        <div style="font-size: 13px; color: #475569; font-weight: 500;">Terima kasih atas pembayaran Anda!</div>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Dokumen ini adalah bukti pembayaran yang sah.</div>
+        <div style="font-size: 10px; color: #cbd5e1; margin-top: 16px; text-transform: uppercase; letter-spacing: 1px;">© ${new Date().getFullYear()} Griya Sakinah Management</div>
       </div>
     </div>
   `
@@ -236,11 +218,9 @@ export async function generateReceiptImage(resident, payment) {
 }
 
 // Download receipt as PDF
-export async function downloadReceiptImage(resident, payment) {
+export async function downloadReceiptPdf(resident, payment) {
   const canvas = await generateReceiptImage(resident, payment)
   
-  // Calculate dimensions for PDF (A5 portrait size might be good, or fit to image)
-  // PDF format 'a5' is 148 x 210 mm. Let's just create a PDF that fits the canvas.
   const imgData = canvas.toDataURL('image/png')
   const pdf = new jsPDF({
     orientation: 'portrait',
@@ -252,6 +232,25 @@ export async function downloadReceiptImage(resident, payment) {
   pdf.save(`Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.pdf`)
   
   return `Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.pdf`
+}
+
+// Download receipt as PNG
+export async function downloadReceiptPng(resident, payment) {
+  const canvas = await generateReceiptImage(resident, payment)
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `Kwitansi_${resident.blok_rumah}_${payment.bulan}_${payment.tahun}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      resolve(link.download)
+    }, 'image/png')
+  })
 }
 
 // Get receipt as blob
