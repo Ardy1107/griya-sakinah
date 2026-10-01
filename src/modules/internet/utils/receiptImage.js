@@ -7,7 +7,10 @@ import bannerInternet from '../../../assets/banner-internet.webp'
 // Create receipt HTML element for capture
 export function createReceiptElement(resident, payment) {
   const receiptNumber = payment.nomor_referensi || generateReceiptNumber(payment.id)
-  const period = `${getMonthName(payment.bulan)} ${payment.tahun}`
+  const multi = payment._multiMonth
+  const period = multi
+    ? `${multi.rangeLabel} (${multi.count} bln)`
+    : `${getMonthName(payment.bulan)} ${payment.tahun}`
   const tanggalBayar = payment.tanggal_bayar
     ? new Date(payment.tanggal_bayar).toLocaleDateString('id-ID', {
         day: 'numeric',
@@ -119,6 +122,7 @@ export function createReceiptElement(resident, payment) {
           <div>
             <div style="color: #047857; font-size: 13px; font-weight: 600; margin-bottom: 4px;">Total Dibayarkan</div>
             <div style="color: #065f46; font-size: 24px; font-weight: 800;">${formatCurrency(payment.nominal)}</div>
+            ${multi ? `<div style="color: #047857; font-size: 11px; margin-top: 4px;">${formatCurrency(multi.perMonth)}/bln × ${multi.count} bulan</div>` : ''}
           </div>
           
           <!-- Stamp Graphic -->

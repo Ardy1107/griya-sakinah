@@ -73,7 +73,14 @@ export function generateWhatsAppUrl(phone, message) {
 
 // Generate receipt message for WhatsApp
 export function generateReceiptMessage(resident, payment, receiptUrl) {
-    const period = `${getMonthName(payment.bulan)} ${payment.tahun}`
+    const multi = payment._multiMonth
+    const period = multi
+        ? `${multi.rangeLabel} (${multi.count} bulan)`
+        : `${getMonthName(payment.bulan)} ${payment.tahun}`
+
+    const nominalLine = multi
+        ? `Nominal: ${formatCurrency(multi.perMonth)}/bln × ${multi.count} = *${formatCurrency(payment.nominal)}*`
+        : `Nominal: ${formatCurrency(payment.nominal)}`
 
     return `🏠 *KWITANSI PEMBAYARAN IURAN INTERNET*
   
@@ -81,7 +88,7 @@ Yth. ${resident.nama_warga}
 Blok: ${resident.blok_rumah}
 
 Periode: ${period}
-Nominal: ${formatCurrency(payment.nominal)}
+${nominalLine}
 Status: ✅ LUNAS
 
 📄 Kwitansi Digital:

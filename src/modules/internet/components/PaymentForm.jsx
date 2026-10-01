@@ -1,6 +1,6 @@
-// Payment Form Component - Enhanced v2.0
-import { useState, useEffect } from 'react'
-import { CreditCard, User, Calendar, DollarSign, Loader2, Check, Wallet, Hash, FileText, Download } from 'lucide-react'
+// Payment Form Component - Enhanced v3.0 with Multi-Month Support
+import { useState, useEffect, useMemo } from 'react'
+import { CreditCard, User, Calendar, DollarSign, Loader2, Check, Wallet, Hash, FileText, Download, Layers } from 'lucide-react'
 import { useResidents, useAdminOperations, useCurrentPeriod, uploadToStorage } from '../hooks/useSupabase'
 import { getMonthName, formatCurrency, generateReceiptNumber } from '../utils/helpers'
 import { getReceiptPDFBlob } from '../utils/receiptPdf'
@@ -15,6 +15,45 @@ const PAYMENT_METHODS = [
 ]
 
 const DEFAULT_NOMINAL = 150000 // Rp 150.000
+const SUBSIDIZED_NOMINAL = 75000 // Rp 75.000 for B2 & A18
+
+// Units with Starlink equipment — get 50% subsidy
+const SUBSIDIZED_UNITS = ['B2', 'A18']
+
+const MONTH_COUNT_OPTIONS = [
+    { value: 1, label: '1 Bulan' },
+    { value: 2, label: '2 Bulan' },
+    { value: 3, label: '3 Bulan' },
+    { value: 6, label: '6 Bulan' },
+    { value: 12, label: '12 Bulan' }
+]
+
+// Calculate the list of months covered from a start month/year for N months
+function getMonthRange(startBulan, startTahun, count) {
+    const months = []
+    let bulan = startBulan
+    let tahun = startTahun
+    for (let i = 0; i < count; i++) {
+        months.push({ bulan, tahun })
+        bulan++
+        if (bulan > 12) {
+            bulan = 1
+            tahun++
+        }
+    }
+    return months
+}
+
+function getMonthRangeLabel(startBulan, startTahun, count) {
+    if (count === 1) return `${getMonthName(startBulan)} ${startTahun}`
+    const months = getMonthRange(startBulan, startTahun, count)
+    const first = months[0]
+    const last = months[months.length - 1]
+    if (first.tahun === last.tahun) {
+        return `${getMonthName(first.bulan)} - ${getMonthName(last.bulan)} ${first.tahun}`
+    }
+    return `${getMonthName(first.bulan)} ${first.tahun} - ${getMonthName(last.bulan)} ${last.tahun}`
+}
 
 export default function PaymentForm({ onSuccess, blockFilter }) {
     const { residents, loading: residentsLoading } = useResidents()
@@ -31,18 +70,36 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
         resident_id: '',
         bulan: currentBulan,
         tahun: currentTahun,
-        nominal: DEFAULT_NOMINAL,
         tanggal_bayar: new Date().toISOString().split('T')[0],
         metode_bayar: 'Cash',
         nomor_referensi: ''
     })
 
+    const [jumlahBulan, setJumlahBulan] = useState(1)
     const [selectedResident, setSelectedResident] = useState(null)
-    const [savedPayment, setSavedPayment] = useState(null)
+    const [savedPayments, setSavedPayments] = useState([])
     const [receiptUrls, setReceiptUrls] = useState(null)
     const [generatingReceipt, setGeneratingReceipt] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(false)
+
+    // Detect if selected resident is a subsidized unit
+    const isSubsidized = useMemo(() => {
+        if (!selectedResident) return false
+        const blok = selectedResident.blok_rumah?.toUpperCase()?.trim()
+        return SUBSIDIZED_UNITS.includes(blok)
+    }, [selectedResident])
+
+    // Per-month nominal based on unit
+    const perMonthNominal = isSubsidized ? SUBSIDIZED_NOMINAL : DEFAULT_NOMINAL
+
+    // Total nominal
+    const totalNominal = perMonthNominal * jumlahBulan
+
+    // Month range for display
+    const monthRangeLabel = getMonthRangeLabel(formData.bulan, formData.tahun, jumlahBulan)
+    const monthRange = getMonthRange(formData.bulan, formData.tahun, jumlahBulan)
 
     // Auto-generate reference number
     useEffect(() => {
@@ -64,26 +121,26 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
         const { name, value } = e.target
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'nominal' || name === 'bulan' || name === 'tahun'
+            [name]: name === 'bulan' || name === 'tahun'
                 ? Number(value)
                 : value
         }))
         setError(null)
         setSuccess(false)
-        setSavedPayment(null)
+        setSavedPayments([])
         setReceiptUrls(null)
     }
 
-    const generateAndUploadReceipts = async (resident, payment) => {
+    const generateAndUploadReceipts = async (resident, combinedPayment) => {
         setGeneratingReceipt(true)
         try {
             // Generate PDF
-            const pdfBlob = await getReceiptPDFBlob(resident, payment)
-            const pdfPath = `receipts/${resident.blok_rumah}/${payment.tahun}/${payment.bulan}_pdf.pdf`
+            const pdfBlob = await getReceiptPDFBlob(resident, combinedPayment)
+            const pdfPath = `receipts/${resident.blok_rumah}/${combinedPayment.tahun}/${combinedPayment.bulan}_${jumlahBulan}bln_pdf.pdf`
 
             // Generate Image
-            const imgBlob = await getReceiptImageBlob(resident, payment)
-            const imgPath = `receipts/${resident.blok_rumah}/${payment.tahun}/${payment.bulan}_img.png`
+            const imgBlob = await getReceiptImageBlob(resident, combinedPayment)
+            const imgPath = `receipts/${resident.blok_rumah}/${combinedPayment.tahun}/${combinedPayment.bulan}_${jumlahBulan}bln_img.png`
 
             let pdfUrl = null
             let imgUrl = null
@@ -100,8 +157,9 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                 console.warn('Image upload failed:', uploadErr)
             }
 
-            if (pdfUrl || imgUrl) {
-                await updatePaymentReceipt(payment.id, {
+            // Update the first payment record with receipt URLs
+            if ((pdfUrl || imgUrl) && combinedPayment.id) {
+                await updatePaymentReceipt(combinedPayment.id, {
                     receipt_url_pdf: pdfUrl,
                     receipt_url_img: imgUrl
                 })
@@ -121,30 +179,62 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
         e.preventDefault()
         setError(null)
         setSuccess(false)
+        setSubmitting(true)
 
         if (!formData.resident_id) {
             setError('Pilih warga terlebih dahulu')
+            setSubmitting(false)
             return
         }
 
         try {
-            const payment = await createPayment({
-                ...formData,
-                tanggal_bayar: new Date(formData.tanggal_bayar).toISOString(),
-                status: 'Lunas'
-            })
+            const createdPayments = []
 
-            setSavedPayment(payment)
+            // Create individual payment records for each month
+            for (const period of monthRange) {
+                const payment = await createPayment({
+                    resident_id: formData.resident_id,
+                    bulan: period.bulan,
+                    tahun: period.tahun,
+                    nominal: perMonthNominal,
+                    tanggal_bayar: new Date(formData.tanggal_bayar).toISOString(),
+                    metode_bayar: formData.metode_bayar,
+                    nomor_referensi: formData.nomor_referensi,
+                    status: 'Lunas'
+                })
+                createdPayments.push(payment)
+            }
+
+            setSavedPayments(createdPayments)
             setSuccess(true)
-            toast.success('Pembayaran berhasil disimpan!')
 
-            // Generate receipts in background
-            generateAndUploadReceipts(selectedResident, payment)
+            const monthLabel = jumlahBulan > 1
+                ? `${jumlahBulan} bulan (${monthRangeLabel})`
+                : monthRangeLabel
+            toast.success(`Pembayaran ${monthLabel} berhasil disimpan!`)
+
+            // Create a combined payment object for the receipt
+            const combinedPayment = {
+                ...createdPayments[0],
+                nominal: totalNominal,
+                // Add multi-month metadata for receipt rendering
+                _multiMonth: jumlahBulan > 1 ? {
+                    count: jumlahBulan,
+                    perMonth: perMonthNominal,
+                    rangeLabel: monthRangeLabel,
+                    months: monthRange
+                } : null
+            }
+
+            // Generate 1 combined receipt in background
+            generateAndUploadReceipts(selectedResident, combinedPayment)
 
             if (onSuccess) onSuccess()
         } catch (err) {
             setError(err.message)
             toast.error('Gagal menyimpan pembayaran')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -154,12 +244,12 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
             resident_id: '',
             bulan: currentBulan,
             tahun: currentTahun,
-            nominal: DEFAULT_NOMINAL,
             tanggal_bayar: new Date().toISOString().split('T')[0],
             metode_bayar: 'Cash',
             nomor_referensi: newRefNo
         })
-        setSavedPayment(null)
+        setJumlahBulan(1)
+        setSavedPayments([])
         setReceiptUrls(null)
         setSuccess(false)
         setError(null)
@@ -186,7 +276,7 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                 </h3>
             </div>
 
-            {success && savedPayment ? (
+            {success && savedPayments.length > 0 ? (
                 <div>
                     <div style={{
                         background: 'rgba(34, 197, 94, 0.1)',
@@ -203,12 +293,36 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                         <p className="text-muted" style={{ fontSize: '0.875rem' }}>
                             {selectedResident?.nama_warga} - {selectedResident?.blok_rumah}
                             <br />
-                            {getMonthName(savedPayment.bulan)} {savedPayment.tahun} - {formatCurrency(savedPayment.nominal)}
+                            {jumlahBulan > 1 ? (
+                                <>
+                                    <strong>{jumlahBulan} bulan</strong> ({monthRangeLabel})
+                                    <br />
+                                    {formatCurrency(perMonthNominal)}/bulan × {jumlahBulan} = <strong>{formatCurrency(totalNominal)}</strong>
+                                </>
+                            ) : (
+                                <>
+                                    {monthRangeLabel} - {formatCurrency(totalNominal)}
+                                </>
+                            )}
                             <br />
                             <span style={{ color: 'var(--text-primary)' }}>
                                 Ref: {formData.nomor_referensi} | {formData.metode_bayar}
                             </span>
                         </p>
+
+                        {isSubsidized && (
+                            <p style={{
+                                fontSize: '0.75rem',
+                                color: '#f59e0b',
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                padding: '4px 8px',
+                                borderRadius: 'var(--radius-sm)',
+                                display: 'inline-block',
+                                marginTop: 'var(--space-sm)'
+                            }}>
+                                ⚡ Subsidi perangkat Starlink — Rp 75.000/bulan
+                            </p>
+                        )}
 
                         {generatingReceipt && (
                             <p className="text-muted mt-2" style={{ fontSize: '0.75rem' }}>
@@ -218,12 +332,20 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                         )}
                     </div>
 
-                    {selectedResident && savedPayment && (
+                    {selectedResident && savedPayments[0] && (
                         <>
                             <div style={{ marginBottom: 'var(--space-md)' }}>
                                 <WhatsAppShare
                                     resident={selectedResident}
-                                    payment={savedPayment}
+                                    payment={{
+                                        ...savedPayments[0],
+                                        nominal: totalNominal,
+                                        _multiMonth: jumlahBulan > 1 ? {
+                                            count: jumlahBulan,
+                                            perMonth: perMonthNominal,
+                                            rangeLabel: monthRangeLabel
+                                        } : null
+                                    }}
                                     receiptUrl={receiptUrls?.img || receiptUrls?.pdf}
                                 />
                             </div>
@@ -308,17 +430,30 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                             {filteredResidents.map(resident => (
                                 <option key={resident.id} value={resident.id}>
                                     {resident.blok_rumah} - {resident.nama_warga}
+                                    {SUBSIDIZED_UNITS.includes(resident.blok_rumah?.toUpperCase()?.trim()) ? ' ⚡' : ''}
                                 </option>
                             ))}
                         </select>
+                        {isSubsidized && (
+                            <small style={{
+                                color: '#f59e0b',
+                                fontSize: '0.75rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                marginTop: '4px'
+                            }}>
+                                ⚡ Unit Starlink — Iuran Rp 75.000/bulan (subsidi listrik)
+                            </small>
+                        )}
                     </div>
 
-                    {/* Period */}
+                    {/* Period - Start Month */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
                         <div className="form-group">
                             <label className="form-label">
                                 <Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                                Bulan
+                                Mulai Bulan
                             </label>
                             <select
                                 name="bulan"
@@ -347,6 +482,76 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                         </div>
                     </div>
 
+                    {/* Month Count Selector */}
+                    <div className="form-group">
+                        <label className="form-label">
+                            <Layers size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                            Jumlah Bulan
+                        </label>
+                        <div style={{
+                            display: 'flex',
+                            gap: '6px',
+                            flexWrap: 'wrap'
+                        }}>
+                            {MONTH_COUNT_OPTIONS.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        setJumlahBulan(opt.value)
+                                        setError(null)
+                                    }}
+                                    style={{
+                                        flex: '1 1 auto',
+                                        minWidth: '60px',
+                                        padding: '8px 12px',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: jumlahBulan === opt.value
+                                            ? '2px solid var(--color-primary)'
+                                            : '2px solid var(--color-border)',
+                                        background: jumlahBulan === opt.value
+                                            ? 'rgba(16, 185, 129, 0.1)'
+                                            : 'transparent',
+                                        color: jumlahBulan === opt.value
+                                            ? 'var(--color-primary)'
+                                            : 'var(--text-secondary)',
+                                        fontWeight: jumlahBulan === opt.value ? 700 : 500,
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        fontFamily: 'var(--font-sans)',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    {opt.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Month range preview */}
+                        {jumlahBulan > 1 && (
+                            <div style={{
+                                marginTop: '8px',
+                                padding: '8px 12px',
+                                background: 'rgba(16, 185, 129, 0.06)',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid rgba(16, 185, 129, 0.15)',
+                                fontSize: '0.8rem'
+                            }}>
+                                <div style={{ color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                                    📅 Periode: <strong style={{ color: 'var(--text-primary)' }}>{monthRangeLabel}</strong>
+                                </div>
+                                <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                                    {monthRange.map((m, i) => (
+                                        <span key={i}>
+                                            {getMonthName(m.bulan).substring(0, 3)} {m.tahun}
+                                            {i < monthRange.length - 1 ? ' → ' : ''}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Payment Method */}
                     <div className="form-group">
                         <label className="form-label">
@@ -365,25 +570,35 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                         </select>
                     </div>
 
-                    {/* Amount */}
+                    {/* Amount Summary */}
                     <div className="form-group">
                         <label className="form-label">
                             <DollarSign size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                            Nominal (Rp)
+                            Total Pembayaran
                         </label>
-                        <input
-                            type="number"
-                            name="nominal"
-                            value={formData.nominal}
-                            onChange={handleChange}
-                            className="form-input"
-                            min="0"
-                            step="1000"
-                            required
-                        />
-                        <small className="text-muted" style={{ fontSize: '0.75rem' }}>
-                            Nominal: {formatCurrency(formData.nominal)}
-                        </small>
+                        <div style={{
+                            padding: '12px 16px',
+                            background: 'var(--bg-secondary)',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--color-border)'
+                        }}>
+                            <div style={{
+                                fontSize: '1.5rem',
+                                fontWeight: 800,
+                                color: 'var(--color-primary)',
+                                fontFamily: 'var(--font-mono, monospace)'
+                            }}>
+                                {formatCurrency(totalNominal)}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                {jumlahBulan > 1 ? (
+                                    <>{formatCurrency(perMonthNominal)}/bulan × {jumlahBulan} bulan</>
+                                ) : (
+                                    <>{formatCurrency(perMonthNominal)}/bulan</>
+                                )}
+                                {isSubsidized && <span style={{ color: '#f59e0b' }}> (Subsidi Starlink)</span>}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Payment Date */}
@@ -404,17 +619,20 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
                         type="submit"
                         className="btn btn-primary btn-lg"
                         style={{ width: '100%' }}
-                        disabled={loading || residentsLoading}
+                        disabled={submitting || loading || residentsLoading}
                     >
-                        {loading ? (
+                        {submitting ? (
                             <>
                                 <Loader2 size={18} className="animate-spin" />
-                                Menyimpan...
+                                Menyimpan {jumlahBulan > 1 ? `${jumlahBulan} bulan...` : '...'}
                             </>
                         ) : (
                             <>
                                 <Check size={18} />
-                                Simpan Pembayaran
+                                {jumlahBulan > 1
+                                    ? `Simpan Pembayaran ${jumlahBulan} Bulan (${formatCurrency(totalNominal)})`
+                                    : 'Simpan Pembayaran'
+                                }
                             </>
                         )}
                     </button>

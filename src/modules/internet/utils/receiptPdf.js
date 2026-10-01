@@ -10,7 +10,10 @@ export function generateReceiptPDF(resident, payment) {
     })
 
     const receiptNumber = payment.nomor_referensi || generateReceiptNumber(payment.id)
-    const period = `${getMonthName(payment.bulan)} ${payment.tahun}`
+    const multi = payment._multiMonth
+    const period = multi
+        ? `${multi.rangeLabel} (${multi.count} bln)`
+        : `${getMonthName(payment.bulan)} ${payment.tahun}`
     const tanggalBayar = new Date(payment.tanggal_bayar).toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'long',
@@ -77,6 +80,11 @@ export function generateReceiptPDF(resident, payment) {
         ['Tanggal Bayar', tanggalBayar],
         ['Metode', metodeBayar]
     ]
+
+    // Add per-month breakdown for multi-month
+    if (multi) {
+        details.push(['Iuran/Bulan', formatCurrency(multi.perMonth)])
+    }
 
     details.forEach((row, idx) => {
         const y = detailsStart + (idx * lineHeight)
