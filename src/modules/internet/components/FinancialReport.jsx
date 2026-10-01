@@ -5,10 +5,21 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { useFinancialSummary } from '../hooks/useSupabase'
 import { formatCurrency, groupPaymentsByMonth, groupExpensesByCategory, getMonthName } from '../utils/helpers'
 
-export default function FinancialReport() {
-    const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary()
+export default function FinancialReport({ blockFilter }) {
+    const { totalPemasukan: rawPemasukan, totalPengeluaran: rawPengeluaran, saldo: rawSaldo, payments: rawPayments, expenses: rawExpenses } = useFinancialSummary()
     const [detailModal, setDetailModal] = useState(null) // 'pemasukan' | 'pengeluaran' | null
     const [searchTerm, setSearchTerm] = useState('')
+
+    // Filter by block if blockFilter provided
+    const payments = blockFilter
+        ? rawPayments.filter(p => p.resident?.blok_rumah?.charAt(0)?.toUpperCase() === blockFilter)
+        : rawPayments
+    const expenses = blockFilter
+        ? rawExpenses.filter(e => e.block_id === blockFilter)
+        : rawExpenses
+    const totalPemasukan = payments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalPengeluaran = expenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
+    const saldo = totalPemasukan - totalPengeluaran
 
     const paymentChartData = groupPaymentsByMonth(payments)
     const expenseChartData = groupExpensesByCategory(expenses)

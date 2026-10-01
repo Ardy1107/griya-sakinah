@@ -39,16 +39,15 @@ function getExpenseCategories(blockId) {
 
 const EMPTY_ITEM = { nama: '', qty: 1, harga: 0 }
 
-export default function ExpenseForm({ onSuccess, expenses = [] }) {
+export default function ExpenseForm({ onSuccess, expenses = [], blockFilter }) {
     const { createExpense, loading } = useAdminOperations()
     const { blockId, blockName, isBlockSpecific } = useBlock()
     const now = new Date()
     const currentMonth = now.getMonth() + 1
     const currentYear = now.getFullYear()
 
-    // If not in block-specific mode, admin can choose which block
-    const [selectedBlock, setSelectedBlock] = useState(blockId || 'B')
-    const effectiveBlockId = isBlockSpecific ? blockId : selectedBlock
+    // Use blockFilter from parent (AdminPanel) if available, otherwise fall back to BlockContext
+    const effectiveBlockId = blockFilter || blockId || 'A'
 
     // Dynamic categories based on effective block
     const EXPENSE_CATEGORIES = useMemo(() => {
@@ -359,8 +358,8 @@ export default function ExpenseForm({ onSuccess, expenses = [] }) {
                     </div>
                 )}
 
-                {/* Block Selector (only when not in block-specific mode) */}
-                {!isBlockSpecific && (
+                {/* Block Selector (only when not controlled by parent and not in block-specific mode) */}
+                {!blockFilter && !isBlockSpecific && (
                     <div className="form-group">
                         <label className="form-label">
                             <Filter size={14} style={{ display: 'inline', marginRight: '4px' }} />

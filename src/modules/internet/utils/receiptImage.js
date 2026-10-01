@@ -2,16 +2,19 @@
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { formatCurrency, getMonthName, generateReceiptNumber } from './helpers'
+import bannerInternet from '../../../assets/banner-internet.webp'
 
 // Create receipt HTML element for capture
 export function createReceiptElement(resident, payment) {
   const receiptNumber = payment.nomor_referensi || generateReceiptNumber(payment.id)
   const period = `${getMonthName(payment.bulan)} ${payment.tahun}`
-  const tanggalBayar = new Date(payment.tanggal_bayar).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
+  const tanggalBayar = payment.tanggal_bayar
+    ? new Date(payment.tanggal_bayar).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    : '-'
   const metodeBayar = payment.metode_bayar || 'Cash'
 
   const container = document.createElement('div')
@@ -36,43 +39,8 @@ export function createReceiptElement(resident, payment) {
         pointer-events: none;
       "></div>
 
-      <!-- Header with Logo and Gradient -->
-      <div style="
-        background: linear-gradient(135deg, #0f172a, #1e293b);
-        padding: 32px 24px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-      ">
-        <div style="
-          position: absolute;
-          top: -50%; left: -50%; width: 200%; height: 200%;
-          background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 50%);
-        "></div>
-        <div style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          position: relative;
-          z-index: 1;
-        ">
-          <div style="
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 20px;
-            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
-          ">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-          </div>
-          <div style="text-align: left;">
-            <div style="font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px;">INTERNET SAKINAH</div>
-            <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Kwitansi Resmi</div>
-          </div>
-        </div>
-      </div>
+      <!-- Header Banner -->
+      <img src="${bannerInternet}" style="width: 100%; display: block; border-top-left-radius: 16px; border-top-right-radius: 16px;" alt="Banner Internet Sakinah" />
 
       <!-- Receipt Number Ribbon -->
       <div style="
@@ -83,8 +51,8 @@ export function createReceiptElement(resident, payment) {
         justify-content: space-between;
         align-items: center;
       ">
-        <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">No. Referensi</span>
-        <span style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 4px 10px; border-radius: 6px;">${receiptNumber}</span>
+        <div style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">No. Referensi</div>
+        <div style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 4px 10px; border-radius: 6px; display: inline-block;">${receiptNumber}</div>
       </div>
 
       <!-- Details Section -->
@@ -113,7 +81,7 @@ export function createReceiptElement(resident, payment) {
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #64748b; font-size: 14px;">Blok Rumah</span>
-              <span style="color: #0f172a; font-weight: 700; font-size: 15px; background: #f1f5f9; padding: 4px 12px; border-radius: 20px;">${resident.blok_rumah}</span>
+              <div style="color: #0f172a; font-weight: 700; font-size: 15px; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; display: inline-block;">${resident.blok_rumah}</div>
             </div>
             <div style="height: 1px; background: #e2e8f0; margin: 4px 0;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -126,10 +94,10 @@ export function createReceiptElement(resident, payment) {
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #64748b; font-size: 14px;">Metode Pembayaran</span>
-              <span style="color: #0f172a; font-weight: 500; font-size: 15px; display: flex; align-items: center; gap: 6px;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+              <div style="color: #0f172a; font-weight: 500; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
                 ${metodeBayar}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -201,8 +169,18 @@ export async function generateReceiptImage(resident, payment) {
   receiptElement.style.top = '0'
   document.body.appendChild(receiptElement)
 
+  // Wait for all images in the receipt to load before capturing
+  const images = receiptElement.querySelectorAll('img')
+  await Promise.all(Array.from(images).map(img => {
+    if (img.complete) return Promise.resolve()
+    return new Promise(resolve => {
+      img.onload = resolve
+      img.onerror = resolve
+    })
+  }))
+
   try {
-    const canvas = await html2canvas(receiptElement.firstChild, {
+    const canvas = await html2canvas(receiptElement.firstElementChild, {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff',

@@ -5,7 +5,7 @@ import Header from '../components/Header'
 import { useResidents, usePayments } from '../hooks/useSupabase'
 import { formatCurrency, getMonthName, formatDate } from '../utils/helpers'
 import { downloadReceiptPDF } from '../utils/receiptPdf'
-import { downloadReceiptImage } from '../utils/receiptImage'
+import { downloadReceiptPng } from '../utils/receiptImage'
 import { useBlock } from '../context/BlockContext'
 import { useAgreementCheck, useMonthlyReminder } from '../hooks/useAgreement'
 import ReminderModal from '../components/ReminderModal'
@@ -65,7 +65,7 @@ export default function CekStatus() {
 
     const handleDownloadImage = async (payment) => {
         try {
-            await downloadReceiptImage(selectedResident, payment)
+            await downloadReceiptPng(selectedResident, payment)
         } catch (err) {
             console.error('Download error:', err)
         }

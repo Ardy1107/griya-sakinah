@@ -207,7 +207,7 @@ const AdminDashboard = () => {
     return (
         <div className="admin-dashboard">
             {/* Sidebar */}
-            <aside className="admin-sidebar">
+            <aside className="unified-sidebar">
                 <div className="sidebar-header">
                     <div className="admin-brand">
                         <div className="brand-icon">

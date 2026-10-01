@@ -16,11 +16,16 @@ const PAYMENT_METHODS = [
 
 const DEFAULT_NOMINAL = 150000 // Rp 150.000
 
-export default function PaymentForm({ onSuccess }) {
+export default function PaymentForm({ onSuccess, blockFilter }) {
     const { residents, loading: residentsLoading } = useResidents()
     const { createPayment, updatePaymentReceipt, loading } = useAdminOperations()
     const { bulan: currentBulan, tahun: currentTahun } = useCurrentPeriod()
     const toast = useToast()
+
+    // Filter residents by block
+    const filteredResidents = blockFilter
+        ? residents.filter(r => r.blok_rumah?.charAt(0)?.toUpperCase() === blockFilter)
+        : residents
 
     const [formData, setFormData] = useState({
         resident_id: '',
@@ -300,7 +305,7 @@ export default function PaymentForm({ onSuccess }) {
                             required
                         >
                             <option value="">-- Pilih Warga --</option>
-                            {residents.map(resident => (
+                            {filteredResidents.map(resident => (
                                 <option key={resident.id} value={resident.id}>
                                     {resident.blok_rumah} - {resident.nama_warga}
                                 </option>

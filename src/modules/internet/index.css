@@ -3687,6 +3687,15 @@ a:hover {
   background: var(--bg-primary);
 }
 
+/* FIX: Prevent global CSS conflicts from unified AdminDashboard.css */
+.admin-layout .admin-sidebar {
+  position: sticky !important;
+  width: auto !important;
+}
+.admin-layout .admin-main {
+  margin-left: 0 !important;
+}
+
 .admin-loading {
   min-height: 100vh;
   display: flex;

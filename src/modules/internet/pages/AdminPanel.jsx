@@ -61,7 +61,7 @@ export default function AdminPanel() {
     useEffect(() => {
         sessionStorage.setItem('adminActiveTab', activeTab)
     }, [activeTab])
-    const [adminBlockFilter, setAdminBlockFilter] = useState('all') // 'all', 'A', 'B'
+    const [adminBlockFilter, setAdminBlockFilter] = useState(() => blockId || 'A') // 'A' or 'B' — never 'all'
     const [showBlockDropdown, setShowBlockDropdown] = useState(false)
     const [selectedPeriod, setSelectedPeriod] = useState(() => {
         const now = new Date()
@@ -75,14 +75,12 @@ export default function AdminPanel() {
     const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
     const toast = useToast()
 
-    // Filter data by admin block filter (for admin view only — beyond BlockContext)
+    // Filter data by admin block filter (always filter by specific block)
     const filteredResidents = useMemo(() => {
-        if (adminBlockFilter === 'all') return residents
         return residents.filter(r => r.blok_rumah?.charAt(0)?.toUpperCase() === adminBlockFilter)
     }, [residents, adminBlockFilter])
 
     const filteredPayments = useMemo(() => {
-        if (adminBlockFilter === 'all') return payments
         return payments.filter(p => {
             const block = p.resident?.blok_rumah?.charAt(0)?.toUpperCase()
             return block === adminBlockFilter
@@ -90,15 +88,14 @@ export default function AdminPanel() {
     }, [payments, adminBlockFilter])
 
     const filteredExpenses = useMemo(() => {
-        if (adminBlockFilter === 'all') return expenses
         return expenses.filter(e => {
             if (e.block_id) return e.block_id === adminBlockFilter
-            return true
+            // If no block_id tag, exclude from block-specific view
+            return false
         })
     }, [expenses, adminBlockFilter])
 
     const filteredStatusList = useMemo(() => {
-        if (adminBlockFilter === 'all') return statusList
         return statusList.filter(r => r.blok_rumah?.charAt(0)?.toUpperCase() === adminBlockFilter)
     }, [statusList, adminBlockFilter])
 
@@ -133,17 +130,17 @@ export default function AdminPanel() {
             ...p,
             resident: residents.find(r => r.id === p.resident_id)
         }))
-        exportToExcel(data, `pembayaran${adminBlockFilter !== 'all' ? `-blok-${adminBlockFilter}` : ''}`, 'payments')
+        exportToExcel(data, `pembayaran-blok-${adminBlockFilter}`, 'payments')
         toast.success('Data pembayaran berhasil di-export!')
     }
 
     const handleExportExpenses = () => {
-        exportToExcel(filteredExpenses, `pengeluaran${adminBlockFilter !== 'all' ? `-blok-${adminBlockFilter}` : ''}`, 'expenses')
+        exportToExcel(filteredExpenses, `pengeluaran-blok-${adminBlockFilter}`, 'expenses')
         toast.success('Data pengeluaran berhasil di-export!')
     }
 
     const handleExportResidents = () => {
-        exportToExcel(filteredResidents, `data-warga${adminBlockFilter !== 'all' ? `-blok-${adminBlockFilter}` : ''}`, 'residents')
+        exportToExcel(filteredResidents, `data-warga-blok-${adminBlockFilter}`, 'residents')
         toast.success('Data warga berhasil di-export!')
     }
 
@@ -154,7 +151,6 @@ export default function AdminPanel() {
 
     // Block filter label
     const getBlockFilterLabel = () => {
-        if (adminBlockFilter === 'all') return 'Semua Blok'
         return `Blok ${adminBlockFilter}`
     }
 
@@ -210,7 +206,7 @@ export default function AdminPanel() {
                             <TrendChart payments={filteredPayments} />
                         </div>
 
-                        <StatusGrid selectedPeriod={selectedPeriod} />
+                        <StatusGrid selectedPeriod={selectedPeriod} blockFilter={adminBlockFilter} />
                     </div>
                 )
 
@@ -251,7 +247,7 @@ export default function AdminPanel() {
                                 <p className="admin-section-subtitle">Catat pembayaran iuran internet warga</p>
                             </div>
                         </div>
-                        <PaymentForm onSuccess={handleRefresh} />
+                        <PaymentForm onSuccess={handleRefresh} blockFilter={adminBlockFilter} />
                     </div>
                 )
 
@@ -269,7 +265,7 @@ export default function AdminPanel() {
                             selectedPeriod={{ month: selectedPeriod.bulan, year: selectedPeriod.tahun }}
                             onRecordPayment={handleRefresh}
                         />
-                        <ExpenseForm onSuccess={handleRefresh} expenses={allExpenses} />
+                        <ExpenseForm onSuccess={handleRefresh} expenses={allExpenses} blockFilter={adminBlockFilter} />
                     </div>
                 )
 
@@ -284,7 +280,7 @@ export default function AdminPanel() {
                                 </p>
                             </div>
                         </div>
-                        <ResidentForm onSuccess={handleRefresh} />
+                        <ResidentForm onSuccess={handleRefresh} blockFilter={adminBlockFilter} />
                         <ResidentListAdmin
                             residents={filteredResidents}
                             onUpdateResident={async (id, data) => {
@@ -332,7 +328,7 @@ export default function AdminPanel() {
                                 <p className="admin-section-subtitle">Rekap dan analisa keuangan internet — {getBlockFilterLabel()}</p>
                             </div>
                         </div>
-                        <FinancialReport />
+                        <FinancialReport blockFilter={adminBlockFilter} />
                     </div>
                 )
 
@@ -426,7 +422,6 @@ export default function AdminPanel() {
                     {showBlockDropdown && (
                         <div className="admin-block-dropdown">
                             {[
-                                { value: 'all', label: 'Semua Blok', color: 'var(--text-secondary)' },
                                 { value: 'A', label: 'Blok A', color: '#10b981' },
                                 { value: 'B', label: 'Blok B', color: '#3b82f6' }
                             ].map(opt => (

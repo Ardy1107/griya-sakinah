@@ -4,12 +4,12 @@ import { User, Home, Phone, Loader2, Check, Plus, ChevronDown, ChevronUp } from 
 import { useAdminOperations } from '../hooks/useSupabase'
 import { validatePhoneNumber } from '../utils/helpers'
 
-export default function ResidentForm({ onSuccess }) {
+export default function ResidentForm({ onSuccess, blockFilter }) {
     const { createResident, loading } = useAdminOperations()
     const [isExpanded, setIsExpanded] = useState(false)
 
     const [formData, setFormData] = useState({
-        blok_rumah: '',
+        blok_rumah: blockFilter ? `${blockFilter}` : '',
         nama_warga: '',
         no_whatsapp: ''
     })
@@ -57,7 +57,7 @@ export default function ResidentForm({ onSuccess }) {
 
             setSuccess(true)
             setFormData({
-                blok_rumah: '',
+                blok_rumah: blockFilter ? `${blockFilter}` : '',
                 nama_warga: '',
                 no_whatsapp: ''
             })

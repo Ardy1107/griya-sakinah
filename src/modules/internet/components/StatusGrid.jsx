@@ -5,15 +5,23 @@ import { usePaymentStatus } from '../hooks/useSupabase'
 import { debounce } from '../utils/helpers'
 import ResidentModal from './ResidentModal'
 
-export default function StatusGrid({ selectedPeriod }) {
+export default function StatusGrid({ selectedPeriod, blockFilter }) {
     const { statusList, totalPaid, totalUnpaid, bulan, tahun } = usePaymentStatus(
         selectedPeriod?.bulan, selectedPeriod?.tahun
     )
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedResident, setSelectedResident] = useState(null)
 
+    // Apply block filter if provided (from AdminPanel)
+    const blockFilteredList = blockFilter
+        ? statusList.filter(r => r.blok_rumah?.charAt(0)?.toUpperCase() === blockFilter)
+        : statusList
+
+    const blockPaid = blockFilteredList.filter(r => r.isPaid).length
+    const blockUnpaid = blockFilteredList.filter(r => !r.isPaid).length
+
     // Filter residents based on search
-    const filteredList = statusList.filter(resident =>
+    const filteredList = blockFilteredList.filter(resident =>
         resident.blok_rumah.toLowerCase().includes(searchTerm.toLowerCase()) ||
         resident.nama_warga.toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -42,10 +50,10 @@ export default function StatusGrid({ selectedPeriod }) {
 
                 <div className="flex gap-2">
                     <span className="status-badge lunas" style={{ fontSize: '0.75rem' }}>
-                        <Check size={12} /> {totalPaid} Lunas
+                        <Check size={12} /> {blockFilter ? blockPaid : totalPaid} Lunas
                     </span>
                     <span className="status-badge belum" style={{ fontSize: '0.75rem' }}>
-                        <X size={12} /> {totalUnpaid} Belum
+                        <X size={12} /> {blockFilter ? blockUnpaid : totalUnpaid} Belum
                     </span>
                 </div>
             </div>
