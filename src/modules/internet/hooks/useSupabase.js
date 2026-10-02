@@ -188,6 +188,70 @@ export function usePaymentStatus(pBulan, pTahun) {
     }
 }
 
+// All-time financial summary (for Kas Utama / General Ledger)
+export function useAllTimeFinancials() {
+    const [allPayments, setAllPayments] = useState([])
+    const [allExpenses, setAllExpenses] = useState([])
+    const [loading, setLoading] = useState(true)
+    const { blockId } = useBlock()
+
+    const fetchAll = useCallback(async () => {
+        try {
+            setLoading(true)
+            const [paymentsRes, expensesRes] = await Promise.all([
+                supabase
+                    .from('payments')
+                    .select('*, resident:residents(*)')
+                    .order('tanggal_bayar', { ascending: true }),
+                supabase
+                    .from('expenses')
+                    .select('*')
+                    .order('tanggal', { ascending: true })
+            ])
+
+            let payments = paymentsRes.data || []
+            let expenses = expensesRes.data || []
+
+            // Filter by block
+            if (blockId) {
+                payments = payments.filter(p => {
+                    const residentBlock = p.resident?.blok_rumah?.charAt(0)?.toUpperCase()
+                    return residentBlock === blockId
+                })
+                expenses = expenses.filter(e => {
+                    if (e.block_id) return e.block_id === blockId
+                    return false
+                })
+            }
+
+            setAllPayments(payments)
+            setAllExpenses(expenses)
+        } catch (err) {
+            console.error('Error fetching all-time financials:', err)
+        } finally {
+            setLoading(false)
+        }
+    }, [blockId])
+
+    useEffect(() => {
+        fetchAll()
+    }, [fetchAll])
+
+    const totalPemasukan = allPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalPengeluaran = allExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
+    const kasUtama = totalPemasukan - totalPengeluaran
+
+    return {
+        allPayments,
+        allExpenses,
+        totalPemasukan,
+        totalPengeluaran,
+        kasUtama,
+        loading,
+        refetch: fetchAll
+    }
+}
+
 // Admin CRUD operations
 export function useAdminOperations() {
     const [loading, setLoading] = useState(false)

@@ -229,7 +229,6 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
             // Generate 1 combined receipt in background
             generateAndUploadReceipts(selectedResident, combinedPayment)
 
-            if (onSuccess) onSuccess()
         } catch (err) {
             setError(err.message)
             toast.error('Gagal menyimpan pembayaran')
@@ -254,6 +253,8 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
         setSuccess(false)
         setError(null)
         setSelectedResident(null)
+        
+        if (onSuccess) onSuccess()
     }
 
     // Generate month options

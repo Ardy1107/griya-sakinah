@@ -11,7 +11,7 @@ import {
     Phone, Save, Printer, User
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
-import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useAdminOperations } from '../hooks/useSupabase'
+import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useAdminOperations, useAllTimeFinancials } from '../hooks/useSupabase'
 import { useBlock } from '../context/BlockContext'
 import { useTheme } from '../context/ThemeContext'
 import PaymentForm from '../components/PaymentForm'
@@ -20,6 +20,7 @@ import ResidentForm from '../components/ResidentForm'
 import FinancialReport from '../components/FinancialReport'
 import StatusGrid from '../components/StatusGrid'
 import HeroStats from '../components/HeroStats'
+import KasUtamaCard from '../components/KasUtamaCard'
 import ProgressBar from '../components/ProgressBar'
 import TrendChart from '../components/TrendChart'
 import PeriodPicker from '../components/PeriodPicker'
@@ -73,6 +74,7 @@ export default function AdminPanel() {
     const { residents, refetch: refetchResidents } = useResidents()
     const { expenses: allExpenses } = useExpenses()
     const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
+    const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, kasUtama, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
     const toast = useToast()
 
     // Filter data by admin block filter (always filter by specific block)
@@ -175,6 +177,17 @@ export default function AdminPanel() {
                             <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
                         </div>
 
+                        <KasUtamaCard
+                            kasUtama={kasUtama}
+                            totalPemasukan={allTimePemasukan}
+                            totalPengeluaran={allTimePengeluaran}
+                            allPayments={allTimePaymentsData}
+                            allExpenses={allTimeExpensesData}
+                            blockFilter={adminBlockFilter}
+                            loading={kasLoading}
+                            onViewDetail={() => setActiveTab('bukukas')}
+                        />
+
                         <HeroStats
                             saldo={filteredSaldo}
                             pemasukan={filteredPemasukan}
@@ -218,6 +231,8 @@ export default function AdminPanel() {
                     selectedPeriod={selectedPeriod}
                     onPeriodChange={setSelectedPeriod}
                     blockFilter={adminBlockFilter}
+                    allPayments={allTimePaymentsData}
+                    allExpenses={allTimeExpensesData}
                     onDeletePayment={async (id) => {
                         try {
                             await deletePayment(id)
@@ -530,10 +545,32 @@ export default function AdminPanel() {
 }
 
 // ─── Buku Kas Tab ────────────────────────────────────
-function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, onDeletePayment, onDeleteExpense }) {
+function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, allPayments = [], allExpenses = [], onDeletePayment, onDeleteExpense }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(null)
     const [showReceipt, setShowReceipt] = useState(null)
+    const [viewMode, setViewMode] = useState('monthly') // 'monthly' or 'alltime'
+
+    // All-time data filtered by block
+    const allTimePayments = useMemo(() => {
+        if (!blockFilter) return allPayments
+        return allPayments.filter(p => {
+            const block = p.resident?.blok_rumah?.charAt(0)?.toUpperCase()
+            return block === blockFilter
+        })
+    }, [allPayments, blockFilter])
+
+    const allTimeExpenses = useMemo(() => {
+        if (!blockFilter) return allExpenses
+        return allExpenses.filter(e => {
+            if (e.block_id) return e.block_id === blockFilter
+            return false
+        })
+    }, [allExpenses, blockFilter])
+
+    // Choose data source based on view mode
+    const activePayments = viewMode === 'alltime' ? allTimePayments : payments
+    const activeExpenses = viewMode === 'alltime' ? allTimeExpenses : expenses
 
     // Combine payments and expenses into one ledger
     const ledgerEntries = useMemo(() => {
@@ -549,11 +586,14 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                 debit: Number(p.nominal || 0),
                 kredit: 0,
                 kategori: 'Iuran',
-                source: 'payment'
+                source: 'payment',
+                bulan: p.bulan,
+                tahun: p.tahun
             })
         })
 
         expenses.forEach(e => {
+            const d = new Date(e.tanggal)
             entries.push({
                 id: e.id,
                 type: 'keluar',
@@ -562,7 +602,9 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                 debit: 0,
                 kredit: Number(e.nominal || 0),
                 kategori: e.kategori,
-                source: 'expense'
+                source: 'expense',
+                bulan: d.getMonth() + 1,
+                tahun: d.getFullYear()
             })
         })
 
@@ -577,7 +619,7 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         })
 
         return entries
-    }, [payments, expenses, residents])
+    }, [activePayments, activeExpenses, residents])
 
     // Filter
     const filteredEntries = useMemo(() => {
@@ -609,10 +651,31 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                 <div>
                     <h2 className="admin-section-title">📒 Buku Kas</h2>
                     <p className="admin-section-subtitle">
-                        Catatan lengkap uang masuk & keluar — {getMonthName(selectedPeriod.bulan)} {selectedPeriod.tahun}
+                        {viewMode === 'alltime'
+                            ? 'Catatan lengkap uang masuk & keluar — Semua Waktu'
+                            : `Catatan lengkap uang masuk & keluar — ${getMonthName(selectedPeriod.bulan)} ${selectedPeriod.tahun}`
+                        }
                     </p>
                 </div>
-                <PeriodPicker value={selectedPeriod} onChange={onPeriodChange} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <div className="bukukas-view-toggle">
+                        <button
+                            className={`bukukas-view-btn ${viewMode === 'monthly' ? 'active' : ''}`}
+                            onClick={() => setViewMode('monthly')}
+                        >
+                            Bulanan
+                        </button>
+                        <button
+                            className={`bukukas-view-btn ${viewMode === 'alltime' ? 'active' : ''}`}
+                            onClick={() => setViewMode('alltime')}
+                        >
+                            Semua Waktu
+                        </button>
+                    </div>
+                    {viewMode === 'monthly' && (
+                        <PeriodPicker value={selectedPeriod} onChange={onPeriodChange} />
+                    )}
+                </div>
             </div>
 
             {/* Summary Cards */}
