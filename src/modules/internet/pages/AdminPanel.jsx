@@ -62,7 +62,10 @@ export default function AdminPanel() {
     useEffect(() => {
         sessionStorage.setItem('adminActiveTab', activeTab)
     }, [activeTab])
-    const [adminBlockFilter, setAdminBlockFilter] = useState(() => blockId || 'A') // 'A' or 'B' — never 'all'
+    const [adminBlockFilter, setAdminBlockFilter] = useState(() => sessionStorage.getItem('adminBlockFilter') || blockId || 'A')
+    useEffect(() => {
+        sessionStorage.setItem('adminBlockFilter', adminBlockFilter)
+    }, [adminBlockFilter])
     const [showBlockDropdown, setShowBlockDropdown] = useState(false)
     const [selectedPeriod, setSelectedPeriod] = useState(() => {
         const now = new Date()
