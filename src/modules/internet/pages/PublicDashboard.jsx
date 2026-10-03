@@ -7,7 +7,8 @@ import HeroStats from '../components/HeroStats'
 import TrendChart from '../components/TrendChart'
 import ProgressBar from '../components/ProgressBar'
 import PeriodPicker from '../components/PeriodPicker'
-import { useFinancialSummary, usePaymentStatus, useResidents, usePayments } from '../hooks/useSupabase'
+import KasUtamaCard from '../components/KasUtamaCard'
+import { useFinancialSummary, usePaymentStatus, useResidents, useAllTimeFinancials } from '../hooks/useSupabase'
 import { getMonthName } from '../utils/helpers'
 import { useBlock } from '../context/BlockContext'
 
@@ -24,6 +25,9 @@ export default function PublicDashboard() {
     const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
     const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
     const { residents } = useResidents()
+    
+    // Add all-time financials for Kas Utama
+    const { allPayments: allTimePayments, allExpenses: allTimeExpenses, kasUtama, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
 
     const totalWarga = residents.length
 
@@ -55,6 +59,21 @@ export default function PublicDashboard() {
                         />
                     </div>
                 </div>
+
+                {/* Kas Utama (All-Time General Ledger) */}
+                <KasUtamaCard 
+                    kasUtama={kasUtama}
+                    totalPemasukan={allTimePemasukan}
+                    totalPengeluaran={allTimePengeluaran}
+                    allPayments={allTimePayments}
+                    allExpenses={allTimeExpenses}
+                    blockFilter={blockId}
+                    loading={kasLoading}
+                    onViewDetail={() => {
+                        // On public dashboard, the modal opens automatically. 
+                        // But we don't have a specific ledger tab here, so we just let the modal show the history.
+                    }}
+                />
 
                 {/* Hero Stats - Clickable */}
                 <HeroStats
