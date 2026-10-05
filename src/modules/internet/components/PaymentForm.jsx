@@ -55,7 +55,13 @@ function getMonthRangeLabel(startBulan, startTahun, count) {
     return `${getMonthName(first.bulan)} ${first.tahun} - ${getMonthName(last.bulan)} ${last.tahun}`
 }
 
-export default function PaymentForm({ onSuccess, blockFilter }) {
+export default function PaymentForm({ 
+    onSuccess, 
+    blockFilter, 
+    initialResidentId = '', 
+    initialBulan = null, 
+    initialTahun = null 
+}) {
     const { residents, loading: residentsLoading } = useResidents()
     const { createPayment, updatePaymentReceipt, loading } = useAdminOperations()
     const { bulan: currentBulan, tahun: currentTahun } = useCurrentPeriod()
@@ -67,13 +73,25 @@ export default function PaymentForm({ onSuccess, blockFilter }) {
         : residents
 
     const [formData, setFormData] = useState({
-        resident_id: '',
-        bulan: currentBulan,
-        tahun: currentTahun,
+        resident_id: initialResidentId || '',
+        bulan: initialBulan || currentBulan,
+        tahun: initialTahun || currentTahun,
         tanggal_bayar: new Date().toISOString().split('T')[0],
         metode_bayar: 'Cash',
         nomor_referensi: ''
     })
+
+    // Sync if initial props change
+    useEffect(() => {
+        if (initialResidentId) {
+            setFormData(prev => ({
+                ...prev,
+                resident_id: initialResidentId,
+                ...(initialBulan ? { bulan: initialBulan } : {}),
+                ...(initialTahun ? { tahun: initialTahun } : {})
+            }))
+        }
+    }, [initialResidentId, initialBulan, initialTahun])
 
     const [jumlahBulan, setJumlahBulan] = useState(1)
     const [selectedResident, setSelectedResident] = useState(null)

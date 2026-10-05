@@ -28,6 +28,8 @@ import StarlinkReminder from '../components/StarlinkReminder'
 import ImportData from '../components/ImportData'
 import ConfirmModal from '../components/ConfirmModal'
 import DigitalReceipt from '../components/DigitalReceipt'
+import DigitalInvoice from '../components/DigitalInvoice'
+import InvoiceTab from '../components/InvoiceTab'
 import { useToast } from '../components/Toast'
 import { getMonthName, formatCurrency, formatDate } from '../utils/helpers'
 import { exportToExcel, exportBackup } from '../utils/export'
@@ -37,6 +39,7 @@ import { validatePhoneNumber } from '../utils/helpers'
 const TABS = [
     { id: 'transparansi', label: 'Transparansi', icon: Eye, group: 'main' },
     { id: 'bukukas', label: 'Buku Kas', icon: BookOpen, group: 'main' },
+    { id: 'invoice', label: 'Invoice Tagihan', icon: FileText, group: 'kelola' },
     { id: 'payment', label: 'Input Bayar', icon: CreditCard, group: 'kelola' },
     { id: 'expense', label: 'Pengeluaran', icon: Receipt, group: 'kelola' },
     { id: 'residents', label: 'Data Warga', icon: Users, group: 'kelola' },
@@ -79,6 +82,9 @@ export default function AdminPanel() {
     const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
     const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, kasUtama, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
     const toast = useToast()
+
+    const [showInvoiceModal, setShowInvoiceModal] = useState(null)
+    const [paymentPreselect, setPaymentPreselect] = useState(null)
 
     // Filter data by admin block filter (always filter by specific block)
     const filteredResidents = useMemo(() => {
@@ -256,6 +262,39 @@ export default function AdminPanel() {
                     }}
                 />
 
+            case 'invoice':
+                return (
+                    <div>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 className="admin-section-title">Invoice & Penagihan Warga</h2>
+                                <p className="admin-section-subtitle">
+                                    Kelola daftar tagihan warga belum lunas & unduh invoice — {getBlockFilterLabel()}
+                                </p>
+                            </div>
+                            <PeriodPicker value={selectedPeriod} onChange={setSelectedPeriod} />
+                        </div>
+                        <InvoiceTab
+                            residents={filteredResidents}
+                            statusList={filteredStatusList}
+                            allPayments={allTimePaymentsData}
+                            selectedPeriod={selectedPeriod}
+                            adminBlockFilter={adminBlockFilter}
+                            onOpenPayment={(resident) => {
+                                setPaymentPreselect({
+                                    residentId: resident.id,
+                                    bulan: selectedPeriod.bulan,
+                                    tahun: selectedPeriod.tahun
+                                })
+                                setActiveTab('payment')
+                            }}
+                            onShowInvoice={(resident, unpaidMonths) => {
+                                setShowInvoiceModal({ resident, unpaidMonths })
+                            }}
+                        />
+                    </div>
+                )
+
             case 'payment':
                 return (
                     <div>
@@ -265,7 +304,16 @@ export default function AdminPanel() {
                                 <p className="admin-section-subtitle">Catat pembayaran iuran internet warga</p>
                             </div>
                         </div>
-                        <PaymentForm onSuccess={handleRefresh} blockFilter={adminBlockFilter} />
+                        <PaymentForm 
+                            onSuccess={() => {
+                                handleRefresh()
+                                setPaymentPreselect(null)
+                            }} 
+                            blockFilter={adminBlockFilter} 
+                            initialResidentId={paymentPreselect?.residentId}
+                            initialBulan={paymentPreselect?.bulan}
+                            initialTahun={paymentPreselect?.tahun}
+                        />
                     </div>
                 )
 
@@ -478,6 +526,20 @@ export default function AdminPanel() {
                                 >
                                     <tab.icon size={18} />
                                     <span>{tab.label}</span>
+                                    {tab.id === 'invoice' && filteredTotalUnpaid > 0 && (
+                                        <span style={{
+                                            marginLeft: 'auto',
+                                            background: '#fef3c7',
+                                            color: '#b45309',
+                                            fontSize: '11px',
+                                            fontWeight: 800,
+                                            padding: '1px 7px',
+                                            borderRadius: '12px',
+                                            border: '1px solid #fde68a'
+                                        }}>
+                                            {filteredTotalUnpaid}
+                                        </span>
+                                    )}
                                 </a>
                             ))}
                         </div>
@@ -541,6 +603,25 @@ export default function AdminPanel() {
                 <div
                     className="admin-overlay"
                     onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            {/* Digital Invoice Modal */}
+            {showInvoiceModal && (
+                <DigitalInvoice
+                    resident={showInvoiceModal.resident}
+                    period={selectedPeriod}
+                    unpaidMonths={showInvoiceModal.unpaidMonths}
+                    onClose={() => setShowInvoiceModal(null)}
+                    onPayNow={(resident) => {
+                        setPaymentPreselect({
+                            residentId: resident.id,
+                            bulan: selectedPeriod.bulan,
+                            tahun: selectedPeriod.tahun
+                        })
+                        setShowInvoiceModal(null)
+                        setActiveTab('payment')
+                    }}
                 />
             )}
         </div>
