@@ -141,21 +141,72 @@ export function useExpenses(bulan, tahun) {
     return { expenses, loading, error, refetch: fetchExpenses }
 }
 
+// Hook for fetching other incomes (Pemasukan Lain: Kas Sebelumnya, Donasi, etc.)
+export function useOtherIncomes(bulan, tahun) {
+    const [otherIncomes, setOtherIncomes] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const { blockId } = useBlock()
+
+    const fetchOtherIncomes = useCallback(async () => {
+        try {
+            setLoading(true)
+            let query = supabase
+                .from('internet_other_incomes')
+                .select('*')
+                .order('tanggal', { ascending: false })
+
+            if (blockId) {
+                query = query.or(`block_id.eq.${blockId},block_id.is.null`)
+            }
+
+            if (bulan && tahun) {
+                const startDate = `${tahun}-${String(bulan).padStart(2, '0')}-01`
+                const endDate = new Date(tahun, bulan, 0).toISOString().split('T')[0]
+                query = query.gte('tanggal', startDate).lte('tanggal', endDate)
+            }
+
+            const { data, error } = await query
+
+            if (error) throw error
+            setOtherIncomes(data || [])
+        } catch (err) {
+            setError(err.message)
+            console.error('Error fetching other incomes:', err)
+        } finally {
+            setLoading(false)
+        }
+    }, [bulan, tahun, blockId])
+
+    useEffect(() => {
+        fetchOtherIncomes()
+    }, [fetchOtherIncomes])
+
+    return { otherIncomes, loading, error, refetch: fetchOtherIncomes }
+}
+
 // Calculate financial summary
 export function useFinancialSummary(bulan, tahun) {
     const { payments } = usePayments(bulan, tahun)
     const { expenses } = useExpenses(bulan, tahun)
+    const { otherIncomes, refetch: refetchOtherIncomes } = useOtherIncomes(bulan, tahun)
 
-    const totalPemasukan = payments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalIuran = payments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalPemasukanLain = otherIncomes.reduce((sum, o) => sum + Number(o.nominal || 0), 0)
+    const totalPemasukan = totalIuran + totalPemasukanLain
     const totalPengeluaran = expenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
     const saldo = totalPemasukan - totalPengeluaran
 
     return {
         totalPemasukan,
+        totalIuran,
+        totalPemasukanLain,
         totalPengeluaran,
         saldo,
         payments,
-        expenses
+        expenses,
+        otherIncomes,
+        refetchOtherIncomes
     }
 }
 
@@ -188,13 +239,14 @@ export function usePaymentStatus(pBulan, pTahun) {
     }
 }
 
-// Default initial cash balances (fallback if not in DB)
-export const DEFAULT_SALDO_AWAL = { A: 5000000, B: 5000000 }
+// Default initial cash balances (defaults to 0, no injected 5jt)
+export const DEFAULT_SALDO_AWAL = { A: 0, B: 0 }
 
 // All-time financial summary (for Kas Utama / General Ledger)
 export function useAllTimeFinancials() {
     const [allPayments, setAllPayments] = useState([])
     const [allExpenses, setAllExpenses] = useState([])
+    const [allOtherIncomes, setAllOtherIncomes] = useState([])
     const [saldoAwalMap, setSaldoAwalMap] = useState(DEFAULT_SALDO_AWAL)
     const [loading, setLoading] = useState(true)
     const { blockId } = useBlock()
@@ -202,7 +254,7 @@ export function useAllTimeFinancials() {
     const fetchAll = useCallback(async () => {
         try {
             setLoading(true)
-            const [paymentsRes, expensesRes, settingsRes] = await Promise.all([
+            const [paymentsRes, expensesRes, settingsRes, otherIncomesRes] = await Promise.all([
                 supabase
                     .from('payments')
                     .select('*, resident:residents(*)')
@@ -213,13 +265,18 @@ export function useAllTimeFinancials() {
                     .order('tanggal', { ascending: true }),
                 supabase
                     .from('internet_settings')
+                    .select('*'),
+                supabase
+                    .from('internet_other_incomes')
                     .select('*')
+                    .order('tanggal', { ascending: true })
             ])
 
             let payments = paymentsRes.data || []
             let expenses = expensesRes.data || []
+            let otherIncomes = otherIncomesRes.data || []
 
-            // Extract saldo awal settings
+            // Extract saldo awal settings (defaults to 0)
             let sAwalA = DEFAULT_SALDO_AWAL.A
             let sAwalB = DEFAULT_SALDO_AWAL.B
             if (settingsRes?.data) {
@@ -230,7 +287,7 @@ export function useAllTimeFinancials() {
             }
             setSaldoAwalMap({ A: sAwalA, B: sAwalB })
 
-            // Filter by block
+            // Filter by block if blockId active
             if (blockId) {
                 payments = payments.filter(p => {
                     const residentBlock = p.resident?.blok_rumah?.charAt(0)?.toUpperCase()
@@ -240,10 +297,15 @@ export function useAllTimeFinancials() {
                     if (e.block_id) return e.block_id === blockId
                     return false
                 })
+                otherIncomes = otherIncomes.filter(o => {
+                    if (!o.block_id) return true
+                    return o.block_id === blockId
+                })
             }
 
             setAllPayments(payments)
             setAllExpenses(expenses)
+            setAllOtherIncomes(otherIncomes)
         } catch (err) {
             console.error('Error fetching all-time financials:', err)
         } finally {
@@ -261,14 +323,19 @@ export function useAllTimeFinancials() {
             ? saldoAwalMap.B
             : (saldoAwalMap.A + saldoAwalMap.B)
 
-    const totalPemasukan = allPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalIuran = allPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const totalPemasukanLain = allOtherIncomes.reduce((sum, o) => sum + Number(o.nominal || 0), 0)
+    const totalPemasukan = totalIuran + totalPemasukanLain
     const totalPengeluaran = allExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
     const kasUtama = saldoAwal + totalPemasukan - totalPengeluaran
 
     return {
         allPayments,
         allExpenses,
+        allOtherIncomes,
         totalPemasukan,
+        totalIuran,
+        totalPemasukanLain,
         totalPengeluaran,
         saldoAwal,
         saldoAwalMap,
@@ -420,6 +487,59 @@ export function useAdminOperations() {
         }
     }
 
+    // Create other income (Pemasukan Lain)
+    const createOtherIncome = async (incomeData) => {
+        setLoading(true)
+        setError(null)
+        try {
+            const { data, error } = await supabaseAdmin
+                .from('internet_other_incomes')
+                .insert([incomeData])
+                .select()
+                .single()
+
+            if (error) throw error
+            return data
+        } catch (err) {
+            setError(err.message)
+            throw err
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Delete other income
+    const deleteOtherIncome = async (id) => {
+        const { error } = await supabaseAdmin
+            .from('internet_other_incomes')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+    }
+
+    // Update other income
+    const updateOtherIncome = async (id, incomeData) => {
+        setLoading(true)
+        setError(null)
+        try {
+            const { data, error } = await supabaseAdmin
+                .from('internet_other_incomes')
+                .update(incomeData)
+                .eq('id', id)
+                .select()
+                .single()
+
+            if (error) throw error
+            return data
+        } catch (err) {
+            setError(err.message)
+            throw err
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return {
         loading,
         error,
@@ -430,7 +550,10 @@ export function useAdminOperations() {
         updateResident,
         deleteResident,
         deletePayment,
-        deleteExpense
+        deleteExpense,
+        createOtherIncome,
+        updateOtherIncome,
+        deleteOtherIncome
     }
 }
 

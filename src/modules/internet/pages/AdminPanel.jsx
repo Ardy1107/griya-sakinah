@@ -8,14 +8,15 @@ import {
     Filter, ChevronDown, Shield, Settings, Moon, Sun,
     TrendingUp, TrendingDown, Wallet, Search, Trash2, Edit3,
     CheckCircle, XCircle, AlertTriangle, RefreshCw, Key, EyeOff,
-    Phone, Save, Printer, User
+    Phone, Save, Printer, User, PlusCircle
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth.jsx'
-import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useAdminOperations, useAllTimeFinancials } from '../hooks/useSupabase'
+import { usePaymentStatus, useFinancialSummary, useResidents, usePayments, useExpenses, useOtherIncomes, useAdminOperations, useAllTimeFinancials } from '../hooks/useSupabase'
 import { useBlock } from '../context/BlockContext'
 import { useTheme } from '../context/ThemeContext'
 import PaymentForm from '../components/PaymentForm'
 import ExpenseForm from '../components/ExpenseForm'
+import OtherIncomeForm from '../components/OtherIncomeForm'
 import ResidentForm from '../components/ResidentForm'
 import FinancialReport from '../components/FinancialReport'
 import StatusGrid from '../components/StatusGrid'
@@ -41,6 +42,7 @@ const TABS = [
     { id: 'bukukas', label: 'Buku Kas', icon: BookOpen, group: 'main' },
     { id: 'invoice', label: 'Invoice Tagihan', icon: FileText, group: 'kelola' },
     { id: 'payment', label: 'Input Bayar', icon: CreditCard, group: 'kelola' },
+    { id: 'other_income', label: 'Pemasukan Lain', icon: PlusCircle, group: 'kelola' },
     { id: 'expense', label: 'Pengeluaran', icon: Receipt, group: 'kelola' },
     { id: 'residents', label: 'Data Warga', icon: Users, group: 'kelola' },
     { id: 'import', label: 'Import Data', icon: FileText, group: 'tools' },
@@ -76,11 +78,11 @@ export default function AdminPanel() {
     })
 
     const { totalPaid, totalUnpaid, statusList } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
-    const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
+    const { totalPemasukan, totalPengeluaran, saldo, payments, expenses, otherIncomes = [], refetchOtherIncomes } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
     const { residents, refetch: refetchResidents } = useResidents()
     const { expenses: allExpenses } = useExpenses()
-    const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
-    const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, kasUtama, saldoAwal, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
+    const { deletePayment, deleteExpense, updateResident, deleteResident, createOtherIncome, deleteOtherIncome } = useAdminOperations()
+    const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, allOtherIncomes: allTimeOtherIncomesData = [], kasUtama, saldoAwal, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading, refetch: refetchAllTime } = useAllTimeFinancials()
     const toast = useToast()
 
     const [showInvoiceModal, setShowInvoiceModal] = useState(null)
@@ -106,13 +108,19 @@ export default function AdminPanel() {
         })
     }, [expenses, adminBlockFilter])
 
+    const filteredOtherIncomes = useMemo(() => {
+        return otherIncomes.filter(o => !o.block_id || o.block_id === adminBlockFilter)
+    }, [otherIncomes, adminBlockFilter])
+
     const filteredStatusList = useMemo(() => {
         return statusList.filter(r => r.blok_rumah?.charAt(0)?.toUpperCase() === adminBlockFilter)
     }, [statusList, adminBlockFilter])
 
     const filteredTotalPaid = filteredStatusList.filter(r => r.isPaid).length
     const filteredTotalUnpaid = filteredStatusList.filter(r => !r.isPaid).length
-    const filteredPemasukan = filteredPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const filteredIuran = filteredPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const filteredPemasukanLain = filteredOtherIncomes.reduce((sum, o) => sum + Number(o.nominal || 0), 0)
+    const filteredPemasukan = filteredIuran + filteredPemasukanLain
     const filteredPengeluaran = filteredExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
     const filteredSaldo = filteredPemasukan - filteredPengeluaran
 
@@ -193,6 +201,7 @@ export default function AdminPanel() {
                             totalPengeluaran={allTimePengeluaran}
                             allPayments={allTimePaymentsData}
                             allExpenses={allTimeExpensesData}
+                            allOtherIncomes={allTimeOtherIncomesData}
                             blockFilter={adminBlockFilter}
                             loading={kasLoading}
                             onViewDetail={() => setActiveTab('bukukas')}
@@ -238,6 +247,7 @@ export default function AdminPanel() {
                 return <BukuKasTab
                     payments={filteredPayments}
                     expenses={filteredExpenses}
+                    otherIncomes={filteredOtherIncomes}
                     residents={residents}
                     selectedPeriod={selectedPeriod}
                     onPeriodChange={setSelectedPeriod}
@@ -245,6 +255,7 @@ export default function AdminPanel() {
                     saldoAwal={saldoAwal}
                     allPayments={allTimePaymentsData}
                     allExpenses={allTimeExpensesData}
+                    allOtherIncomes={allTimeOtherIncomesData}
                     onDeletePayment={async (id) => {
                         try {
                             await deletePayment(id)
@@ -263,6 +274,16 @@ export default function AdminPanel() {
                             toast.error('Gagal menghapus: ' + e.message)
                         }
                     }}
+                    onDeleteOtherIncome={async (id) => {
+                        try {
+                            await deleteOtherIncome(id)
+                            toast.success('Pemasukan lain berhasil dihapus')
+                            handleRefresh()
+                        } catch (e) {
+                            toast.error('Gagal menghapus: ' + e.message)
+                        }
+                    }}
+                    onAddOtherIncome={() => setActiveTab('other_income')}
                 />
 
             case 'invoice':
@@ -318,6 +339,26 @@ export default function AdminPanel() {
                             initialTahun={paymentPreselect?.tahun}
                         />
                     </div>
+                )
+
+            case 'other_income':
+                return (
+                    <OtherIncomeForm
+                        blockFilter={adminBlockFilter}
+                        otherIncomes={allTimeOtherIncomesData}
+                        onSuccess={() => {
+                            handleRefresh()
+                        }}
+                        onDeleteIncome={async (id) => {
+                            try {
+                                await deleteOtherIncome(id)
+                                toast.success('Pemasukan lain berhasil dihapus')
+                                handleRefresh()
+                            } catch (e) {
+                                toast.error('Gagal menghapus: ' + e.message)
+                            }
+                        }}
+                    />
                 )
 
             case 'expense':
@@ -632,7 +673,23 @@ export default function AdminPanel() {
 }
 
 // ─── Buku Kas Tab ────────────────────────────────────
-function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, allPayments = [], allExpenses = [], saldoAwal, onDeletePayment, onDeleteExpense }) {
+function BukuKasTab({
+    payments,
+    expenses,
+    otherIncomes = [],
+    residents,
+    selectedPeriod,
+    onPeriodChange,
+    blockFilter,
+    allPayments = [],
+    allExpenses = [],
+    allOtherIncomes = [],
+    saldoAwal,
+    onDeletePayment,
+    onDeleteExpense,
+    onDeleteOtherIncome,
+    onAddOtherIncome
+}) {
     const [searchTerm, setSearchTerm] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(null)
     const [showReceipt, setShowReceipt] = useState(null)
@@ -655,11 +712,17 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         })
     }, [allExpenses, blockFilter])
 
+    const allTimeOtherIncomes = useMemo(() => {
+        if (!blockFilter) return allOtherIncomes
+        return allOtherIncomes.filter(o => !o.block_id || o.block_id === blockFilter)
+    }, [allOtherIncomes, blockFilter])
+
     // Choose data source based on view mode
     const activePayments = viewMode === 'alltime' ? allTimePayments : payments
     const activeExpenses = viewMode === 'alltime' ? allTimeExpenses : expenses
+    const activeOtherIncomes = viewMode === 'alltime' ? allTimeOtherIncomes : otherIncomes
 
-    // Combine payments and expenses into one ledger
+    // Combine payments, other incomes, and expenses into one ledger
     const ledgerEntries = useMemo(() => {
         const entries = []
 
@@ -676,6 +739,22 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                 source: 'payment',
                 bulan: p.bulan,
                 tahun: p.tahun
+            })
+        })
+
+        activeOtherIncomes.forEach(o => {
+            const d = new Date(o.tanggal)
+            entries.push({
+                id: o.id,
+                type: 'masuk',
+                tanggal: o.tanggal,
+                keterangan: `${o.keterangan || o.kategori}${o.block_id ? ` (Blok ${o.block_id})` : ' (Semua Blok)'}`,
+                debit: Number(o.nominal || 0),
+                kredit: 0,
+                kategori: o.kategori || 'Pemasukan Lain',
+                source: 'other_income',
+                bulan: d.getMonth() + 1,
+                tahun: d.getFullYear()
             })
         })
 
@@ -698,18 +777,14 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         // Sort by date
         entries.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
 
-        // Prepend Saldo Awal when in alltime view mode
-        const initialBalance = typeof saldoAwal === 'number'
-            ? saldoAwal
-            : (blockFilter === 'A' || blockFilter === 'B' ? 5000000 : 10000000)
-
-        if (viewMode === 'alltime' && initialBalance > 0) {
+        // Prepend Saldo Awal ONLY if explicitly configured > 0 (defaults to 0, no injected 5jt/10jt)
+        if (viewMode === 'alltime' && typeof saldoAwal === 'number' && saldoAwal > 0) {
             entries.unshift({
                 id: 'saldo-awal-kas',
                 type: 'masuk',
                 tanggal: '2026-01-01',
-                keterangan: `🏛️ Saldo Kas Sebelumnya — Blok ${blockFilter || 'A & B'}`,
-                debit: initialBalance,
+                keterangan: `🏛️ Saldo Kas Awal — Blok ${blockFilter || 'A & B'}`,
+                debit: saldoAwal,
                 kredit: 0,
                 kategori: 'Saldo Awal',
                 source: 'initial',
@@ -726,7 +801,7 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         })
 
         return entries
-    }, [activePayments, activeExpenses, residents, viewMode, saldoAwal, blockFilter])
+    }, [activePayments, activeOtherIncomes, activeExpenses, residents, viewMode, saldoAwal, blockFilter])
 
     // Filter
     const filteredEntries = useMemo(() => {
@@ -746,6 +821,8 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         if (!confirmDelete) return
         if (confirmDelete.source === 'payment') {
             await onDeletePayment(confirmDelete.id)
+        } else if (confirmDelete.source === 'other_income') {
+            if (onDeleteOtherIncome) await onDeleteOtherIncome(confirmDelete.id)
         } else {
             await onDeleteExpense(confirmDelete.id)
         }
@@ -765,6 +842,17 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
                     </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {onAddOtherIncome && (
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-primary"
+                            onClick={onAddOtherIncome}
+                            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', padding: '6px 12px' }}
+                        >
+                            <PlusCircle size={15} />
+                            + Pemasukan Lain
+                        </button>
+                    )}
                     <div className="bukukas-view-toggle">
                         <button
                             className={`bukukas-view-btn ${viewMode === 'monthly' ? 'active' : ''}`}

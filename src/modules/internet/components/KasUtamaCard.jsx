@@ -87,19 +87,18 @@ export default function KasUtamaCard({
     saldoAwal,
     allPayments = [],
     allExpenses = [],
+    allOtherIncomes = [],
     blockFilter,
     loading,
     onViewDetail
 }) {
     const [showDetail, setShowDetail] = useState(false)
 
-    // Effective initial balance for this block (default 5jt per block)
+    // Effective initial balance for this block (default 0, no injected 5jt/10jt)
     const effectiveSaldoAwal = useMemo(() => {
         if (typeof saldoAwal === 'number') return saldoAwal
-        if (blockFilter === 'A') return 5000000
-        if (blockFilter === 'B') return 5000000
-        return 10000000
-    }, [saldoAwal, blockFilter])
+        return 0
+    }, [saldoAwal])
 
     // Filter data by admin block filter
     const filteredPayments = useMemo(() => {
@@ -118,7 +117,17 @@ export default function KasUtamaCard({
         })
     }, [allExpenses, blockFilter])
 
-    const filteredPemasukan = filteredPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const filteredOtherIncomes = useMemo(() => {
+        if (!blockFilter) return allOtherIncomes
+        return allOtherIncomes.filter(o => {
+            if (!o.block_id) return true
+            return o.block_id === blockFilter
+        })
+    }, [allOtherIncomes, blockFilter])
+
+    const filteredIuran = filteredPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
+    const filteredPemasukanLain = filteredOtherIncomes.reduce((sum, o) => sum + Number(o.nominal || 0), 0)
+    const filteredPemasukan = filteredIuran + filteredPemasukanLain
     const filteredPengeluaran = filteredExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
     const filteredKasUtama = effectiveSaldoAwal + filteredPemasukan - filteredPengeluaran
 
@@ -130,6 +139,13 @@ export default function KasUtamaCard({
             const key = `${p.tahun}-${String(p.bulan).padStart(2, '0')}`
             if (!map[key]) map[key] = { bulan: p.bulan, tahun: p.tahun, masuk: 0, keluar: 0 }
             map[key].masuk += Number(p.nominal || 0)
+        })
+
+        filteredOtherIncomes.forEach(o => {
+            const d = new Date(o.tanggal)
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            if (!map[key]) map[key] = { bulan: d.getMonth() + 1, tahun: d.getFullYear(), masuk: 0, keluar: 0 }
+            map[key].masuk += Number(o.nominal || 0)
         })
 
         filteredExpenses.forEach(e => {
@@ -145,7 +161,7 @@ export default function KasUtamaCard({
             runningBalance += data.masuk - data.keluar
             return { ...data, key, saldo: runningBalance }
         })
-    }, [filteredPayments, filteredExpenses, effectiveSaldoAwal])
+    }, [filteredPayments, filteredOtherIncomes, filteredExpenses, effectiveSaldoAwal])
 
     const sparklineData = monthlyData.length > 0 
         ? [effectiveSaldoAwal, ...monthlyData.map(m => m.saldo)]
@@ -241,9 +257,16 @@ export default function KasUtamaCard({
                                     )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <TrendingUp size={14} style={{ color: '#22c55e' }} />
-                                        <span style={{ color: 'var(--text-muted)' }}>Iuran Masuk:</span>
-                                        <strong style={{ color: '#22c55e' }}>{formatCurrency(filteredPemasukan)}</strong>
+                                        <span style={{ color: 'var(--text-muted)' }}>Iuran Warga:</span>
+                                        <strong style={{ color: '#22c55e' }}>{formatCurrency(filteredIuran)}</strong>
                                     </div>
+                                    {filteredPemasukanLain > 0 && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '13px' }}>📥</span>
+                                            <span style={{ color: 'var(--text-muted)' }}>Pemasukan Lain:</span>
+                                            <strong style={{ color: '#06b6d4' }}>{formatCurrency(filteredPemasukanLain)}</strong>
+                                        </div>
+                                    )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <TrendingDown size={14} style={{ color: '#ef4444' }} />
                                         <span style={{ color: 'var(--text-muted)' }}>Keluar:</span>

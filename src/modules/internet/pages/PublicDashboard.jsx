@@ -27,7 +27,7 @@ export default function PublicDashboard() {
     const { residents } = useResidents()
     
     // Add all-time financials for Kas Utama
-    const { allPayments: allTimePayments, allExpenses: allTimeExpenses, kasUtama, saldoAwal, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
+    const { allPayments: allTimePayments, allExpenses: allTimeExpenses, allOtherIncomes: allTimeOtherIncomes, kasUtama, saldoAwal, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
 
     const totalWarga = residents.length
 
@@ -68,6 +68,7 @@ export default function PublicDashboard() {
                     totalPengeluaran={allTimePengeluaran}
                     allPayments={allTimePayments}
                     allExpenses={allTimeExpenses}
+                    allOtherIncomes={allTimeOtherIncomes}
                     blockFilter={blockId}
                     loading={kasLoading}
                     onViewDetail={() => {

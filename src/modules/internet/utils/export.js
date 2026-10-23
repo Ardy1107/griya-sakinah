@@ -37,6 +37,20 @@ export function exportToExcel(data, filename, type = 'payments') {
             ].join(',')
             csvContent += row + '\n'
         })
+    } else if (type === 'other_incomes') {
+        csvContent = 'No,Tanggal,Blok,Kategori,Keterangan,Nominal\n'
+
+        data.forEach((item, idx) => {
+            const row = [
+                idx + 1,
+                formatDateShort(item.tanggal),
+                item.block_id ? `Blok ${item.block_id}` : 'Semua',
+                item.kategori || 'Pemasukan Lain',
+                `"${item.keterangan || '-'}"`,
+                item.nominal
+            ].join(',')
+            csvContent += row + '\n'
+        })
     } else if (type === 'residents') {
         csvContent = 'No,Blok,Nama Warga,No WhatsApp,Tanggal Daftar\n'
 
