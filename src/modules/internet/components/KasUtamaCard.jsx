@@ -84,6 +84,7 @@ export default function KasUtamaCard({
     kasUtama,
     totalPemasukan,
     totalPengeluaran,
+    saldoAwal,
     allPayments = [],
     allExpenses = [],
     blockFilter,
@@ -91,6 +92,14 @@ export default function KasUtamaCard({
     onViewDetail
 }) {
     const [showDetail, setShowDetail] = useState(false)
+
+    // Effective initial balance for this block (default 5jt per block)
+    const effectiveSaldoAwal = useMemo(() => {
+        if (typeof saldoAwal === 'number') return saldoAwal
+        if (blockFilter === 'A') return 5000000
+        if (blockFilter === 'B') return 5000000
+        return 10000000
+    }, [saldoAwal, blockFilter])
 
     // Filter data by admin block filter
     const filteredPayments = useMemo(() => {
@@ -111,7 +120,7 @@ export default function KasUtamaCard({
 
     const filteredPemasukan = filteredPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
     const filteredPengeluaran = filteredExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
-    const filteredKasUtama = filteredPemasukan - filteredPengeluaran
+    const filteredKasUtama = effectiveSaldoAwal + filteredPemasukan - filteredPengeluaran
 
     // Monthly breakdown for sparkline and detail
     const monthlyData = useMemo(() => {
@@ -131,20 +140,22 @@ export default function KasUtamaCard({
         })
 
         const sorted = Object.entries(map).sort(([a], [b]) => a.localeCompare(b))
-        let runningBalance = 0
+        let runningBalance = effectiveSaldoAwal
         return sorted.map(([key, data]) => {
             runningBalance += data.masuk - data.keluar
             return { ...data, key, saldo: runningBalance }
         })
-    }, [filteredPayments, filteredExpenses])
+    }, [filteredPayments, filteredExpenses, effectiveSaldoAwal])
 
-    const sparklineData = monthlyData.map(m => m.saldo)
+    const sparklineData = monthlyData.length > 0 
+        ? [effectiveSaldoAwal, ...monthlyData.map(m => m.saldo)]
+        : [effectiveSaldoAwal]
 
     return (
         <>
             {/* Main Card */}
             <div
-                className="kas-utama-card"
+                className={`kas-utama-card ${blockFilter === 'B' ? 'theme-blue' : ''}`}
                 onClick={() => setShowDetail(true)}
                 style={{ cursor: 'pointer' }}
             >
@@ -167,7 +178,7 @@ export default function KasUtamaCard({
                             <span className="kas-utama-sublabel">Saldo Akumulasi Sepanjang Masa</span>
                         </div>
                         <div className="kas-utama-sparkline">
-                            <MiniSparkline data={sparklineData} color="#34d399" height={36} width={100} />
+                            <MiniSparkline data={sparklineData} color={blockFilter === 'B' ? "#93c5fd" : "#34d399"} height={36} width={100} />
                         </div>
                     </div>
 
@@ -198,7 +209,7 @@ export default function KasUtamaCard({
             {showDetail && (
                 <div className="modal-overlay" onClick={() => setShowDetail(false)}>
                     <div className="modal kas-utama-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-                        <div className="modal-header" style={{ background: 'linear-gradient(135deg, #064e3b, #065f46)', color: 'white' }}>
+                        <div className="modal-header" style={{ background: blockFilter === 'B' ? 'linear-gradient(135deg, #1e3a8a, #1e40af)' : 'linear-gradient(135deg, #064e3b, #065f46)', color: 'white' }}>
                             <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white' }}>
                                 <Landmark size={22} />
                                 Detail Kas Utama — Blok {blockFilter}
@@ -211,8 +222,8 @@ export default function KasUtamaCard({
                             {/* Grand Total Summary */}
                             <div style={{
                                 padding: '20px 24px',
-                                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 78, 59, 0.06))',
-                                borderBottom: '1px solid var(--color-border)'
+                                background: blockFilter === 'B' ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(30, 58, 138, 0.06))' : 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 78, 59, 0.06))',
+                                borderBottom: '1px solid var(--border-color)'
                             }}>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                     Saldo Kas Utama (All-Time)
@@ -220,10 +231,17 @@ export default function KasUtamaCard({
                                 <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-primary)' }}>
                                     {formatCurrency(filteredKasUtama)}
                                 </div>
-                                <div style={{ display: 'flex', gap: '24px', marginTop: '12px', fontSize: '0.85rem' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '12px', fontSize: '0.85rem' }}>
+                                    {effectiveSaldoAwal > 0 && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '13px' }}>🏛️</span>
+                                            <span style={{ color: 'var(--text-muted)' }}>Kas Awal:</span>
+                                            <strong style={{ color: 'var(--color-primary)' }}>{formatCurrency(effectiveSaldoAwal)}</strong>
+                                        </div>
+                                    )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <TrendingUp size={14} style={{ color: '#22c55e' }} />
-                                        <span style={{ color: 'var(--text-muted)' }}>Masuk:</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>Iuran Masuk:</span>
                                         <strong style={{ color: '#22c55e' }}>{formatCurrency(filteredPemasukan)}</strong>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -238,10 +256,10 @@ export default function KasUtamaCard({
                             <div style={{ padding: '16px 24px' }}>
                                 <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Calendar size={14} />
-                                    Rincian Per Bulan
+                                    Rincian Buku Kas Akumulasi
                                 </h4>
 
-                                {monthlyData.length === 0 ? (
+                                {monthlyData.length === 0 && effectiveSaldoAwal === 0 ? (
                                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '20px' }}>
                                         Belum ada data transaksi
                                     </p>
@@ -257,6 +275,22 @@ export default function KasUtamaCard({
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                {effectiveSaldoAwal > 0 && (
+                                                    <tr style={{ background: 'rgba(16, 185, 129, 0.08)', borderBottom: '1px solid var(--color-border)' }}>
+                                                        <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--color-primary)' }}>
+                                                            🏛️ Saldo Kas Sebelumnya
+                                                        </td>
+                                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: '#22c55e', fontWeight: 600 }}>
+                                                            +{formatCurrency(effectiveSaldoAwal)}
+                                                        </td>
+                                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-muted)' }}>
+                                                            -
+                                                        </td>
+                                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--color-primary)', fontWeight: 700 }}>
+                                                            {formatCurrency(effectiveSaldoAwal)}
+                                                        </td>
+                                                    </tr>
+                                                )}
                                                 {monthlyData.map((m, i) => (
                                                     <tr
                                                         key={m.key}

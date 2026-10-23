@@ -80,7 +80,7 @@ export default function AdminPanel() {
     const { residents, refetch: refetchResidents } = useResidents()
     const { expenses: allExpenses } = useExpenses()
     const { deletePayment, deleteExpense, updateResident, deleteResident } = useAdminOperations()
-    const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, kasUtama, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
+    const { allPayments: allTimePaymentsData, allExpenses: allTimeExpensesData, kasUtama, saldoAwal, totalPemasukan: allTimePemasukan, totalPengeluaran: allTimePengeluaran, loading: kasLoading } = useAllTimeFinancials()
     const toast = useToast()
 
     const [showInvoiceModal, setShowInvoiceModal] = useState(null)
@@ -188,6 +188,7 @@ export default function AdminPanel() {
 
                         <KasUtamaCard
                             kasUtama={kasUtama}
+                            saldoAwal={saldoAwal}
                             totalPemasukan={allTimePemasukan}
                             totalPengeluaran={allTimePengeluaran}
                             allPayments={allTimePaymentsData}
@@ -220,6 +221,7 @@ export default function AdminPanel() {
                                     max={totalWarga || 1}
                                     label="Progress Pembayaran"
                                     variant="auto"
+                                    color={adminBlockFilter === 'B' ? '#10b981' : '#3b82f6'}
                                 />
                                 <p className="text-muted mt-2" style={{ fontSize: '0.875rem' }}>
                                     {filteredTotalPaid} dari {totalWarga} warga sudah membayar
@@ -240,6 +242,7 @@ export default function AdminPanel() {
                     selectedPeriod={selectedPeriod}
                     onPeriodChange={setSelectedPeriod}
                     blockFilter={adminBlockFilter}
+                    saldoAwal={saldoAwal}
                     allPayments={allTimePaymentsData}
                     allExpenses={allTimeExpensesData}
                     onDeletePayment={async (id) => {
@@ -629,7 +632,7 @@ export default function AdminPanel() {
 }
 
 // ─── Buku Kas Tab ────────────────────────────────────
-function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, allPayments = [], allExpenses = [], onDeletePayment, onDeleteExpense }) {
+function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodChange, blockFilter, allPayments = [], allExpenses = [], saldoAwal, onDeletePayment, onDeleteExpense }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [confirmDelete, setConfirmDelete] = useState(null)
     const [showReceipt, setShowReceipt] = useState(null)
@@ -660,7 +663,7 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
     const ledgerEntries = useMemo(() => {
         const entries = []
 
-        payments.forEach(p => {
+        activePayments.forEach(p => {
             const resident = p.resident || residents.find(r => r.id === p.resident_id)
             entries.push({
                 id: p.id,
@@ -676,7 +679,7 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
             })
         })
 
-        expenses.forEach(e => {
+        activeExpenses.forEach(e => {
             const d = new Date(e.tanggal)
             entries.push({
                 id: e.id,
@@ -695,6 +698,26 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         // Sort by date
         entries.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
 
+        // Prepend Saldo Awal when in alltime view mode
+        const initialBalance = typeof saldoAwal === 'number'
+            ? saldoAwal
+            : (blockFilter === 'A' || blockFilter === 'B' ? 5000000 : 10000000)
+
+        if (viewMode === 'alltime' && initialBalance > 0) {
+            entries.unshift({
+                id: 'saldo-awal-kas',
+                type: 'masuk',
+                tanggal: '2026-01-01',
+                keterangan: `🏛️ Saldo Kas Sebelumnya — Blok ${blockFilter || 'A & B'}`,
+                debit: initialBalance,
+                kredit: 0,
+                kategori: 'Saldo Awal',
+                source: 'initial',
+                bulan: 1,
+                tahun: 2026
+            })
+        }
+
         // Calculate running balance
         let balance = 0
         entries.forEach(entry => {
@@ -703,7 +726,7 @@ function BukuKasTab({ payments, expenses, residents, selectedPeriod, onPeriodCha
         })
 
         return entries
-    }, [activePayments, activeExpenses, residents])
+    }, [activePayments, activeExpenses, residents, viewMode, saldoAwal, blockFilter])
 
     // Filter
     const filteredEntries = useMemo(() => {
@@ -1218,10 +1241,12 @@ function ResidentListAdmin({ residents, onUpdateResident, onDeleteResident, paym
     )
 }
 
-// ─── PIN Settings Component ──────────────────────
+// ─── PIN & Saldo Settings Component ──────────────────────
 function PinSettings() {
     const [pinA, setPinA] = useState('')
     const [pinB, setPinB] = useState('')
+    const [saldoAwalA, setSaldoAwalA] = useState('5000000')
+    const [saldoAwalB, setSaldoAwalB] = useState('5000000')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [showPinA, setShowPinA] = useState(false)
@@ -1229,10 +1254,10 @@ function PinSettings() {
     const [message, setMessage] = useState(null)
 
     useEffect(() => {
-        loadPins()
+        loadSettings()
     }, [])
 
-    async function loadPins() {
+    async function loadSettings() {
         if (!supabase) return
         setLoading(true)
         try {
@@ -1246,10 +1271,23 @@ function PinSettings() {
                 .select('value')
                 .eq('key', 'pin_blok_b')
                 .single()
+            const { data: dataSaldoA } = await supabase
+                .from('internet_settings')
+                .select('value')
+                .eq('key', 'saldo_awal_blok_a')
+                .single()
+            const { data: dataSaldoB } = await supabase
+                .from('internet_settings')
+                .select('value')
+                .eq('key', 'saldo_awal_blok_b')
+                .single()
+
             if (dataA) setPinA(dataA.value)
             if (dataB) setPinB(dataB.value)
+            if (dataSaldoA) setSaldoAwalA(dataSaldoA.value)
+            if (dataSaldoB) setSaldoAwalB(dataSaldoB.value)
         } catch (err) {
-            console.error('Error loading PINs:', err)
+            console.error('Error loading settings:', err)
         } finally {
             setLoading(false)
         }
@@ -1257,20 +1295,31 @@ function PinSettings() {
 
     async function handleSave() {
         if (!supabase) return
-        if (pinA.length < 4 || pinB.length < 4) {
+        if (pinA && pinB && (pinA.length < 4 || pinB.length < 4)) {
             setMessage({ type: 'error', text: 'PIN harus minimal 4 digit' })
             return
         }
         setSaving(true)
         setMessage(null)
         try {
+            if (pinA) {
+                await supabase
+                    .from('internet_settings')
+                    .upsert({ key: 'pin_blok_a', value: pinA, updated_at: new Date().toISOString() })
+            }
+            if (pinB) {
+                await supabase
+                    .from('internet_settings')
+                    .upsert({ key: 'pin_blok_b', value: pinB, updated_at: new Date().toISOString() })
+            }
             await supabase
                 .from('internet_settings')
-                .upsert({ key: 'pin_blok_a', value: pinA, updated_at: new Date().toISOString() })
+                .upsert({ key: 'saldo_awal_blok_a', value: String(saldoAwalA || 0), updated_at: new Date().toISOString() })
             await supabase
                 .from('internet_settings')
-                .upsert({ key: 'pin_blok_b', value: pinB, updated_at: new Date().toISOString() })
-            setMessage({ type: 'success', text: '✅ PIN berhasil disimpan!' })
+                .upsert({ key: 'saldo_awal_blok_b', value: String(saldoAwalB || 0), updated_at: new Date().toISOString() })
+
+            setMessage({ type: 'success', text: '✅ Pengaturan PIN & Saldo Awal berhasil disimpan!' })
         } catch (err) {
             setMessage({ type: 'error', text: '❌ Gagal menyimpan: ' + err.message })
         } finally {
@@ -1282,9 +1331,9 @@ function PinSettings() {
         <div>
             <div className="admin-section-header">
                 <div>
-                    <h2 className="admin-section-title">Pengaturan Kode Akses</h2>
+                    <h2 className="admin-section-title">Pengaturan Kode Akses & Saldo Awal</h2>
                     <p className="admin-section-subtitle">
-                        Atur kode PIN yang digunakan warga untuk mengakses dashboard blok masing-masing
+                        Atur PIN akses warga dan saldo kas awal periode sebelumnya untuk masing-masing blok
                     </p>
                 </div>
             </div>
@@ -1296,7 +1345,7 @@ function PinSettings() {
                 </div>
             ) : (
                 <div className="card" style={{ padding: 'var(--space-xl)' }}>
-                    <div style={{ display: 'grid', gap: '24px', maxWidth: '400px' }}>
+                    <div style={{ display: 'grid', gap: '24px', maxWidth: '440px' }}>
                         {/* PIN Blok A */}
                         <div>
                             <label style={{
@@ -1403,6 +1452,81 @@ function PinSettings() {
                             </div>
                         </div>
 
+                        {/* Divider */}
+                        <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
+
+                        {/* Saldo Awal Blok A */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                color: 'var(--text-secondary)',
+                                marginBottom: '8px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                🏛️ Saldo Kas Awal — Blok A
+                            </label>
+                            <input
+                                type="number"
+                                value={saldoAwalA}
+                                onChange={e => setSaldoAwalA(e.target.value)}
+                                placeholder="5000000"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '2px solid var(--border-color)',
+                                    background: 'var(--bg-tertiary)',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '1rem',
+                                    fontFamily: 'var(--font-mono)',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                            />
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                Nominal: {formatCurrency(Number(saldoAwalA) || 0)}
+                            </p>
+                        </div>
+
+                        {/* Saldo Awal Blok B */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                color: 'var(--text-secondary)',
+                                marginBottom: '8px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                🏛️ Saldo Kas Awal — Blok B
+                            </label>
+                            <input
+                                type="number"
+                                value={saldoAwalB}
+                                onChange={e => setSaldoAwalB(e.target.value)}
+                                placeholder="5000000"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    border: '2px solid var(--border-color)',
+                                    background: 'var(--bg-tertiary)',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '1rem',
+                                    fontFamily: 'var(--font-mono)',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                            />
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                Nominal: {formatCurrency(Number(saldoAwalB) || 0)}
+                            </p>
+                        </div>
+
                         {/* Message */}
                         {message && (
                             <div style={{
@@ -1441,7 +1565,7 @@ function PinSettings() {
                             }}
                         >
                             <Key size={16} />
-                            {saving ? 'Menyimpan...' : 'Simpan Kode Akses'}
+                            {saving ? 'Menyimpan...' : 'Simpan Pengaturan'}
                         </button>
 
                         {/* Info */}
@@ -1453,11 +1577,10 @@ function PinSettings() {
                             color: 'var(--text-muted)',
                             lineHeight: 1.6
                         }}>
-                            <strong>ℹ️ Informasi:</strong><br />
-                            • Kode akses digunakan warga untuk masuk ke dashboard blok mereka<br />
-                            • Bagikan kode hanya ke warga blok terkait melalui grup WhatsApp<br />
-                            • Setelah warga memasukkan kode 1 kali, kode akan tersimpan di HP mereka<br />
-                            • Jika Anda mengubah kode, warga harus memasukkan kode baru saat berikutnya
+                            <strong>ℹ️ Informasi Saldo Awal:</strong><br />
+                            • Saldo awal ini otomatis diakumulasikan ke Kas Utama masing-masing blok.<br />
+                            • Tercatat rapi di baris pertama Buku Kas sebagai saldo awal pembukuan.<br />
+                            • Tidak mengotori data iuran bulanan warga.
                         </div>
                     </div>
                 </div>

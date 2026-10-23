@@ -137,8 +137,9 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '5px',
-                padding: '5px 12px',
+                padding: '4px 12px',
                 background: '#fef2f2',
                 border: '1.5px solid #ef4444',
                 color: '#dc2626',
@@ -146,7 +147,9 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
                 fontSize: '11px',
                 fontWeight: 800,
                 letterSpacing: '0.5px',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                lineHeight: 1
               }}>
                 <AlertTriangle size={14} />
                 Jatuh Tempo Terlewat
@@ -155,8 +158,9 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '5px',
-                padding: '5px 12px',
+                padding: '4px 12px',
                 background: '#fffbeb',
                 border: '1.5px solid #f59e0b',
                 color: '#b45309',
@@ -164,7 +168,9 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
                 fontSize: '11px',
                 fontWeight: 800,
                 letterSpacing: '0.5px',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                lineHeight: 1
               }}>
                 <Clock size={14} />
                 Menunggu Pembayaran
@@ -189,7 +195,7 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
                 <span style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', display: 'block' }}>
                   {resident.nama_warga}
                 </span>
-                <div style={{ display: 'inline-block', marginTop: '4px', fontSize: '12px', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 10px', borderRadius: '6px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginTop: '4px', fontSize: '12px', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '4px 10px', borderRadius: '6px', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   Blok {resident.blok_rumah}
                 </div>
               </div>
@@ -249,11 +255,11 @@ _Mohon konfirmasikan bukti transfer jika sudah melakukan pembayaran. Terima kasi
                           Iuran {getMonthName(item.bulan)} {item.tahun}
                         </span>
                         {isCurrent ? (
-                          <span style={{ marginLeft: '6px', fontSize: '10px', background: '#e2e8f0', color: '#334155', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: '6px', fontSize: '10px', background: '#e2e8f0', color: '#334155', padding: '3px 8px', borderRadius: '4px', fontWeight: 600, whiteSpace: 'nowrap', lineHeight: 1 }}>
                             Bulan Ini
                           </span>
                         ) : (
-                          <span style={{ marginLeft: '6px', fontSize: '10px', background: '#fee2e2', color: '#b91c1c', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: '6px', fontSize: '10px', background: '#fee2e2', color: '#b91c1c', padding: '3px 8px', borderRadius: '4px', fontWeight: 600, whiteSpace: 'nowrap', lineHeight: 1 }}>
                             Tunggakan
                           </span>
                         )}

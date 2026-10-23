@@ -6,7 +6,7 @@
 .tooltip {
     position: absolute;
     background: rgba(15, 23, 42, 0.95);
-    color: #f1f5f9;
+    color: var(--text-primary);
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 12px;
@@ -96,21 +96,21 @@
 /* Light mode */
 [data-theme="light"] .tooltip {
     background: #0f172a;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .tooltip-top .tooltip-arrow {
-    border-top-color: #0f172a;
+    border-top-color: var(--text-primary);
 }
 
 [data-theme="light"] .tooltip-bottom .tooltip-arrow {
-    border-bottom-color: #0f172a;
+    border-bottom-color: var(--text-primary);
 }
 
 [data-theme="light"] .tooltip-right .tooltip-arrow {
-    border-right-color: #0f172a;
+    border-right-color: var(--text-primary);
 }
 
 [data-theme="light"] .tooltip-left .tooltip-arrow {
-    border-left-color: #0f172a;
+    border-left-color: var(--text-primary);
 }

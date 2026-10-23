@@ -8,10 +8,12 @@ CREATE TABLE IF NOT EXISTS internet_settings (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Insert default PINs (admin can change later)
+-- Insert default PINs and Initial Balances (admin can change later)
 INSERT INTO internet_settings (key, value) VALUES
     ('pin_blok_a', '1234'),
-    ('pin_blok_b', '5678')
+    ('pin_blok_b', '5678'),
+    ('saldo_awal_blok_a', '5000000'),
+    ('saldo_awal_blok_b', '5000000')
 ON CONFLICT (key) DO NOTHING;
 
 -- Allow read access for PIN verification (anon role)

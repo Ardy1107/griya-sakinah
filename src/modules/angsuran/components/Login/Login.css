@@ -77,14 +77,14 @@
 .login-header h1 {
   font-size: 24px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin: 0 0 6px 0;
   letter-spacing: -0.5px;
 }
 
 .login-header p {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -97,7 +97,7 @@
 
 .mode-label {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-muted);
   text-align: center;
   margin: 0 0 4px 0;
   text-transform: uppercase;
@@ -176,23 +176,23 @@
 .mode-title {
   font-size: 16px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .mode-desc {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .mode-arrow {
-  color: #475569;
+  color: var(--text-secondary);
   flex-shrink: 0;
   transition: transform 0.2s;
 }
 
 .mode-card:hover .mode-arrow {
   transform: translateX(3px);
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 /* ===== PIN Entry ===== */
@@ -253,7 +253,7 @@
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(15, 23, 42, 0.6);
-  color: #f1f5f9;
+  color: var(--text-primary);
   font-size: 22px;
   font-weight: 600;
   cursor: pointer;
@@ -279,12 +279,12 @@
 }
 
 .numpad-btn.back-btn {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 
 .numpad-btn.back-btn:hover:not(:disabled) {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .numpad-btn.delete-btn {

@@ -120,7 +120,7 @@
 }
 
 .input-wrapper input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: none;
     letter-spacing: normal;
     font-weight: 400;

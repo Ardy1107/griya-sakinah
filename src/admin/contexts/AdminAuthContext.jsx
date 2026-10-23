@@ -124,7 +124,7 @@ export const AdminAuthProvider = ({ children }) => {
             const { data, error } = await supabase
                 .from('portal_users')
                 .select('*')
-                .eq('username', username)
+                .ilike('username', username.trim())
                 .eq('password', password)
                 .eq('is_active', true)
                 .single();

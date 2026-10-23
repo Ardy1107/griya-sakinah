@@ -68,7 +68,7 @@ export default function DigitalReceipt({ resident, payment, onClose }) {
           {/* Receipt Number */}
           <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>No. Referensi</span>
-            <div style={{ fontSize: '14px', color: '#0f172a', fontWeight: 700, fontFamily: 'monospace', background: '#e2e8f0', padding: '4px 10px', borderRadius: '6px', display: 'inline-block' }}>{receiptNumber}</div>
+            <div style={{ fontSize: '14px', color: '#0f172a', fontWeight: 700, fontFamily: 'monospace', background: '#e2e8f0', padding: '4px 10px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1 }}>{receiptNumber}</div>
           </div>
 
           {/* Body with details */}
@@ -83,7 +83,7 @@ export default function DigitalReceipt({ resident, payment, onClose }) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#64748b', fontSize: '14px' }}>Blok Rumah</span>
-                <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '15px', background: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', display: 'inline-block' }}>{resident.blok_rumah}</div>
+                <div style={{ color: '#0f172a', fontWeight: 700, fontSize: '15px', background: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap', lineHeight: 1 }}>{resident.blok_rumah}</div>
               </div>
               <div style={{ height: '1px', background: '#e2e8f0', margin: '4px 0' }}></div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

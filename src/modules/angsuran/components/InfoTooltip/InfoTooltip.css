@@ -81,6 +81,6 @@
 }
 
 [data-theme="light"] .info-tooltip-arrow {
-    background: #ffffff;
+    background: var(--card-bg);
     border-color: rgba(0, 0, 0, 0.08);
 }

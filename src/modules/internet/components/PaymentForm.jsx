@@ -527,7 +527,7 @@ export default function PaymentForm({
                                         borderRadius: 'var(--radius-md)',
                                         border: jumlahBulan === opt.value
                                             ? '2px solid var(--color-primary)'
-                                            : '2px solid var(--color-border)',
+                                            : '2px solid transparent',
                                         background: jumlahBulan === opt.value
                                             ? 'rgba(16, 185, 129, 0.1)'
                                             : 'transparent',

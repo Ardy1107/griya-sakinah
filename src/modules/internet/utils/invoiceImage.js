@@ -73,11 +73,15 @@ export function createInvoiceElement(resident, period, unpaidMonths = [], blockI
         </div>
         <div>
           ${isOverdue 
-            ? `<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #fef2f2; border: 1.5px solid #ef4444; color: #dc2626; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
-                ⚠️ JATUH TEMPO TERLEWAT
+            ? `<div style="display: inline-block; padding: 6px 12px; background: #fef2f2; border: 1.5px solid #ef4444; border-radius: 20px;">
+                <span style="color: #dc2626; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;">
+                  ⚠️ JATUH TEMPO TERLEWAT
+                </span>
               </div>`
-            : `<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #fffbeb; border: 1.5px solid #f59e0b; color: #b45309; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
-                ⏳ MENUNGGU PEMBAYARAN
+            : `<div style="display: inline-block; padding: 6px 12px; background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 20px;">
+                <span style="color: #b45309; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;">
+                  ⏳ MENUNGGU PEMBAYARAN
+                </span>
               </div>`
           }
         </div>
@@ -106,7 +110,9 @@ export function createInvoiceElement(resident, period, unpaidMonths = [], blockI
             <div>
               <div style="font-size: 12px; color: #64748b; font-weight: 500; margin-bottom: 2px;">Tagihan Kepada:</div>
               <div style="font-size: 16px; font-weight: 700; color: #0f172a;">${resident.nama_warga}</div>
-              <div style="display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 6px;">Blok ${resident.blok_rumah}</div>
+              <div style="display: inline-block; margin-top: 4px; background: #e0f2fe; padding: 4px 8px; border-radius: 6px;">
+                <span style="font-size: 12px; font-weight: 700; color: #0284c7; white-space: nowrap;">Blok ${resident.blok_rumah}</span>
+              </div>
             </div>
             <div style="text-align: right;">
               <div style="font-size: 12px; color: #64748b; font-weight: 500; margin-bottom: 2px;">Batas Jatuh Tempo:</div>
@@ -125,7 +131,7 @@ export function createInvoiceElement(resident, period, unpaidMonths = [], blockI
               <div style="padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-top: ${idx > 0 ? '1px solid #f1f5f9' : 'none'}; background: ${idx % 2 === 0 ? '#ffffff' : '#fafafa'}; font-size: 13px;">
                 <div>
                   <span style="font-weight: 600; color: #1e293b;">Iuran Internet ${getMonthName(item.bulan)} ${item.tahun}</span>
-                  ${item.bulan === period.bulan && item.tahun === period.tahun ? '<span style="margin-left: 6px; font-size: 10px; background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Periode Aktif</span>' : '<span style="margin-left: 6px; font-size: 10px; background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Tunggakan</span>'}
+                  ${item.bulan === period.bulan && item.tahun === period.tahun ? '<div style="display: inline-block; margin-left: 6px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;"><span style="font-size: 10px; color: #475569; font-weight: 600; white-space: nowrap;">Periode Aktif</span></div>' : '<div style="display: inline-block; margin-left: 6px; background: #fee2e2; padding: 2px 6px; border-radius: 4px;"><span style="font-size: 10px; color: #b91c1c; font-weight: 600; white-space: nowrap;">Tunggakan</span></div>'}
                 </div>
                 <span style="font-weight: 700; color: #0f172a; font-family: monospace;">${formatCurrency(item.nominal || iuranPerBulan)}</span>
               </div>

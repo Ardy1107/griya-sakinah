@@ -188,17 +188,21 @@ export function usePaymentStatus(pBulan, pTahun) {
     }
 }
 
+// Default initial cash balances (fallback if not in DB)
+export const DEFAULT_SALDO_AWAL = { A: 5000000, B: 5000000 }
+
 // All-time financial summary (for Kas Utama / General Ledger)
 export function useAllTimeFinancials() {
     const [allPayments, setAllPayments] = useState([])
     const [allExpenses, setAllExpenses] = useState([])
+    const [saldoAwalMap, setSaldoAwalMap] = useState(DEFAULT_SALDO_AWAL)
     const [loading, setLoading] = useState(true)
     const { blockId } = useBlock()
 
     const fetchAll = useCallback(async () => {
         try {
             setLoading(true)
-            const [paymentsRes, expensesRes] = await Promise.all([
+            const [paymentsRes, expensesRes, settingsRes] = await Promise.all([
                 supabase
                     .from('payments')
                     .select('*, resident:residents(*)')
@@ -206,11 +210,25 @@ export function useAllTimeFinancials() {
                 supabase
                     .from('expenses')
                     .select('*')
-                    .order('tanggal', { ascending: true })
+                    .order('tanggal', { ascending: true }),
+                supabase
+                    .from('internet_settings')
+                    .select('*')
             ])
 
             let payments = paymentsRes.data || []
             let expenses = expensesRes.data || []
+
+            // Extract saldo awal settings
+            let sAwalA = DEFAULT_SALDO_AWAL.A
+            let sAwalB = DEFAULT_SALDO_AWAL.B
+            if (settingsRes?.data) {
+                const settingA = settingsRes.data.find(s => s.key === 'saldo_awal_blok_a')
+                const settingB = settingsRes.data.find(s => s.key === 'saldo_awal_blok_b')
+                if (settingA && !isNaN(Number(settingA.value))) sAwalA = Number(settingA.value)
+                if (settingB && !isNaN(Number(settingB.value))) sAwalB = Number(settingB.value)
+            }
+            setSaldoAwalMap({ A: sAwalA, B: sAwalB })
 
             // Filter by block
             if (blockId) {
@@ -237,15 +255,23 @@ export function useAllTimeFinancials() {
         fetchAll()
     }, [fetchAll])
 
+    const saldoAwal = blockId === 'A'
+        ? saldoAwalMap.A
+        : blockId === 'B'
+            ? saldoAwalMap.B
+            : (saldoAwalMap.A + saldoAwalMap.B)
+
     const totalPemasukan = allPayments.reduce((sum, p) => sum + Number(p.nominal || 0), 0)
     const totalPengeluaran = allExpenses.reduce((sum, e) => sum + Number(e.nominal || 0), 0)
-    const kasUtama = totalPemasukan - totalPengeluaran
+    const kasUtama = saldoAwal + totalPemasukan - totalPengeluaran
 
     return {
         allPayments,
         allExpenses,
         totalPemasukan,
         totalPengeluaran,
+        saldoAwal,
+        saldoAwalMap,
         kasUtama,
         loading,
         refetch: fetchAll

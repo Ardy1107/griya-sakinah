@@ -81,22 +81,8 @@ async function deploy() {
         }
         console.log('');
 
-        // Delete old assets folder
-        console.log('🗑️  Deleting old assets folder...');
-        try {
-            await client.removeDir(`${remoteDir}/assets`);
-            console.log('   ✅ Old assets deleted!\n');
-        } catch (e) {
-            console.log('   ⚠️  No old assets to delete\n');
-        }
-
-        // Delete old index.html
-        try {
-            await client.remove(`${remoteDir}/index.html`);
-            console.log('✅ Deleted old index.html\n');
-        } catch (e) {
-            console.log('⚠️  No old index.html to delete\n');
-        }
+        // Do not delete assets folder to avoid FTP timing issues
+        console.log('📦 Uploading all files from dist (overwriting)...\n');
 
         // Upload all files
         console.log('📦 Uploading all files from dist...\n');

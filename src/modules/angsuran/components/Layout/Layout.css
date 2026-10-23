@@ -46,7 +46,7 @@
 .logo span {
     font-size: 18px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     white-space: nowrap;
 }
 
@@ -59,7 +59,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
@@ -67,7 +67,7 @@
 
 .sidebar-toggle:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 /* Closed sidebar - stack logo and toggle vertically */
@@ -97,7 +97,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     text-decoration: none;
     border-radius: 12px;
     transition: all 0.2s ease;
@@ -114,7 +114,7 @@
 
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .nav-item.active {
@@ -142,16 +142,18 @@
 }
 
 /* Nav Tooltip Info Icon - React Component */
+.nav-item .nav-tooltip-trigger,
 .nav-tooltip-trigger {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 20px;
     height: 20px;
+    flex: 0 0 20px;
     margin-left: auto;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 50%;
-    color: #64748b;
+    color: var(--text-muted);
     cursor: help;
     transition: all 0.2s ease;
     position: relative;
@@ -198,7 +200,7 @@
 /* Light mode nav tooltip */
 [data-theme="light"] .nav-tooltip-trigger {
     background: rgba(0, 0, 0, 0.03);
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .nav-tooltip-trigger:hover {
@@ -207,9 +209,9 @@
 }
 
 [data-theme="light"] .nav-tooltip-popup {
-    background: #ffffff;
-    border-color: #e2e8f0;
-    color: #334155;
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
@@ -339,7 +341,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
 }
 
@@ -412,16 +414,16 @@
 .user-name {
     font-size: 14px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .user-role {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .user-button svg:last-child {
-    color: #64748b;
+    color: var(--text-muted);
     transition: transform 0.2s ease;
 }
 
@@ -561,40 +563,40 @@
    ========================================== */
 
 [data-theme="light"] .layout {
-    background: #f8fafc;
+    background: var(--bg-primary);
 }
 
 [data-theme="light"] .sidebar {
-    background: #ffffff;
+    background: var(--card-bg);
     border-right: 1px solid #e2e8f0;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="light"] .sidebar-header {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .logo span {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .sidebar-toggle {
     background: #f1f5f9;
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .sidebar-toggle:hover {
     background: #e2e8f0;
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .nav-item {
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .nav-item:hover {
     background: #f1f5f9;
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .nav-item.active {
@@ -603,7 +605,7 @@
 }
 
 [data-theme="light"] .sidebar-footer {
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .portal-back-button {
@@ -619,19 +621,19 @@
 
 [data-theme="light"] .header {
     background: rgba(255, 255, 255, 0.95);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
     backdrop-filter: blur(20px);
 }
 
 [data-theme="light"] .user-button {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="light"] .user-button:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: var(--bg-primary);
+    border-color: var(--text-secondary);
 }
 
 [data-theme="light"] .user-avatar {
@@ -639,20 +641,20 @@
 }
 
 [data-theme="light"] .user-name {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .user-role {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .user-button svg:last-child {
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .user-dropdown {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     box-shadow:
         0 4px 6px -1px rgba(0, 0, 0, 0.1),
         0 10px 20px -5px rgba(0, 0, 0, 0.1);
@@ -664,5 +666,5 @@
 
 [data-theme="light"] .mobile-menu-toggle {
     background: #f1f5f9;
-    color: #475569;
+    color: var(--text-secondary);
 }

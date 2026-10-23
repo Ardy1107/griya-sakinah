@@ -15,13 +15,13 @@
 .page-header h1 {
     font-size: 28px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .page-header p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 4px 0 0 0;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .search-box svg {
-    color: #64748b;
+    color: var(--text-muted);
     flex-shrink: 0;
 }
 
@@ -63,7 +63,7 @@
     flex: 1;
     background: none;
     border: none;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     font-weight: 500;
     font-family: inherit;
@@ -71,7 +71,7 @@
 }
 
 .search-box input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 400;
 }
 
@@ -91,7 +91,7 @@
     background-size: 14px;
     border: none;
     border-radius: 10px;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     font-weight: 500;
     font-family: inherit;
@@ -104,8 +104,8 @@
 }
 
 .filter-group select option {
-    background: #1e293b;
-    color: #f1f5f9;
+    background: var(--card-bg);
+    color: var(--text-primary);
     padding: 12px;
 }
 
@@ -175,7 +175,7 @@
 .stat-label {
     font-size: 13px;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -183,7 +183,7 @@
 .stat-value {
     font-size: 28px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     line-height: 1.2;
 }
 
@@ -213,11 +213,11 @@
 }
 
 [data-theme="light"] .stat-label {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .stat-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .stat-value.green {
@@ -252,7 +252,7 @@
 .data-table th {
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     background: rgba(15, 23, 42, 0.4);
@@ -273,7 +273,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
 }
 
@@ -367,7 +367,7 @@
     justify-content: center;
     padding: 64px 24px;
     text-align: center;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .empty-state svg {
@@ -377,7 +377,7 @@
 
 .empty-state h3 {
     font-size: 18px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 8px 0;
 }
 
@@ -427,7 +427,7 @@
 }
 
 .detail-modal {
-    background: #1e293b;
+    background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     width: 100%;
@@ -460,7 +460,7 @@
 .modal-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -473,14 +473,14 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .close-button:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .modal-body {
@@ -501,7 +501,7 @@
     gap: 8px;
     font-size: 14px;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 16px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -521,12 +521,12 @@
 
 .detail-label {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .detail-value {
     font-size: 15px;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -571,15 +571,15 @@
    ========================================== */
 
 [data-theme="light"] .page-header h1 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .page-header p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .search-box {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -590,11 +590,11 @@
 }
 
 [data-theme="light"] .search-box input {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .filter-group {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -606,7 +606,7 @@
 }
 
 [data-theme="light"] .filter-group select option {
-    background: #ffffff;
+    background: var(--card-bg);
     color: #374151;
 }
 
@@ -620,34 +620,34 @@
 }
 
 [data-theme="light"] .summary-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .summary-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .transactions-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="light"] .data-table th {
-    background: #f8fafc;
-    color: #475569;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
     border-bottom-color: #e2e8f0;
 }
 
 [data-theme="light"] .data-table td {
     color: #374151;
-    border-bottom-color: #f1f5f9;
+    border-bottom-color: var(--text-primary);
 }
 
 [data-theme="light"] .data-table tr:hover td {
-    background: #f8fafc;
+    background: var(--bg-primary);
 }
 
 [data-theme="light"] .block-badge {
@@ -685,35 +685,35 @@
 }
 
 [data-theme="light"] .detail-modal {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="light"] .modal-header {
-    border-bottom-color: #f1f5f9;
+    border-bottom-color: var(--text-primary);
 }
 
 [data-theme="light"] .modal-header h2 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .close-button {
     background: #f1f5f9;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .close-button:hover {
     background: #e2e8f0;
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .detail-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .notes-text {
-    background: #f8fafc;
+    background: var(--bg-primary);
     color: #374151;
 }
 

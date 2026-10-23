@@ -15,7 +15,7 @@
 .monitoring-page .page-header h1 {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin-bottom: 4px;
     background: linear-gradient(135deg, #10b981, #3b82f6);
     -webkit-background-clip: text;
@@ -24,7 +24,7 @@
 }
 
 .monitoring-page .page-header p {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.9rem;
 }
 
@@ -43,7 +43,7 @@
 .year-selector button {
     background: rgba(255, 255, 255, 0.05);
     border: none;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 8px;
     border-radius: 10px;
@@ -61,7 +61,7 @@
 .year-selector .current-year {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     min-width: 70px;
     text-align: center;
 }
@@ -93,7 +93,7 @@
 }
 
 .monitoring-controls .search-box svg {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .monitoring-controls .search-box input {
@@ -101,12 +101,12 @@
     background: transparent;
     width: 100%;
     outline: none;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
 .monitoring-controls .search-box input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* LEGEND */
@@ -124,7 +124,7 @@
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .text-success {
@@ -157,7 +157,7 @@
 
 .monitoring-table th {
     background: rgba(15, 23, 42, 0.8);
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-weight: 600;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -244,7 +244,7 @@
 
 .unit-info-cell .unit-name {
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--text-secondary);
     padding-left: 16px;
 }
 
@@ -297,7 +297,7 @@
 .monitoring-table .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 1rem;
 }
 
@@ -324,7 +324,7 @@
 .detail-modal .modal-header h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .detail-modal .modal-content {
@@ -348,13 +348,13 @@
 }
 
 .detail-row .label {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.9rem;
 }
 
 .detail-row .value {
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
@@ -367,7 +367,7 @@
 .evidence-section h4 {
     font-size: 0.85rem;
     margin-bottom: 16px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -432,7 +432,7 @@
 }
 
 .no-evidence {
-    color: #64748b;
+    color: var(--text-muted);
     font-style: italic;
     text-align: center;
     padding: 20px;
@@ -455,7 +455,7 @@
     border: none;
     font-size: 1.25rem;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--text-secondary);
     width: 36px;
     height: 36px;
     border-radius: 10px;

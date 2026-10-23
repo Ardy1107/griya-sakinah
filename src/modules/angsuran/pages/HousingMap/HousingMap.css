@@ -336,7 +336,7 @@
 .block-road .road-label {
     font-size: 13px;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--text-secondary);
     white-space: nowrap;
     letter-spacing: 2px;
     padding: 8px 16px;
@@ -399,7 +399,7 @@
 
 .tooltip-header strong {
     font-size: 16px;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .tooltip-header .status-badge {
@@ -438,7 +438,7 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin-bottom: 6px;
 }
 
@@ -447,66 +447,66 @@
 }
 
 .tooltip-body svg {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* Light Mode */
 [data-theme="light"] .housing-map-page .page-header h1 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .housing-map-page .page-header p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .period-selector .nav-btn {
     background: #f1f5f9;
-    border-color: #e2e8f0;
-    color: #475569;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .period-selector .period-display {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .legend-bar {
-    background: #f8fafc;
+    background: var(--bg-primary);
 }
 
 [data-theme="light"] .stat-box {
-    background: #ffffff;
-    border-color: #e2e8f0;
+    background: var(--card-bg);
+    border-color: var(--border-color);
 }
 
 [data-theme="light"] .stat-box .stat-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .map-container {
-    background: #ffffff;
-    border-color: #e2e8f0;
+    background: var(--card-bg);
+    border-color: var(--border-color);
 }
 
 [data-theme="light"] .block-label {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .house-number {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .house-tooltip {
-    background: #ffffff;
-    border-color: #e2e8f0;
+    background: var(--card-bg);
+    border-color: var(--border-color);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="light"] .tooltip-header strong {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .tooltip-body p {
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 /* Mobile Responsive */

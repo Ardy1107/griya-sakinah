@@ -64,7 +64,7 @@
 
 .welcome-subtitle {
     font-size: 16px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 24px 0;
 }
 
@@ -178,17 +178,17 @@
 
 /* Light mode iOS-style overrides */
 [data-theme="light"] .page-header h1 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .page-header p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .refresh-button {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #475569;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -391,7 +391,7 @@
 
 /* Light mode stat cards - iOS style */
 [data-theme="light"] .stat-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
@@ -406,11 +406,11 @@
 }
 
 [data-theme="light"] .stat-label {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .stat-value {
-    color: #0f172a !important;
+    color: var(--text-primary) !important;
 }
 
 [data-theme="light"] .stat-card.green .stat-value {
@@ -529,7 +529,7 @@
 
 .stat-label {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -538,7 +538,7 @@
 .stat-value {
     font-size: 26px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     line-height: 1.2;
 }
 
@@ -637,7 +637,7 @@
 .card-header h3 {
     font-size: 16px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
     display: flex;
     align-items: center;
@@ -690,7 +690,7 @@
     position: absolute;
     top: -32px;
     font-size: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -702,7 +702,7 @@
 
 .bar-label {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* Status List */
@@ -740,20 +740,20 @@
 .status-label {
     flex: 1;
     font-size: 14px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .status-value {
     font-size: 14px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 /* Empty State */
 .empty-state {
     padding: 48px 24px;
     text-align: center;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .empty-state svg {
@@ -764,7 +764,7 @@
 .empty-state p {
     font-size: 16px;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 8px 0;
 }
 
@@ -791,7 +791,7 @@
 .data-table th {
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -821,7 +821,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .duration-badge {
@@ -897,7 +897,7 @@
     margin: 0;
     font-size: 15px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .due-soon-list {
@@ -980,7 +980,7 @@
 .quick-actions h3 {
     font-size: 14px;
     font-weight: 600;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 16px 0;
 }
 
@@ -1075,7 +1075,7 @@
 }
 
 .header-link-icon {
-    color: #64748b;
+    color: var(--text-muted);
     margin-left: auto;
     opacity: 0.6;
     transition: opacity 0.2s;
@@ -1092,7 +1092,7 @@
 
 /* Dashboard Cards (Chart & Status) */
 [data-theme="light"] .dashboard-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
@@ -1100,12 +1100,12 @@
 }
 
 [data-theme="light"] .card-header {
-    background: #ffffff;
-    border-bottom: 1px solid #f1f5f9;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .card-header h3 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .header-icon {
@@ -1114,28 +1114,28 @@
 
 /* Chart Container */
 [data-theme="light"] .chart-container {
-    background: #ffffff;
+    background: var(--card-bg);
 }
 
 [data-theme="light"] .bar-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .bar-label {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* Status Card & List */
 [data-theme="light"] .status-list {
-    background: #ffffff;
+    background: var(--card-bg);
 }
 
 [data-theme="light"] .status-label {
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .status-value {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 /* Aging Receivable / Tunggakan Card */
@@ -1143,7 +1143,7 @@
 [data-theme="light"] .tunggakan-card,
 [data-theme="light"] .receivable-card,
 [data-theme="light"] .warning-card {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
@@ -1165,25 +1165,25 @@
 /* Table Styling for Light Mode */
 [data-theme="light"] .data-table,
 [data-theme="light"] table {
-    background: #ffffff;
+    background: var(--card-bg);
 }
 
 [data-theme="light"] .data-table thead th,
 [data-theme="light"] table thead th {
-    background: #f8fafc;
-    color: #475569;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .data-table tbody tr,
 [data-theme="light"] table tbody tr {
-    background: #ffffff;
-    border-bottom: 1px solid #f1f5f9;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .data-table tbody tr:hover,
 [data-theme="light"] table tbody tr:hover {
-    background: #f8fafc;
+    background: var(--bg-primary);
 }
 
 [data-theme="light"] .data-table tbody td,
@@ -1202,17 +1202,17 @@
 }
 
 [data-theme="light"] .due-soon-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .due-soon-item:hover {
-    background: #f8fafc;
+    background: var(--bg-primary);
     border-color: #10b981;
 }
 
 [data-theme="light"] .resident-name {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .block-badge {
@@ -1239,7 +1239,7 @@
 
 /* Quick Actions */
 [data-theme="light"] .quick-actions {
-    background: #ffffff;
+    background: var(--card-bg);
     border: none;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
@@ -1247,23 +1247,23 @@
 }
 
 [data-theme="light"] .quick-actions h3 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .quick-action-btn {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
     box-shadow: none;
 }
 
 [data-theme="light"] .quick-action-btn:hover {
-    background: #ffffff;
+    background: var(--card-bg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
 }
 
 [data-theme="light"] .quick-action-btn span {
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 /* Stat Card Icons in Light Mode */
@@ -1365,12 +1365,12 @@
 
 /* Empty State */
 [data-theme="light"] .empty-state {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* Link Icons */
 [data-theme="light"] .header-link-icon {
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .clickable-card:hover .header-link-icon {
@@ -1428,13 +1428,13 @@
 .unpaid-modal .modal-title h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .unpaid-modal .modal-title p {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 4px 0 0 0;
 }
 
@@ -1447,7 +1447,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -1518,7 +1518,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .unpaid-item .unit-blok svg {
@@ -1530,11 +1530,11 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .unpaid-item .unit-resident svg {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .unpaid-item .unit-details {
@@ -1551,7 +1551,7 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .unpaid-item .unit-amount {
@@ -1575,7 +1575,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -1584,7 +1584,7 @@
 
 .unpaid-modal .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .unpaid-modal .btn-primary {
@@ -1607,26 +1607,26 @@
 
 /* Light Mode Modal */
 [data-theme="light"] .unpaid-modal {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="light"] .unpaid-modal .modal-header {
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .unpaid-modal .modal-title h3 {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .unpaid-modal .modal-title p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .unpaid-modal .modal-close {
     background: #f1f5f9;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .unpaid-modal .modal-close:hover {
@@ -1635,8 +1635,8 @@
 }
 
 [data-theme="light"] .unpaid-item {
-    background: #f8fafc;
-    border-color: #e2e8f0;
+    background: var(--bg-primary);
+    border-color: var(--border-color);
 }
 
 [data-theme="light"] .unpaid-item:hover {
@@ -1645,13 +1645,13 @@
 }
 
 [data-theme="light"] .unpaid-item .unit-blok {
-    color: #0f172a;
+    color: var(--text-primary);
 }
 
 [data-theme="light"] .unpaid-item .unit-resident,
 [data-theme="light"] .unpaid-item .unit-phone,
 [data-theme="light"] .unpaid-item .unit-due {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .unpaid-item .unit-amount {
@@ -1659,16 +1659,16 @@
 }
 
 [data-theme="light"] .unpaid-modal .modal-footer {
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
 }
 
 [data-theme="light"] .unpaid-modal .btn-secondary {
     background: #f1f5f9;
-    border-color: #e2e8f0;
-    color: #475569;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
 }
 
 [data-theme="light"] .unpaid-modal .btn-secondary:hover {
     background: #e2e8f0;
-    color: #0f172a;
+    color: var(--text-primary);
 }

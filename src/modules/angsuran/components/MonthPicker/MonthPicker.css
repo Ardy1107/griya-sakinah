@@ -11,7 +11,7 @@
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -31,7 +31,7 @@
 }
 
 .date-picker-trigger .chevron {
-    color: #64748b;
+    color: var(--text-muted);
     transition: transform 0.2s ease;
 }
 
@@ -44,7 +44,7 @@
     top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: #1e293b;
+    background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 16px;
@@ -84,14 +84,14 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .month-nav button:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .month-nav button:disabled {
@@ -102,7 +102,7 @@
 .month-year-display {
     font-size: 15px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .weekdays {
@@ -117,7 +117,7 @@
     text-align: center;
     font-size: 11px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
 }
 
@@ -178,7 +178,7 @@
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -198,7 +198,7 @@
 }
 
 .month-picker-trigger .chevron {
-    color: #64748b;
+    color: var(--text-muted);
     transition: transform 0.2s ease;
 }
 
@@ -211,7 +211,7 @@
     top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: #1e293b;
+    background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 16px;
@@ -238,14 +238,14 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .year-selector button:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .year-selector button:disabled {
@@ -256,7 +256,7 @@
 .year-display {
     font-size: 16px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .months-grid {
@@ -270,7 +270,7 @@
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid transparent;
     border-radius: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;

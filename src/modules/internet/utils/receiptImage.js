@@ -55,7 +55,9 @@ export function createReceiptElement(resident, payment) {
         align-items: center;
       ">
         <div style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">No. Referensi</div>
-        <div style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: #e2e8f0; padding: 4px 10px; border-radius: 6px; display: inline-block;">${receiptNumber}</div>
+        <div style="background: #e2e8f0; padding: 4px 10px; border-radius: 6px; display: inline-block;">
+          <span style="font-size: 14px; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono', monospace; white-space: nowrap;">${receiptNumber}</span>
+        </div>
       </div>
 
       <!-- Details Section -->
@@ -84,7 +86,9 @@ export function createReceiptElement(resident, payment) {
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #64748b; font-size: 14px;">Blok Rumah</span>
-              <div style="color: #0f172a; font-weight: 700; font-size: 15px; background: #f1f5f9; padding: 4px 12px; border-radius: 20px; display: inline-block;">${resident.blok_rumah}</div>
+              <div style="background: #f1f5f9; padding: 4px 12px; border-radius: 12px; display: inline-block;">
+                <span style="color: #0f172a; font-weight: 700; font-size: 15px; white-space: nowrap;">${resident.blok_rumah}</span>
+              </div>
             </div>
             <div style="height: 1px; background: #e2e8f0; margin: 4px 0;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">

@@ -90,7 +90,7 @@
 }
 
 .portal-welcome p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 1.2rem;
 }
 
@@ -171,7 +171,7 @@
 }
 
 .app-card-premium p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     line-height: 1.6;
     font-size: 1rem;
 }
@@ -198,7 +198,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--text-muted);
     font-weight: 700;
 }
 
@@ -245,7 +245,7 @@
 .count-label {
     font-size: 0.7rem;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .tasbih-controls {
@@ -308,7 +308,7 @@
 
 .mng {
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-style: italic;
     line-height: 1.4;
 }

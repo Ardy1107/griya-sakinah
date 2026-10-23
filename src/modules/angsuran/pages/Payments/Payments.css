@@ -15,13 +15,13 @@
 .page-header h1 {
     font-size: 28px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .page-header p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 4px 0 0 0;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .search-box svg {
-    color: #64748b;
+    color: var(--text-muted);
     flex-shrink: 0;
 }
 
@@ -54,7 +54,7 @@
     flex: 1;
     background: none;
     border: none;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     outline: none;
 }
@@ -69,7 +69,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -114,7 +114,7 @@
 .data-table th {
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     background: rgba(15, 23, 42, 0.4);
@@ -135,7 +135,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
 }
 
@@ -229,7 +229,7 @@
     justify-content: center;
     padding: 64px 24px;
     text-align: center;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .empty-state svg {
@@ -239,7 +239,7 @@
 
 .empty-state h3 {
     font-size: 18px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 8px 0;
 }
 
@@ -263,7 +263,7 @@
 }
 
 .modal {
-    background: #1e293b;
+    background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     width: 100%;
@@ -312,7 +312,7 @@
 .modal-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -325,14 +325,14 @@
     background: rgba(255, 255, 255, 0.05);
     border: none;
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .close-button:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .modal-form {
@@ -388,7 +388,7 @@
 .form-group label {
     font-size: 13px;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .form-group input,
@@ -398,7 +398,7 @@
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    color: #f1f5f9;
+    color: var(--text-primary);
     font-size: 14px;
     transition: all 0.2s ease;
 }
@@ -515,7 +515,7 @@
     background: rgba(15, 23, 42, 0.4);
     border: 2px dashed rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    color: #64748b;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -545,7 +545,7 @@
     justify-content: space-between;
     padding: 8px 0;
     font-size: 14px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .summary-row.penalty {
@@ -567,7 +567,7 @@
     justify-content: flex-end;
     padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: #1e293b;
+    background: var(--card-bg);
 }
 
 .primary-button {
@@ -595,7 +595,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -604,7 +604,7 @@
 
 .secondary-button:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 /* Success Modal */
@@ -644,13 +644,13 @@
 .success-modal h2 {
     font-size: 22px;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0 0 12px 0;
 }
 
 .success-modal p {
     font-size: 14px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 32px 0;
 }
 
@@ -697,7 +697,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -705,7 +705,7 @@
 
 .close-success:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 @keyframes fadeIn {
@@ -780,7 +780,7 @@
 
 .input-hint {
     font-size: 11px;
-    color: #64748b;
+    color: var(--text-muted);
     margin-top: 4px;
 }
 
@@ -850,12 +850,12 @@
 .toggle-title {
     font-size: 15px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .toggle-subtitle {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* iOS Switch */
@@ -929,7 +929,7 @@
 .rapel-months-select label {
     font-size: 13px;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin-bottom: 10px;
     display: block;
 }
@@ -946,7 +946,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 20px;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -955,7 +955,7 @@
 
 .month-chip:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .month-chip.active {
@@ -978,7 +978,7 @@
 
 .custom-months:focus {
     border-color: #10b981 !important;
-    color: #f1f5f9 !important;
+    color: var(--text-primary) !important;
 }
 
 /* Rapel Preview */
@@ -1019,7 +1019,7 @@
     padding: 6px 12px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 12px;
 }
 
@@ -1027,7 +1027,7 @@
     padding-top: 12px;
     border-top: 1px solid rgba(16, 185, 129, 0.2);
     font-size: 14px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .rapel-total strong {
