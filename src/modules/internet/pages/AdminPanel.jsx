@@ -343,22 +343,32 @@ export default function AdminPanel() {
 
             case 'other_income':
                 return (
-                    <OtherIncomeForm
-                        blockFilter={adminBlockFilter}
-                        otherIncomes={allTimeOtherIncomesData}
-                        onSuccess={() => {
-                            handleRefresh()
-                        }}
-                        onDeleteIncome={async (id) => {
-                            try {
-                                await deleteOtherIncome(id)
-                                toast.success('Pemasukan lain berhasil dihapus')
+                    <div>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 className="admin-section-title">Input Pemasukan Kas Lain</h2>
+                                <p className="admin-section-subtitle">
+                                    Catat kas sebelumnya, donasi warga, atau pendapatan non-iuran — {getBlockFilterLabel()}
+                                </p>
+                            </div>
+                        </div>
+                        <OtherIncomeForm
+                            blockFilter={adminBlockFilter}
+                            otherIncomes={allTimeOtherIncomesData}
+                            onSuccess={() => {
                                 handleRefresh()
-                            } catch (e) {
-                                toast.error('Gagal menghapus: ' + e.message)
-                            }
-                        }}
-                    />
+                            }}
+                            onDeleteIncome={async (id) => {
+                                try {
+                                    await deleteOtherIncome(id)
+                                    toast.success('Pemasukan lain berhasil dihapus')
+                                    handleRefresh()
+                                } catch (e) {
+                                    toast.error('Gagal menghapus: ' + e.message)
+                                }
+                            }}
+                        />
+                    </div>
                 )
 
             case 'expense':
