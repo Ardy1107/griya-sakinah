@@ -11,7 +11,8 @@
     "lint:fix": "eslint src --ext .js,.jsx --fix",
     "cap:sync": "cap sync",
     "cap:open": "cap open android",
-    "android:build": "npm run build && cap sync android"
+    "android:build": "npm run build && cap sync android",
+    "ping:supabase": "node scripts/supabase-keepalive.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",

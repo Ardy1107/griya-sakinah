@@ -1,0 +1,59 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Berjalan setiap 3 hari sekali pada pukul 01:00 UTC (08:00 WIB)
+    - cron: '0 1 */3 * *'
+  workflow_dispatch: # Memungkinkan tombol 'Run workflow' manual di tab GitHub Actions
+
+jobs:
+  keep-alive:
+    name: Ping Supabase Databases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Internet & Musholla
+        env:
+          URL: ${{ secrets.SUPABASE_URL_INTERNET }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY_INTERNET }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "::warning ::Secret SUPABASE_URL_INTERNET atau SUPABASE_ANON_KEY_INTERNET belum diatur di GitHub Secrets!"
+            exit 1
+          fi
+
+          echo "Pinging Supabase Internet instance..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${URL}/rest/v1/residents?select=id&limit=1" \
+            -H "apikey: ${KEY}" \
+            -H "Authorization: Bearer ${KEY}")
+
+          echo "Response code: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "✅ Supabase Internet & Musholla is active and alive!"
+          else
+            echo "❌ Failed to ping Supabase Internet (HTTP $STATUS)"
+            exit 1
+          fi
+
+      - name: Ping Supabase Angsuran
+        env:
+          URL: ${{ secrets.SUPABASE_URL_ANGSURAN }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY_ANGSURAN }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "::warning ::Secret SUPABASE_URL_ANGSURAN atau SUPABASE_ANON_KEY_ANGSURAN belum diatur di GitHub Secrets!"
+            exit 1
+          fi
+
+          echo "Pinging Supabase Angsuran instance..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${URL}/rest/v1/units?select=id&limit=1" \
+            -H "apikey: ${KEY}" \
+            -H "Authorization: Bearer ${KEY}")
+
+          echo "Response code: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "✅ Supabase Angsuran is active and alive!"
+          else
+            echo "❌ Failed to ping Supabase Angsuran (HTTP $STATUS)"
+            exit 1
+          fi
+
