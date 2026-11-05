@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS internet_settings (
 
 -- Insert default PINs and Initial Balances (admin can change later)
 INSERT INTO internet_settings (key, value) VALUES
-    ('pin_blok_a', '1234'),
-    ('pin_blok_b', '5678'),
+    ('pin_blok_a', '1111'),
+    ('pin_blok_b', '0000'),
     ('saldo_awal_blok_a', '5000000'),
     ('saldo_awal_blok_b', '5000000')
 ON CONFLICT (key) DO NOTHING;

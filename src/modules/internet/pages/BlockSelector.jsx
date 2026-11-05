@@ -92,7 +92,7 @@ export default function BlockSelector() {
     }
 
     // Default PINs (fallback if DB table not yet created)
-    const DEFAULT_PINS = { A: '1234', B: '5678' }
+    const DEFAULT_PINS = { A: '1111', B: '0000' }
 
     const verifyPin = async (blockId, pinCode) => {
         // Try Supabase first
