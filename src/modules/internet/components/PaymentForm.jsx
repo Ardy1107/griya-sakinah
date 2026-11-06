@@ -14,11 +14,10 @@ const PAYMENT_METHODS = [
     { value: 'QRIS', label: 'QRIS' }
 ]
 
-const DEFAULT_NOMINAL = 150000 // Rp 150.000
-const SUBSIDIZED_NOMINAL = 75000 // Rp 75.000 for B2 & A18
+const DEFAULT_NOMINAL = 150000 // Rp 150.000 (Opsi 1 Bruto: Semua warga standar Rp 150.000)
 
-// Units with Starlink equipment — get 50% subsidy
-const SUBSIDIZED_UNITS = ['B2', 'A18']
+// Units with Starlink equipment (Rumah Pak Galih dkk yang ditumpangi perangkat Starlink/router)
+const STARLINK_HOST_UNITS = ['B2', 'A18']
 
 const MONTH_COUNT_OPTIONS = [
     { value: 1, label: '1 Bulan' },
@@ -102,15 +101,15 @@ export default function PaymentForm({
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(false)
 
-    // Detect if selected resident is a subsidized unit
-    const isSubsidized = useMemo(() => {
+    // Detect if selected resident is a Starlink host unit
+    const isStarlinkHost = useMemo(() => {
         if (!selectedResident) return false
         const blok = selectedResident.blok_rumah?.toUpperCase()?.trim()
-        return SUBSIDIZED_UNITS.includes(blok)
+        return STARLINK_HOST_UNITS.includes(blok)
     }, [selectedResident])
 
-    // Per-month nominal based on unit
-    const perMonthNominal = isSubsidized ? SUBSIDIZED_NOMINAL : DEFAULT_NOMINAL
+    // Per-month nominal - Semua warga standar Rp 150.000 (Opsi 1: Bruto)
+    const perMonthNominal = DEFAULT_NOMINAL
 
     // Total nominal
     const totalNominal = perMonthNominal * jumlahBulan
@@ -449,20 +448,20 @@ export default function PaymentForm({
                             {filteredResidents.map(resident => (
                                 <option key={resident.id} value={resident.id}>
                                     {resident.blok_rumah} - {resident.nama_warga}
-                                    {SUBSIDIZED_UNITS.includes(resident.blok_rumah?.toUpperCase()?.trim()) ? ' ⚡' : ''}
+                                    {STARLINK_HOST_UNITS.includes(resident.blok_rumah?.toUpperCase()?.trim()) ? ' ⚡ (Host Starlink)' : ''}
                                 </option>
                             ))}
                         </select>
-                        {isSubsidized && (
+                        {isStarlinkHost && (
                             <small style={{
-                                color: '#f59e0b',
+                                color: '#10b981',
                                 fontSize: '0.75rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '4px',
                                 marginTop: '4px'
                             }}>
-                                ⚡ Unit Starlink — Iuran Rp 75.000/bulan (subsidi listrik)
+                                ⚡ Rumah Perangkat Starlink — Iuran dicatat normal Rp 150.000/bln (Opsi 1 Bruto). Catat kompensasi listrik Rp 75.000 terpisah di menu Pengeluaran.
                             </small>
                         )}
                     </div>
@@ -615,7 +614,7 @@ export default function PaymentForm({
                                 ) : (
                                     <>{formatCurrency(perMonthNominal)}/bulan</>
                                 )}
-                                {isSubsidized && <span style={{ color: '#f59e0b' }}> (Subsidi Starlink)</span>}
+                                {isStarlinkHost && <span style={{ color: '#10b981' }}> (Host Starlink - Dicatat Normal)</span>}
                             </div>
                         </div>
                     </div>
