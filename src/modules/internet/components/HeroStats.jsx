@@ -14,7 +14,9 @@ export default function HeroStats({
     paidList = [],
     unpaidList = [],
     expenseList = [],
-    paymentList = []
+    paymentList = [],
+    totalPemasukanAllTime,
+    totalPengeluaranAllTime
 }) {
     const [showModal, setShowModal] = useState(null)
 
@@ -29,22 +31,22 @@ export default function HeroStats({
     return (
         <>
             <div className="hero-stats-premium">
-                {/* Left Panel - Main Saldo */}
+                {/* Left Panel - Saldo Kas Utama (Kas Abadi yang terus berjalan antar bulan) */}
                 <div
                     className="hero-main-panel clickable"
                     onClick={() => handleStatClick('saldo')}
-                    title="Klik untuk detail saldo"
+                    title="Sentuh untuk detail Kas Utama Paguyuban"
                 >
                     <div className="hero-main-glow" />
                     <div className="hero-main-icon">
-                        <Wallet size={40} />
+                        <Wallet size={38} />
                     </div>
                     <div className="hero-main-content">
-                        <span className="hero-main-label">TOTAL SALDO</span>
+                        <span className="hero-main-label">SALDO KAS UTAMA</span>
                         <AnimatedNumber value={saldo} className="hero-main-value" />
                     </div>
                     <div className="hero-main-footer">
-                        <span className="hero-main-badge">Periode Berjalan</span>
+                        <span className="hero-main-badge">Kas Abadi • Akumulasi Riil</span>
                     </div>
                 </div>
 
@@ -55,26 +57,26 @@ export default function HeroStats({
                         <div
                             className="hero-stat-card success clickable"
                             onClick={() => handleStatClick('pemasukan')}
-                            title="Klik untuk detail pemasukan"
+                            title="Klik untuk detail pemasukan bulan ini"
                         >
                             <div className="hero-stat-icon">
                                 <TrendingUp size={20} />
                             </div>
                             <div className="hero-stat-info">
-                                <span className="hero-stat-label">Pemasukan</span>
+                                <span className="hero-stat-label">Masuk Bulan Ini</span>
                                 <AnimatedNumber value={pemasukan} className="hero-stat-value" />
                             </div>
                         </div>
                         <div
                             className="hero-stat-card danger clickable"
                             onClick={() => handleStatClick('pengeluaran')}
-                            title="Klik untuk detail pengeluaran"
+                            title="Klik untuk detail pengeluaran bulan ini"
                         >
                             <div className="hero-stat-icon">
                                 <TrendingDown size={20} />
                             </div>
                             <div className="hero-stat-info">
-                                <span className="hero-stat-label">Pengeluaran</span>
+                                <span className="hero-stat-label">Keluar Bulan Ini</span>
                                 <AnimatedNumber value={pengeluaran} className="hero-stat-value" />
                             </div>
                         </div>
@@ -132,7 +134,8 @@ export default function HeroStats({
                     onClose={() => setShowModal(null)}
                     data={{
                         saldo, pemasukan, pengeluaran, totalWarga, sudahBayar, belumBayar,
-                        paidList, unpaidList, expenseList, paymentList
+                        paidList, unpaidList, expenseList, paymentList,
+                        totalPemasukanAllTime, totalPengeluaranAllTime
                     }}
                 />
             )}
@@ -146,26 +149,25 @@ function StatDetailModal({ type, onClose, data }) {
         switch (type) {
             case 'saldo':
                 return {
-                    title: 'Detail Saldo',
+                    title: 'Detail Kas Utama Paguyuban',
                     icon: <Wallet size={24} />,
                     content: (
                         <div className="stat-detail-content">
                             <div className="stat-detail-row">
-                                <span>Total Pemasukan</span>
-                                <span className="text-success">{formatCurrency(data.pemasukan)}</span>
+                                <span>Total Pemasukan Kas (Akumulasi)</span>
+                                <span className="text-success">{formatCurrency(data.totalPemasukanAllTime ?? data.pemasukan)}</span>
                             </div>
                             <div className="stat-detail-row">
-                                <span>Total Pengeluaran</span>
-                                <span className="text-danger">- {formatCurrency(data.pengeluaran)}</span>
+                                <span>Total Pengeluaran Kas (Akumulasi)</span>
+                                <span className="text-danger">- {formatCurrency(data.totalPengeluaranAllTime ?? data.pengeluaran)}</span>
                             </div>
                             <div className="stat-detail-divider" />
                             <div className="stat-detail-row total">
-                                <span>Saldo Akhir</span>
+                                <span>Saldo Kas Utama (Kas Abadi)</span>
                                 <span className="text-primary">{formatCurrency(data.saldo)}</span>
                             </div>
                             <p className="stat-detail-note">
-                                Saldo ini adalah selisih antara total pemasukan dari iuran internet
-                                dengan total pengeluaran operasional.
+                                🏛️ <strong>Kas Abadi Paguyuban:</strong> Saldo ini adalah akumulasi riil seluruh iuran dan pemasukan kas dikurangi pengeluaran operasional yang terus berjalan antar bulan. Tidak pernah direset saat pergantian bulan.
                             </p>
                         </div>
                     )

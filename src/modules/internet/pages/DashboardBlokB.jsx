@@ -31,7 +31,10 @@ export default function DashboardBlokB() {
     allPayments: allTimePaymentsData,
     allExpenses: allTimeExpensesData,
     allOtherIncomes: allTimeOtherIncomesData,
+    totalPemasukan: totalPemasukanAllTime,
+    totalPengeluaran: totalPengeluaranAllTime,
     saldoAwal,
+    kasUtama,
     loading: kasLoading
   } = useAllTimeFinancials()
 
@@ -63,20 +66,11 @@ export default function DashboardBlokB() {
           </div>
         </div>
 
-        {/* 1. UANG KAS UTAMA POSISI PALING ATAS (Per-Bulan Transparansi) */}
-        <WargaKasUtamaCard
-          selectedPeriod={selectedPeriod}
-          blockId="B"
-          allPayments={allTimePaymentsData}
-          allExpenses={allTimeExpensesData}
-          allOtherIncomes={allTimeOtherIncomesData}
-          saldoAwal={saldoAwal}
-          loading={kasLoading}
-        />
-
-        {/* 2. Hero Stats - Ringkasan Warga & Operasional */}
+        {/* Hero Stats - Ringkasan Kas Utama (Abadi) & Warga */}
         <HeroStats
-          saldo={saldo}
+          saldo={kasUtama}
+          totalPemasukanAllTime={totalPemasukanAllTime}
+          totalPengeluaranAllTime={totalPengeluaranAllTime}
           pemasukan={totalPemasukan}
           pengeluaran={totalPengeluaran}
           totalWarga={totalWarga}
