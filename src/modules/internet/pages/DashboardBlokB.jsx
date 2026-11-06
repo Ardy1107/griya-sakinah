@@ -104,7 +104,7 @@ export default function DashboardBlokB() {
               {totalPaid} dari {totalWarga} warga Blok B sudah membayar iuran bulan ini
             </p>
           </div>
-          <TrendChart payments={payments} />
+          <TrendChart payments={payments} color="#3b82f6" gradientId="trendBlokB" />
         </div>
 
         {/* 4. Status Grid - Interaktif & Mobile-Friendly */}

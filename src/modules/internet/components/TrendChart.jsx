@@ -3,7 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { formatCurrency, getMonthName } from '../utils/helpers'
 
-export default function TrendChart({ payments, title = 'Trend Pemasukan 3 Bulan' }) {
+export default function TrendChart({ payments, title = 'Trend Pemasukan 3 Bulan', color = '#10b981', gradientId = 'colorTotal' }) {
     // Get last 3 months data
     const chartData = getLast3MonthsData(payments)
 
@@ -25,9 +25,9 @@ export default function TrendChart({ payments, title = 'Trend Pemasukan 3 Bulan'
                     <ResponsiveContainer width="100%" height={150}>
                         <AreaChart data={chartData}>
                             <defs>
-                                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={color} stopOpacity={0.35} />
+                                    <stop offset="95%" stopColor={color} stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <XAxis
@@ -51,9 +51,9 @@ export default function TrendChart({ payments, title = 'Trend Pemasukan 3 Bulan'
                             <Area
                                 type="monotone"
                                 dataKey="total"
-                                stroke="#10b981"
-                                strokeWidth={2}
-                                fill="url(#colorTotal)"
+                                stroke={color}
+                                strokeWidth={2.5}
+                                fill={`url(#${gradientId})`}
                             />
                         </AreaChart>
                     </ResponsiveContainer>

@@ -157,7 +157,7 @@ export function useOtherIncomes(bulan, tahun) {
                 .order('tanggal', { ascending: false })
 
             if (blockId) {
-                query = query.or(`block_id.eq.${blockId},block_id.is.null`)
+                query = query.eq('block_id', blockId)
             }
 
             if (bulan && tahun) {
@@ -298,8 +298,8 @@ export function useAllTimeFinancials() {
                     return false
                 })
                 otherIncomes = otherIncomes.filter(o => {
-                    if (!o.block_id) return true
-                    return o.block_id === blockId
+                    if (o.block_id) return o.block_id === blockId
+                    return false
                 })
             }
 

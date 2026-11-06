@@ -95,7 +95,7 @@ export default function StatusGrid({ selectedPeriod, blockFilter }) {
                 <input
                     type="text"
                     className="status-search-input"
-                    placeholder="Cari blok (A1, B2) atau nama warga..."
+                    placeholder={blockFilter ? `Cari blok ${blockFilter} atau nama warga...` : "Cari nomor blok atau nama warga..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />

@@ -17,7 +17,7 @@ export default function CekStatus() {
 
     const { residents } = useResidents()
     const { payments } = usePayments()
-    const { blockName, isBlockSpecific, urlPrefix } = useBlock()
+    const { blockId, blockName, isBlockSpecific, urlPrefix } = useBlock()
 
     // Agreement and reminder hooks
     const { hasSigned, loading: checkingAgreement } = useAgreementCheck(selectedResident?.blok_rumah)
@@ -97,7 +97,7 @@ export default function CekStatus() {
                                     type="text"
                                     value={searchBlok}
                                     onChange={(e) => setSearchBlok(e.target.value)}
-                                    placeholder="Masukkan blok rumah (contoh: A1, B2)"
+                                    placeholder={blockId ? `Masukkan nomor blok (contoh: ${blockId}1, ${blockId}2)` : "Masukkan nomor blok rumah"}
                                     className="form-input search-input-large"
                                     required
                                 />

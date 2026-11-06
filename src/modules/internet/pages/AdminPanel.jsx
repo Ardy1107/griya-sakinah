@@ -1455,7 +1455,7 @@ function PinSettings() {
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.5px'
                             }}>
-                                🔵 Kode Akses Blok A
+                                🟢 Kode Akses Blok A
                             </label>
                             <div style={{ position: 'relative' }}>
                                 <input
@@ -1508,7 +1508,7 @@ function PinSettings() {
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.5px'
                             }}>
-                                🟢 Kode Akses Blok B
+                                🔵 Kode Akses Blok B
                             </label>
                             <div style={{ position: 'relative' }}>
                                 <input
@@ -1564,13 +1564,13 @@ function PinSettings() {
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.5px'
                             }}>
-                                🏛️ Saldo Kas Awal — Blok A
+                                🟢 Saldo Kas Awal — Blok A
                             </label>
                             <input
                                 type="number"
                                 value={saldoAwalA}
                                 onChange={e => setSaldoAwalA(e.target.value)}
-                                placeholder="5000000"
+                                placeholder="0"
                                 style={{
                                     width: '100%',
                                     padding: '12px 16px',
@@ -1600,13 +1600,13 @@ function PinSettings() {
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.5px'
                             }}>
-                                🏛️ Saldo Kas Awal — Blok B
+                                🔵 Saldo Kas Awal — Blok B
                             </label>
                             <input
                                 type="number"
                                 value={saldoAwalB}
                                 onChange={e => setSaldoAwalB(e.target.value)}
-                                placeholder="5000000"
+                                placeholder="0"
                                 style={{
                                     width: '100%',
                                     padding: '12px 16px',

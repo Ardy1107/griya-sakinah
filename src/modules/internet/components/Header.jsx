@@ -28,10 +28,15 @@ export default function Header() {
                                 <span style={{
                                     marginLeft: '8px',
                                     padding: '2px 8px',
-                                    background: blockId === 'A' ? 'var(--color-primary)' : 'var(--color-secondary)',
+                                    background: blockId === 'A' ? '#10b981' : '#3b82f6',
+                                    color: '#ffffff',
+                                    WebkitTextFillColor: '#ffffff',
                                     borderRadius: 'var(--radius-sm)',
                                     fontSize: '0.7em',
-                                    fontWeight: 600
+                                    fontWeight: 700,
+                                    letterSpacing: '0.3px',
+                                    display: 'inline-block',
+                                    verticalAlign: 'middle'
                                 }}>
                                     {blockName}
                                 </span>

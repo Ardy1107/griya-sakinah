@@ -74,7 +74,10 @@ export default function WargaKasUtamaCard({
     }, [allExpenses, blockId])
 
     const blockOtherIncomes = useMemo(() => {
-        return allOtherIncomes.filter(o => !o.block_id || o.block_id === blockId)
+        return allOtherIncomes.filter(o => {
+            if (o.block_id) return o.block_id === blockId
+            return !blockId
+        })
     }, [allOtherIncomes, blockId])
 
     // 1. Current Month transactions (Bulan yang dipilih)
