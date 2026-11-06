@@ -22,7 +22,7 @@ export default function PublicDashboard() {
     const [selectedPeriod, setSelectedPeriod] = useState(DEFAULT_PERIOD)
     const { blockId, blockName, urlPrefix, isBlockSpecific } = useBlock()
 
-    const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
+    const { totalPemasukan, totalPengeluaran, saldo, payments, expenses, otherIncomes } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
     const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
     const { residents } = useResidents()
     
@@ -79,7 +79,10 @@ export default function PublicDashboard() {
 
                 {/* Hero Stats - Clickable */}
                 <HeroStats
-                    saldo={saldo}
+                    saldo={kasUtama}
+                    saldoAwal={saldoAwal}
+                    totalPemasukanAllTime={allTimePemasukan}
+                    totalPengeluaranAllTime={allTimePengeluaran}
                     pemasukan={totalPemasukan}
                     pengeluaran={totalPengeluaran}
                     totalWarga={totalWarga}
@@ -89,6 +92,10 @@ export default function PublicDashboard() {
                     unpaidList={unpaidList}
                     expenseList={expenses}
                     paymentList={payments}
+                    otherIncomes={otherIncomes}
+                    allOtherIncomes={allTimeOtherIncomes}
+                    allPayments={allTimePayments}
+                    allExpenses={allTimeExpenses}
                 />
 
                 {/* Progress & Trend Row */}

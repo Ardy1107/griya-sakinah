@@ -22,7 +22,7 @@ export default function DashboardBlokA() {
   const [selectedPeriod, setSelectedPeriod] = useState(DEFAULT_PERIOD)
   const { blockName, urlPrefix } = useBlock()
 
-  const { totalPemasukan, totalPengeluaran, saldo, payments, expenses } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
+  const { totalPemasukan, totalPengeluaran, saldo, payments, expenses, otherIncomes } = useFinancialSummary(selectedPeriod.bulan, selectedPeriod.tahun)
   const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
   const { residents } = useResidents()
 
@@ -66,9 +66,10 @@ export default function DashboardBlokA() {
           </div>
         </div>
 
-        {/* Hero Stats - Ringkasan Kas Utama (Abadi) & Warga */}
+        {/* Hero Stats - Ringkasan Kas Utama & Warga */}
         <HeroStats
           saldo={kasUtama}
+          saldoAwal={saldoAwal}
           totalPemasukanAllTime={totalPemasukanAllTime}
           totalPengeluaranAllTime={totalPengeluaranAllTime}
           pemasukan={totalPemasukan}
@@ -80,6 +81,10 @@ export default function DashboardBlokA() {
           unpaidList={unpaidList}
           expenseList={expenses}
           paymentList={payments}
+          otherIncomes={otherIncomes}
+          allOtherIncomes={allTimeOtherIncomesData}
+          allPayments={allTimePaymentsData}
+          allExpenses={allTimeExpensesData}
         />
 
         {/* 3. Progress & Trend */}

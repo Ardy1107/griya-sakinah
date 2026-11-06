@@ -208,7 +208,10 @@ export default function AdminPanel() {
                         />
 
                         <HeroStats
-                            saldo={filteredSaldo}
+                            saldo={kasUtama}
+                            saldoAwal={saldoAwal}
+                            totalPemasukanAllTime={allTimePemasukan}
+                            totalPengeluaranAllTime={allTimePengeluaran}
                             pemasukan={filteredPemasukan}
                             pengeluaran={filteredPengeluaran}
                             totalWarga={totalWarga}
@@ -218,6 +221,10 @@ export default function AdminPanel() {
                             paymentList={filteredPayments}
                             paidList={paidList}
                             unpaidList={unpaidList}
+                            otherIncomes={filteredOtherIncomes}
+                            allOtherIncomes={allTimeOtherIncomesData}
+                            allPayments={allTimePaymentsData}
+                            allExpenses={allTimeExpensesData}
                         />
 
                         <div className="dashboard-grid-2">
