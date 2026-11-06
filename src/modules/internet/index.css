@@ -5398,3 +5398,1403 @@ a:hover {
   }
 }
 
+
+
+/* ===============================================
+   WARGA PORTAL - MOBILE-FIRST & GLOW IN THE DARK
+   (Strictly Element Glow Only • Sharp Crisp Text)
+   =============================================== */
+
+/* Text sharpening & anti-blur enforcement */
+.warga-portal-theme,
+.warga-kas-card,
+.warga-status-card,
+.warga-transparansi-modal,
+.resident-modal-premium {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.warga-portal-theme *,
+.warga-kas-card *,
+.warga-status-card *,
+.warga-transparansi-modal * {
+  text-shadow: none !important; /* STRICT: No blur on text */
+}
+
+/* ─── 1. Warga Kas Utama Hero Card ─── */
+.warga-kas-card {
+  position: relative;
+  border-radius: var(--radius-xl, 20px);
+  padding: 22px 24px;
+  margin-bottom: var(--space-lg, 1.5rem);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(8, 14, 26, 0.98));
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.warga-kas-card:hover {
+  transform: translateY(-2px);
+}
+
+.warga-kas-card:active {
+  transform: scale(0.985);
+}
+
+/* Glow in the dark - Blok A (Emerald Neon) */
+.warga-kas-card.theme-blok-a {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6),
+              0 0 25px rgba(16, 185, 129, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.warga-kas-card.theme-blok-a:hover {
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.7),
+              0 0 35px rgba(16, 185, 129, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Glow in the dark - Blok B (Electric Sapphire) */
+.warga-kas-card.theme-blok-b {
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6),
+              0 0 25px rgba(59, 130, 246, 0.22),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.warga-kas-card.theme-blok-b:hover {
+  border-color: rgba(59, 130, 246, 0.7);
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.7),
+              0 0 35px rgba(59, 130, 246, 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Background Ambient Glow aura */
+.warga-kas-ambient-glow {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+  opacity: 0.25;
+  transition: opacity 0.3s ease;
+}
+
+.theme-blok-a .warga-kas-ambient-glow {
+  background: radial-gradient(circle, #10b981 0%, transparent 70%);
+}
+
+.theme-blok-b .warga-kas-ambient-glow {
+  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+}
+
+.warga-kas-card:hover .warga-kas-ambient-glow {
+  opacity: 0.4;
+}
+
+/* Top bar */
+.warga-kas-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.warga-kas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.theme-blok-a .warga-kas-badge {
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.theme-blok-b .warga-kas-badge {
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+.warga-kas-badge-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  animation: neonDotPulse 1.8s infinite;
+}
+
+.theme-blok-a .warga-kas-badge-pulse {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.theme-blok-b .warga-kas-badge-pulse {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+}
+
+@keyframes neonDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.6; }
+}
+
+.warga-kas-tap-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.warga-kas-card:hover .warga-kas-tap-hint {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.warga-kas-card:hover .warga-kas-hint-arrow {
+  transform: translateX(2px);
+}
+
+.warga-kas-hint-arrow {
+  transition: transform 0.2s ease;
+}
+
+/* Balance wrap */
+.warga-kas-balance-wrap {
+  margin-bottom: 18px;
+}
+
+.warga-kas-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.warga-kas-amount {
+  font-size: 2.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  letter-spacing: -0.5px;
+}
+
+.theme-blok-a .warga-kas-amount {
+  color: #10b981;
+}
+
+.theme-blok-b .warga-kas-amount {
+  color: #38bdf8;
+}
+
+.warga-kas-caption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* 3-Pill Flow Breakdown */
+.warga-kas-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.warga-kas-flow-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 12px);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.warga-kas-flow-pill:hover {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.warga-kas-flow-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.warga-kas-flow-pill.inflow .warga-kas-flow-icon {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+}
+
+.warga-kas-flow-pill.outflow .warga-kas-flow-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+.warga-kas-flow-pill.net .warga-kas-flow-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.warga-kas-flow-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.warga-kas-flow-title {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warga-kas-flow-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  margin: 1px 0;
+  white-space: nowrap;
+}
+
+.warga-kas-flow-val.positive {
+  color: #22c55e;
+}
+
+.warga-kas-flow-val.negative {
+  color: #ef4444;
+}
+
+.warga-kas-flow-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* Footer Banner */
+.warga-kas-footer-banner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.warga-kas-shield-icon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* ─── 2. Status Grid Enhancements ─── */
+.status-grid-container {
+  padding: 22px 24px;
+}
+
+.status-grid-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 641px) {
+  .status-grid-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.status-grid-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.status-grid-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Filter Chips (Thumb-Friendly on mobile) */
+.status-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.filter-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.filter-chip:active {
+  transform: scale(0.95);
+}
+
+.filter-chip.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.theme-blok-a .filter-chip.chip-lunas.active {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+.theme-blok-b .filter-chip.chip-lunas.active {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+}
+
+.filter-chip.chip-belum.active {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.25);
+}
+
+.chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chip-count.lunas {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.chip-count.belum {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Search Bar */
+.status-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.status-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.status-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 42px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 12px);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+}
+
+.status-search-input:focus {
+  outline: none;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.theme-blok-b .status-search-input:focus {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.status-search-clear {
+  position: absolute;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-search-clear:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Status Cards Grid */
+.status-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 641px) {
+  .status-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Individual Warga Card with Neon Glow */
+.warga-status-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 96px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.warga-status-card:hover {
+  transform: translateY(-2px);
+}
+
+.warga-status-card:active {
+  transform: scale(0.96);
+}
+
+/* Blok A Paid Card Glow */
+.theme-blok-a .warga-status-card.paid {
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+              0 0 16px rgba(16, 185, 129, 0.18),
+              inset 0 0 10px rgba(16, 185, 129, 0.04);
+}
+
+.theme-blok-a .warga-status-card.paid:hover {
+  border-color: rgba(16, 185, 129, 0.75);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4),
+              0 0 24px rgba(16, 185, 129, 0.28);
+}
+
+/* Blok B Paid Card Glow */
+.theme-blok-b .warga-status-card.paid {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+              0 0 16px rgba(59, 130, 246, 0.2),
+              inset 0 0 10px rgba(59, 130, 246, 0.04);
+}
+
+.theme-blok-b .warga-status-card.paid:hover {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4),
+              0 0 24px rgba(59, 130, 246, 0.32);
+}
+
+/* Unpaid Card Style */
+.warga-status-card.unpaid {
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25),
+              0 0 12px rgba(239, 68, 68, 0.12);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.warga-status-card.unpaid:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+              0 0 18px rgba(239, 68, 68, 0.2);
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.card-blok-badge {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-mono, monospace);
+}
+
+.card-host-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.card-resident-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-footer-row {
+  display: flex;
+  align-items: center;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pill.pill-lunas {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-pill.pill-lunas .pill-dot {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.status-pill.pill-belum {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-pill.pill-belum .pill-dot {
+  background: #ef4444;
+}
+
+/* Empty State */
+.status-empty-state {
+  text-align: center;
+  padding: 36px 16px;
+  color: var(--text-muted);
+}
+
+.status-empty-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.status-empty-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.status-empty-desc {
+  font-size: 0.8rem;
+  margin-bottom: 14px;
+}
+
+.status-reset-btn {
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ─── 3. Transparansi Modal & Resident Bottom Sheet ─── */
+.warga-transparansi-modal {
+  width: 100%;
+  max-width: 620px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #0b111e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+}
+
+.warga-transparansi-modal.theme-blok-a {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85),
+              0 0 35px rgba(16, 185, 129, 0.2);
+}
+
+.warga-transparansi-modal.theme-blok-b {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85),
+              0 0 35px rgba(59, 130, 246, 0.2);
+}
+
+/* Mobile Bottom Sheet conversion */
+@media (max-width: 640px) {
+  .warga-transparansi-modal,
+  .resident-modal-premium {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100% !important;
+    max-height: 88vh;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0 !important;
+    animation: sheetSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+}
+
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-drag-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 10px auto 4px auto;
+  display: block;
+}
+
+@media (min-width: 641px) {
+  .modal-drag-handle {
+    display: none;
+  }
+}
+
+/* Modal Title */
+.warga-modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.warga-modal-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* Modal Summary */
+.warga-modal-summary {
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 500px) {
+  .warga-modal-summary {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.warga-modal-summary-item .label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.warga-modal-summary-item .val.main {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #10b981;
+  font-family: var(--font-mono, monospace);
+}
+
+.theme-blok-b .warga-modal-summary-item .val.main {
+  color: #38bdf8;
+}
+
+.warga-modal-summary-sub {
+  display: flex;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.sub-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sub-stat .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.sub-stat .dot.in {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.sub-stat .dot.out {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+}
+
+/* Modal Tabs */
+.warga-modal-tabs {
+  display: flex;
+  padding: 8px 16px;
+  gap: 8px;
+  background: rgba(11, 17, 30, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.warga-modal-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.warga-modal-tab:hover {
+  color: var(--text-primary);
+}
+
+.warga-modal-tab.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-blok-a .warga-modal-tab.active {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.theme-blok-b .warga-modal-tab.active {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* Modal Body */
+.warga-modal-body {
+  padding: 16px 20px 24px 20px;
+  max-height: 52vh;
+  overflow-y: auto;
+}
+
+.warga-transaksi-intro {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.warga-transaksi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warga-transaksi-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.15s ease;
+}
+
+.warga-transaksi-item:hover {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.warga-transaksi-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.warga-transaksi-icon.expense {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.warga-transaksi-icon.income {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.warga-transaksi-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.warga-transaksi-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warga-transaksi-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.warga-transaksi-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.warga-transaksi-tag.lunas {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.warga-transaksi-amount {
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  flex-shrink: 0;
+}
+
+.warga-transaksi-amount.expense {
+  color: #ef4444;
+}
+
+.warga-transaksi-amount.income {
+  color: #22c55e;
+}
+
+/* Rekap Table */
+.warga-rekap-table-wrap {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.warga-rekap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.warga-rekap-table th {
+  padding: 9px 12px;
+  background: rgba(15, 23, 42, 0.95);
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.warga-rekap-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.warga-rekap-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.warga-rekap-table tr.selected-row td {
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 2px solid #10b981;
+}
+
+.theme-blok-b .warga-rekap-table tr.selected-row td {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 2px solid #3b82f6;
+}
+
+.table-period {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.table-active-chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.theme-blok-b .table-active-chip {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.warga-empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── 4. Resident Modal Premium Polish ─── */
+.resident-modal-premium {
+  border-radius: 20px;
+  background: #0b111e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+}
+
+.resident-modal-premium.theme-blok-a {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85),
+              0 0 30px rgba(16, 185, 129, 0.2);
+}
+
+.resident-modal-premium.theme-blok-b {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85),
+              0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+.resident-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resident-modal-badge {
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-family: var(--font-mono, monospace);
+}
+
+.resident-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 14px;
+}
+
+.resident-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-blok-b .resident-profile-avatar {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(37, 99, 235, 0.8));
+}
+
+.resident-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.resident-profile-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resident-profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.resident-profile-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #22c55e;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  transition: all 0.2s;
+}
+
+.resident-profile-wa-btn:hover {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+/* Status Banner in Modal */
+.resident-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.resident-status-banner.paid {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.18), inset 0 0 12px rgba(34, 197, 94, 0.04);
+}
+
+.resident-status-banner.unpaid {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.18), inset 0 0 12px rgba(239, 68, 68, 0.04);
+}
+
+.status-banner-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-banner-icon.lunas {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-banner-icon.belum {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.status-banner-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-banner-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.status-banner-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* Receipt CTA Button */
+.resident-receipt-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08));
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+  color: #ffffff;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.theme-blok-b .resident-receipt-btn {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.08));
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.resident-receipt-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.8);
+}
+
+.theme-blok-b .resident-receipt-btn:hover {
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+.receipt-btn-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.theme-blok-b .receipt-btn-icon-wrap {
+  background: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+}
+
+.receipt-btn-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-btn-text strong {
+  font-size: 0.88rem;
+  color: #ffffff;
+}
+
+.receipt-btn-text span {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.resident-receipt-btn-arrow {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.resident-receipt-btn:hover .resident-receipt-btn-arrow {
+  transform: translateX(4px);
+  color: #ffffff;
+}
+
+/* History */
+.resident-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resident-history-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.resident-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resident-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.resident-history-item:hover {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.resident-history-item-period {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.resident-history-item-date {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.resident-history-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resident-history-item-amount {
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #22c55e;
+}
+
+.resident-history-item-receipt {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.resident-history-empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}

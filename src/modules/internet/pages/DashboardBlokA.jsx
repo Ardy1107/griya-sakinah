@@ -8,7 +8,8 @@ import TrendChart from '../components/TrendChart'
 import ProgressBar from '../components/ProgressBar'
 import PeriodPicker from '../components/PeriodPicker'
 import PaymentInfoCard from '../components/PaymentInfoCard'
-import { useFinancialSummary, usePaymentStatus, useResidents } from '../hooks/useSupabase'
+import WargaKasUtamaCard from '../components/WargaKasUtamaCard'
+import { useFinancialSummary, usePaymentStatus, useResidents, useAllTimeFinancials } from '../hooks/useSupabase'
 import { getMonthName } from '../utils/helpers'
 import { useBlock } from '../context/BlockContext'
 
@@ -25,17 +26,26 @@ export default function DashboardBlokA() {
   const { statusList, totalPaid, totalUnpaid } = usePaymentStatus(selectedPeriod.bulan, selectedPeriod.tahun)
   const { residents } = useResidents()
 
+  // All-time financials for running cash balance
+  const {
+    allPayments: allTimePaymentsData,
+    allExpenses: allTimeExpensesData,
+    allOtherIncomes: allTimeOtherIncomesData,
+    saldoAwal,
+    loading: kasLoading
+  } = useAllTimeFinancials()
+
   const totalWarga = residents.length
   const paidList = statusList.filter(r => r.isPaid)
   const unpaidList = statusList.filter(r => !r.isPaid)
 
   return (
-    <div className="app-container">
+    <div className="app-container warga-portal-theme theme-blok-a">
       <Header />
 
       <main className="main-content">
         {/* Welcome Banner with Blok A identity */}
-        <div className="dashboard-welcome">
+        <div className="dashboard-welcome theme-blok-a">
           <div className="dashboard-welcome-inner">
             <div className="dashboard-welcome-text">
               <div className="dashboard-welcome-badge blok-a-badge">
@@ -53,8 +63,18 @@ export default function DashboardBlokA() {
           </div>
         </div>
 
+        {/* 1. UANG KAS UTAMA POSISI PALING ATAS (Per-Bulan Transparansi) */}
+        <WargaKasUtamaCard
+          selectedPeriod={selectedPeriod}
+          blockId="A"
+          allPayments={allTimePaymentsData}
+          allExpenses={allTimeExpensesData}
+          allOtherIncomes={allTimeOtherIncomesData}
+          saldoAwal={saldoAwal}
+          loading={kasLoading}
+        />
 
-        {/* Hero Stats */}
+        {/* 2. Hero Stats - Ringkasan Warga & Operasional */}
         <HeroStats
           saldo={saldo}
           pemasukan={totalPemasukan}
@@ -68,7 +88,7 @@ export default function DashboardBlokA() {
           paymentList={payments}
         />
 
-        {/* Progress & Trend */}
+        {/* 3. Progress & Trend */}
         <div className="dashboard-grid-2">
           <div className="card">
             <h3 className="card-title mb-3">
@@ -87,10 +107,10 @@ export default function DashboardBlokA() {
           <TrendChart payments={payments} />
         </div>
 
-        {/* Status Grid */}
-        <StatusGrid selectedPeriod={selectedPeriod} />
+        {/* 4. Status Grid - Interaktif & Mobile-Friendly */}
+        <StatusGrid selectedPeriod={selectedPeriod} blockFilter="A" />
 
-        {/* Payment Info Card - Blok A specific (rekening info) */}
+        {/* 5. Payment Info Card - Blok A specific (rekening BSI) */}
         <PaymentInfoCard blockId="A" />
       </main>
 
